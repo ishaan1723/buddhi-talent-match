@@ -3,10 +3,10 @@ import Head from 'next/head';
 export default function Credits() {
   const team = [
     {
-      name: "Ishaan Jain",
+      name: "Lead Strategist",
       role: "Lead Strategy & Product Owner",
       contribution: "Led product roadmap design, database schema conceptualization, and alignment with the placement agency client.",
-      avatar: "IJ"
+      avatar: "LS"
     },
     {
       name: "Team Developer 1",
