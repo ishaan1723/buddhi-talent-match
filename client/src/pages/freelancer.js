@@ -14,8 +14,6 @@ export default function FreelancerOnboarding() {
 
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [syncing, setSyncing] = useState(false);
-  const [syncSuccess, setSyncSuccess] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
 
   const handleChange = (e) => {
@@ -24,32 +22,6 @@ export default function FreelancerOnboarding() {
       ...prev,
       [name]: name === 'experience' ? parseInt(value) : name === 'hourly_rate' ? parseFloat(value) : value
     }));
-  };
-
-  // Mock LinkedIn Sync Feature
-  const handleLinkedInSync = () => {
-    if (!formData.linkedin_url || !formData.linkedin_url.includes('linkedin.com/')) {
-      setErrorMsg("Please enter your LinkedIn profile link first before syncing.");
-      return;
-    }
-
-    setErrorMsg('');
-    setSyncing(true);
-
-    // Simulate API fetch from a LinkedIn Scraper (e.g. Proxycurl)
-    setTimeout(() => {
-      setSyncing(false);
-      setSyncSuccess(true);
-      setFormData({
-        name: "Jainish Shah",
-        email: "jainish.shah@example.com",
-        linkedin_url: formData.linkedin_url,
-        primary_skill: "LLM Integrations & Agents (LangChain/LlamaIndex)",
-        experience: 4,
-        hourly_rate: 3500
-      });
-      setTimeout(() => setSyncSuccess(false), 3000);
-    }, 1500);
   };
 
   const handleSubmit = async (e) => {
@@ -158,35 +130,24 @@ export default function FreelancerOnboarding() {
       <main className="form-container">
         <div className="form-header">
           <h1>Join the AI Talent Network</h1>
-          <p>Fill out this quick form or sync your LinkedIn profile to apply instantly.</p>
+          <p>Fill out the details below. Our AI engine will match your profile against active client jobs.</p>
         </div>
 
         <form onSubmit={handleSubmit} className="card form-card">
           {errorMsg && <div className="error-alert">{errorMsg}</div>}
-          {syncSuccess && <div className="success-alert">LinkedIn Profile Synced Successfully!</div>}
 
-          {/* LinkedIn Profile Field with Sync Button */}
+          {/* Simple LinkedIn Profile Field */}
           <div className="form-group">
             <label htmlFor="linkedin_url">LinkedIn Profile URL</label>
-            <div className="input-group-sync">
-              <input 
-                type="text" 
-                id="linkedin_url" 
-                name="linkedin_url" 
-                required 
-                placeholder="e.g. https://www.linkedin.com/in/username" 
-                value={formData.linkedin_url}
-                onChange={handleChange}
-              />
-              <button 
-                type="button" 
-                onClick={handleLinkedInSync} 
-                disabled={syncing}
-                className="btn-sync"
-              >
-                {syncing ? "Syncing..." : "Sync Profile"}
-              </button>
-            </div>
+            <input 
+              type="text" 
+              id="linkedin_url" 
+              name="linkedin_url" 
+              required 
+              placeholder="e.g. https://www.linkedin.com/in/username" 
+              value={formData.linkedin_url}
+              onChange={handleChange}
+            />
           </div>
 
           <div className="form-group">
@@ -215,22 +176,18 @@ export default function FreelancerOnboarding() {
             />
           </div>
 
+          {/* Upgraded to Written Input Field for better semantic matching */}
           <div className="form-group">
-            <label htmlFor="primary_skill">Primary AI Focus Area</label>
-            <select 
+            <label htmlFor="primary_skill">Primary AI Skills & Focus Area</label>
+            <input 
+              type="text" 
               id="primary_skill" 
               name="primary_skill" 
               required 
+              placeholder="e.g. Building custom RAG pipelines with LangChain and PyTorch" 
               value={formData.primary_skill}
               onChange={handleChange}
-            >
-              <option value="">Select your main expertise</option>
-              <option value="LLM Integrations & Agents (LangChain/LlamaIndex)">LLM Integrations & Agents (LangChain/LlamaIndex)</option>
-              <option value="LLM Finetuning & Training (LoRA/QLoRA)">LLM Finetuning & Training (LoRA/QLoRA)</option>
-              <option value="Computer Vision & CNNs (PyTorch/OpenCV)">Computer Vision & CNNs (PyTorch/OpenCV)</option>
-              <option value="Natural Language Processing (Transformers/BERT)">Natural Language Processing (Transformers/BERT)</option>
-              <option value="Prompt Engineering & RAG">Prompt Engineering & RAG</option>
-            </select>
+            />
           </div>
 
           <div className="form-group">
@@ -346,8 +303,7 @@ export default function FreelancerOnboarding() {
           color: #104fdf;
         }
         .form-group input[type="text"],
-        .form-group input[type="email"],
-        .form-group select {
+        .form-group input[type="email"] {
           padding: 12px;
           border: 1px solid #dadbdd;
           border-radius: 4px;
@@ -357,36 +313,8 @@ export default function FreelancerOnboarding() {
           transition: border-color 0.2s;
         }
         .form-group input[type="text"]:focus,
-        .form-group input[type="email"]:focus,
-        .form-group select:focus {
+        .form-group input[type="email"]:focus {
           border-color: #104fdf;
-        }
-        .input-group-sync {
-          display: flex;
-          gap: 8px;
-        }
-        .input-group-sync input {
-          flex: 1;
-        }
-        .btn-sync {
-          background-color: #ffffff;
-          color: #104fdf;
-          border: 1px solid #104fdf;
-          border-radius: 4px;
-          padding: 0 16px;
-          font-weight: 600;
-          font-size: 13px;
-          cursor: pointer;
-          transition: all 0.2s;
-        }
-        .btn-sync:hover {
-          background-color: #eef5ff;
-        }
-        .btn-sync:disabled {
-          color: #62646a;
-          border-color: #dadbdd;
-          background-color: #f7f9fc;
-          cursor: not-allowed;
         }
         .form-group input[type="range"] {
           accent-color: #104fdf;
@@ -420,16 +348,6 @@ export default function FreelancerOnboarding() {
           font-size: 13px;
           font-weight: 500;
           margin-bottom: 24px;
-        }
-        .success-alert {
-          background-color: #e6f9f0;
-          color: #1dbf73;
-          padding: 12px;
-          border-radius: 4px;
-          font-size: 13px;
-          font-weight: 500;
-          margin-bottom: 24px;
-          border: 1px solid #1dbf73;
         }
       `}</style>
     </div>
