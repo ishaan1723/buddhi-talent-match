@@ -6,12 +6,42 @@ export default function ClientPosting() {
   const [formData, setFormData] = useState({
     title: '',
     description: '',
-    budget: 50
+    budget: 2500
   });
 
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
+
+  const templates = [
+    {
+      label: "AI Chatbot Dev",
+      title: "Need Python Dev to build an AI chatbot",
+      description: "We are looking for a developer to build a smart customer support chatbot. The chatbot needs to read our internal PDF files and answer user queries. Experience with LangChain, Python, and OpenAI API is highly preferred.",
+      budget: 2500
+    },
+    {
+      label: "Computer Vision Specialist",
+      title: "Computer Vision Expert for Image Segmentation",
+      description: "Looking for an ML engineer to build an image classification and object detection pipeline for manufacturing defect detection. Must be highly skilled in PyTorch, OpenCV, and convolutional neural networks.",
+      budget: 5000
+    },
+    {
+      label: "NLP Researcher",
+      title: "NLP Engineer for Text Summarization",
+      description: "We need a backend developer to build a text processing service. The goal is to summarize financial news articles daily. Experience with Hugging Face transformers, BERT models, and FastAPI is required.",
+      budget: 3500
+    }
+  ];
+
+  const applyTemplate = (tpl) => {
+    setFormData({
+      title: tpl.title,
+      description: tpl.description,
+      budget: tpl.budget
+    });
+    setErrorMsg('');
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -120,7 +150,24 @@ export default function ClientPosting() {
       <main className="form-container">
         <div className="form-header">
           <h1>Post an AI Requirement</h1>
-          <p>Describe your project in plain English. The AI engine will instantly source the best freelancers.</p>
+          <p>Describe your project or select a template below to auto-fill the form with standard AI roles.</p>
+        </div>
+
+        {/* Template Selector Section */}
+        <div className="template-bar">
+          <span className="template-lbl">Role Presets:</span>
+          <div className="template-buttons">
+            {templates.map((tpl, i) => (
+              <button 
+                key={i} 
+                type="button" 
+                onClick={() => applyTemplate(tpl)}
+                className="btn-template"
+              >
+                {tpl.label}
+              </button>
+            ))}
+          </div>
         </div>
 
         <form onSubmit={handleSubmit} className="card form-card">
@@ -153,14 +200,14 @@ export default function ClientPosting() {
           </div>
 
           <div className="form-group">
-            <label htmlFor="budget">Maximum Hourly Budget ($/hr): <span className="range-val">${formData.budget}/hr</span></label>
+            <label htmlFor="budget">Maximum Hourly Budget (₹/hr): <span className="range-val">₹{formData.budget.toLocaleString('en-IN')}/hr</span></label>
             <input 
               type="range" 
               id="budget" 
               name="budget" 
-              min="20" 
-              max="200" 
-              step="5"
+              min="500" 
+              max="10000" 
+              step="250"
               value={formData.budget}
               onChange={handleChange}
             />
@@ -211,7 +258,7 @@ export default function ClientPosting() {
         }
         .form-container {
           max-width: 580px;
-          margin: 60px auto 0;
+          margin: 40px auto 0;
           padding: 0 24px;
         }
         .form-header {
@@ -227,6 +274,42 @@ export default function ClientPosting() {
           color: #62646a;
           font-size: 15px;
           line-height: 1.5;
+        }
+        .template-bar {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          margin-bottom: 20px;
+          background-color: #ffffff;
+          padding: 12px 18px;
+          border-radius: 8px;
+          border: 1px solid #dadbdd;
+        }
+        .template-lbl {
+          font-size: 13px;
+          font-weight: 700;
+          color: #62646a;
+        }
+        .template-buttons {
+          display: flex;
+          gap: 8px;
+          flex-wrap: wrap;
+        }
+        .btn-template {
+          background-color: #f7f9fc;
+          border: 1px solid #dadbdd;
+          color: #222325;
+          padding: 6px 12px;
+          border-radius: 4px;
+          font-size: 12px;
+          font-weight: 600;
+          cursor: pointer;
+          transition: all 0.2s;
+        }
+        .btn-template:hover {
+          background-color: #eef5ff;
+          border-color: #104fdf;
+          color: #104fdf;
         }
         .form-card {
           background: #ffffff;
