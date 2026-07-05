@@ -3,6 +3,12 @@ import Head from 'next/head';
 
 export default function Home() {
   const [activeFaq, setActiveFaq] = useState(null);
+  
+  // Floating AI Chatbot / WhatsApp Widget States
+  const [isChatOpen, setIsChatOpen] = useState(false);
+  const [chatMessages, setChatMessages] = useState([
+    { sender: 'bot', text: 'Hello! Welcome to AI Shop International. How can I assist you today?' }
+  ]);
 
   const faqs = [
     {
@@ -25,6 +31,24 @@ export default function Home() {
 
   const toggleFaq = (index) => {
     setActiveFaq(activeFaq === index ? null : index);
+  };
+
+  const handleChatOption = (option, label) => {
+    let replyText = '';
+    if (option === 'how_match') {
+      replyText = 'We convert candidate profiles and job files into semantic vector embeddings to calculate a match score against job descriptions.';
+    } else if (option === 'how_apply') {
+      replyText = 'You can click the "Apply as AI Freelancer" button on the homepage to submit your profile in under a minute!';
+    } else if (option === 'whatsapp') {
+      replyText = 'Connecting you to our team on WhatsApp...';
+      window.open('https://wa.me/919999999999', '_blank');
+    }
+
+    setChatMessages(prev => [
+      ...prev,
+      { sender: 'user', text: label },
+      { sender: 'bot', text: replyText }
+    ]);
   };
 
   return (
@@ -163,6 +187,50 @@ export default function Home() {
           </div>
         </div>
       </footer>
+
+      {/* Interactive AI Chatbot & WhatsApp Floating Widget */}
+      <div className="chatbot-widget">
+        {isChatOpen ? (
+          <div className="chat-card card">
+            <div className="chat-header">
+              <div className="chat-avatar">AI</div>
+              <div>
+                <h4>AI Shop Assistant</h4>
+                <span>Online</span>
+              </div>
+              <button className="chat-close" onClick={() => setIsChatOpen(false)}>×</button>
+            </div>
+
+            <div className="chat-body">
+              {chatMessages.map((msg, i) => (
+                <div key={i} className={`chat-message ${msg.sender}`}>
+                  <p>{msg.text}</p>
+                </div>
+              ))}
+            </div>
+
+            <div className="chat-footer">
+              <span className="footer-lbl">Quick Actions:</span>
+              <div className="chat-options">
+                <button onClick={() => handleChatOption('how_match', 'How does matching work?')} className="btn-chat-opt">
+                  How does matching work?
+                </button>
+                <button onClick={() => handleChatOption('how_apply', 'How do I apply?')} className="btn-chat-opt">
+                  How do I apply?
+                </button>
+                <button onClick={() => handleChatOption('whatsapp', 'Chat on WhatsApp')} className="btn-chat-opt whatsapp">
+                  💬 Chat on WhatsApp
+                </button>
+              </div>
+            </div>
+          </div>
+        ) : (
+          <button className="chat-trigger-btn" onClick={() => setIsChatOpen(true)}>
+            <span className="chat-icon">💬</span>
+            <span className="chat-pulse"></span>
+          </button>
+        )}
+      </div>
 
       <style jsx>{`
         .home-container {
@@ -481,19 +549,6 @@ export default function Home() {
           color: #222325;
         }
 
-        .brand-logo-small {
-          background-color: #104fdf;
-          color: #ffffff;
-          font-weight: 700;
-          width: 24px;
-          height: 24px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          border-radius: 2px;
-          font-size: 14px;
-        }
-
         .footer-links {
           display: flex;
           align-items: center;
@@ -509,6 +564,198 @@ export default function Home() {
           max-width: 1200px;
           margin: 0 auto;
           padding: 0 40px;
+        }
+
+        /* Chatbot Floating Widget */
+        .chatbot-widget {
+          position: fixed;
+          bottom: 30px;
+          right: 30px;
+          z-index: 1000;
+          font-family: inherit;
+        }
+
+        .chat-trigger-btn {
+          width: 60px;
+          height: 60px;
+          border-radius: 50%;
+          background-color: #104fdf;
+          border: none;
+          color: #ffffff;
+          font-size: 26px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          cursor: pointer;
+          box-shadow: 0 4px 16px rgba(16, 79, 223, 0.25);
+          position: relative;
+          transition: transform 0.2s;
+        }
+
+        .chat-trigger-btn:hover {
+          transform: scale(1.05);
+        }
+
+        .chat-pulse {
+          position: absolute;
+          width: 100%;
+          height: 100%;
+          border-radius: 50%;
+          background-color: #104fdf;
+          opacity: 0.4;
+          z-index: -1;
+          animation: pulse 2s infinite;
+        }
+
+        .chat-card {
+          width: 360px;
+          height: 500px;
+          background-color: #ffffff;
+          border-radius: 12px;
+          display: flex;
+          flex-direction: column;
+          box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+          overflow: hidden;
+          animation: slideUp 0.3s ease-out;
+        }
+
+        .chat-header {
+          background-color: #104fdf;
+          color: #ffffff;
+          padding: 20px;
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          position: relative;
+        }
+
+        .chat-avatar {
+          width: 36px;
+          height: 36px;
+          border-radius: 50%;
+          background-color: rgba(255, 255, 255, 0.2);
+          font-weight: 700;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+
+        .chat-header h4 {
+          font-size: 15px;
+          margin: 0;
+        }
+
+        .chat-header span {
+          font-size: 11px;
+          opacity: 0.8;
+        }
+
+        .chat-close {
+          position: absolute;
+          top: 18px;
+          right: 20px;
+          background: none;
+          border: none;
+          color: #ffffff;
+          font-size: 24px;
+          cursor: pointer;
+        }
+
+        .chat-body {
+          flex: 1;
+          padding: 20px;
+          overflow-y: auto;
+          display: flex;
+          flex-direction: column;
+          gap: 16px;
+          background-color: #f7f9fc;
+        }
+
+        .chat-message {
+          max-width: 80%;
+          padding: 12px 16px;
+          border-radius: 8px;
+          font-size: 13.5px;
+          line-height: 1.5;
+        }
+
+        .chat-message.bot {
+          background-color: #ffffff;
+          color: #222325;
+          align-self: flex-start;
+          border-bottom-left-radius: 2px;
+          border: 1px solid #dadbdd;
+        }
+
+        .chat-message.user {
+          background-color: #104fdf;
+          color: #ffffff;
+          align-self: flex-end;
+          border-bottom-right-radius: 2px;
+        }
+
+        .chat-footer {
+          padding: 16px 20px;
+          border-top: 1px solid #dadbdd;
+          background-color: #ffffff;
+          display: flex;
+          flex-direction: column;
+          gap: 8px;
+        }
+
+        .footer-lbl {
+          font-size: 11px;
+          font-weight: 700;
+          color: #62646a;
+          text-transform: uppercase;
+        }
+
+        .chat-options {
+          display: flex;
+          flex-direction: column;
+          gap: 6px;
+        }
+
+        .btn-chat-opt {
+          width: 100%;
+          padding: 8px 12px;
+          font-size: 12px;
+          font-weight: 600;
+          text-align: left;
+          background-color: #f7f9fc;
+          border: 1px solid #dadbdd;
+          border-radius: 6px;
+          color: #222325;
+          cursor: pointer;
+          transition: all 0.2s;
+        }
+
+        .btn-chat-opt:hover {
+          background-color: #eef5ff;
+          border-color: #104fdf;
+          color: #104fdf;
+        }
+
+        .btn-chat-opt.whatsapp {
+          background-color: #e6f9f0;
+          border-color: #25d366;
+          color: #128c7e;
+        }
+
+        .btn-chat-opt.whatsapp:hover {
+          background-color: #d1f4e2;
+        }
+
+        /* Animations */
+        @keyframes pulse {
+          0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 79, 223, 0.5); }
+          70% { transform: scale(1); box-shadow: 0 0 0 15px rgba(16, 79, 223, 0); }
+          100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 79, 223, 0); }
+        }
+
+        @keyframes slideUp {
+          from { transform: translateY(20px); opacity: 0; }
+          to { transform: translateY(0); opacity: 1; }
         }
 
         /* Common Buttons */
