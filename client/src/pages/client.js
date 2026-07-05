@@ -200,7 +200,7 @@ export default function ClientPosting() {
           </div>
 
           <div className="form-group">
-            <label htmlFor="budget">Maximum Hourly Budget (₹/hr): <span className="range-val">₹{formData.budget.toLocaleString('en-IN')}/hr</span></label>
+            <label htmlFor="budget">Maximum Hourly Budget (₹/hr): <span className="range-val">₹{formData.budget.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}/hr</span></label>
             <input 
               type="range" 
               id="budget" 

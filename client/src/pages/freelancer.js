@@ -204,7 +204,7 @@ export default function FreelancerOnboarding() {
           </div>
 
           <div className="form-group">
-            <label htmlFor="hourly_rate">Target Hourly Rate (₹/hr): <span className="range-val">₹{formData.hourly_rate.toLocaleString('en-IN')}/hr</span></label>
+            <label htmlFor="hourly_rate">Target Hourly Rate (₹/hr): <span className="range-val">₹{formData.hourly_rate.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}/hr</span></label>
             <input 
               type="range" 
               id="hourly_rate" 

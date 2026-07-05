@@ -29,20 +29,21 @@ def create_freelancer(freelancer: FreelancerCreate):
                 freelancer.hourly_rate
             ))
             result = cursor.fetchone()
-            
-            # Trigger semantic matching engine in the background
-            run_match_for_freelancer(result[0])
-            
-            return FreelancerResponse(
-                id=result[0],
-                name=freelancer.name,
-                email=freelancer.email,
-                linkedin_url=freelancer.linkedin_url,
-                primary_skill=freelancer.primary_skill,
-                experience=freelancer.experience,
-                hourly_rate=freelancer.hourly_rate,
-                created_at=result[1]
-            )
+            f_id, created_at = result[0], result[1]
+        
+        # Trigger semantic matching engine outside the transaction boundary
+        run_match_for_freelancer(f_id)
+        
+        return FreelancerResponse(
+            id=f_id,
+            name=freelancer.name,
+            email=freelancer.email,
+            linkedin_url=freelancer.linkedin_url,
+            primary_skill=freelancer.primary_skill,
+            experience=freelancer.experience,
+            hourly_rate=freelancer.hourly_rate,
+            created_at=created_at
+        )
             
     except psycopg2.errors.UniqueViolation:
         raise HTTPException(

@@ -2,6 +2,11 @@ import { useState, useEffect } from 'react';
 import Head from 'next/head';
 import { API_URL } from '../config';
 
+const formatCurrency = (val) => {
+  if (val === undefined || val === null) return '';
+  return val.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+};
+
 export default function Dashboard() {
   const [jobs, setJobs] = useState([]);
   const [selectedJobId, setSelectedJobId] = useState(null);
@@ -208,7 +213,7 @@ export default function Dashboard() {
                   >
                     <h4>{job.title}</h4>
                     <div className="job-meta">
-                      <span>Budget: ₹{job.budget.toLocaleString('en-IN')}/hr</span>
+                      <span>Budget: ₹{formatCurrency(job.budget)}/hr</span>
                     </div>
                   </li>
                 ))}
@@ -260,7 +265,7 @@ export default function Dashboard() {
             </div>
 
             <div className="filter-group">
-              <label>Max Hourly Rate: <span className="highlight">₹{maxRate.toLocaleString('en-IN')}/hr</span></label>
+              <label>Max Hourly Rate: <span className="highlight">₹{formatCurrency(maxRate)}/hr</span></label>
               <input 
                 type="range" 
                 min="500" 
@@ -303,7 +308,7 @@ export default function Dashboard() {
                     </div>
                     <div className="detail-item">
                       <span className="lbl">Rate Request</span>
-                      <span className="val">₹{candidate.hourly_rate.toLocaleString('en-IN')}/hr</span>
+                      <span className="val">₹{formatCurrency(candidate.hourly_rate)}/hr</span>
                     </div>
                   </div>
 
@@ -386,7 +391,7 @@ export default function Dashboard() {
                     </tr>
                     <tr>
                       <td className="table-lbl">Target Rate</td>
-                      <td>₹{activeDrawerCandidate.hourly_rate.toLocaleString('en-IN')}/hr</td>
+                      <td>₹{formatCurrency(activeDrawerCandidate.hourly_rate)}/hr</td>
                     </tr>
                   </tbody>
                 </table>
@@ -402,7 +407,7 @@ export default function Dashboard() {
                   <p className="breakdown-text">
                     This freelancer was matched against the role <strong>"{getSelectedJob().title}"</strong>. 
                     The system verified their primary focus on <strong>{activeDrawerCandidate.primary_skill.split('(')[0]}</strong> aligns with the job description. 
-                    Additionally, their hourly rate request of <strong>₹{activeDrawerCandidate.hourly_rate.toLocaleString('en-IN')}/hr</strong> is aligned with your budget of <strong>₹{getSelectedJob().budget?.toLocaleString('en-IN')}/hr</strong>.
+                    Additionally, their hourly rate request of <strong>₹{formatCurrency(activeDrawerCandidate.hourly_rate)}/hr</strong> is aligned with your budget of <strong>₹{formatCurrency(getSelectedJob().budget)}/hr</strong>.
                   </p>
                 </div>
               </div>
@@ -429,7 +434,7 @@ export default function Dashboard() {
                 • <strong>Name:</strong> {shareModalCandidate.freelancer_name}<br/>
                 • <strong>Role Focus:</strong> {shareModalCandidate.primary_skill}<br/>
                 • <strong>Experience:</strong> {shareModalCandidate.experience} Years<br/>
-                • <strong>Target Rate:</strong> ₹{shareModalCandidate.hourly_rate.toLocaleString('en-IN')}/hr<br/>
+                • <strong>Target Rate:</strong> ₹{formatCurrency(shareModalCandidate.hourly_rate)}/hr<br/>
                 • <strong>LinkedIn:</strong> {shareModalCandidate.linkedin_url}<br/><br/>
                 Please let us know when you would like to schedule a brief introductory interview.<br/><br/>
                 Best regards,<br/>

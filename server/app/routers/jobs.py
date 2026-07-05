@@ -24,18 +24,18 @@ def create_job(job: JobCreate):
                 job.budget
             ))
             result = cursor.fetchone()
-            
-            # Trigger semantic matching engine in the background
-            run_match_for_job(result[0])
-            
-            return JobResponse(
-                id=result[0],
-                title=job.title,
-                description=job.description,
-                budget=job.budget,
-                created_at=result[1]
-            )
-            
+            job_id, created_at = result[0], result[1]
+        
+        # Trigger semantic matching engine outside the transaction boundary
+        run_match_for_job(job_id)
+        
+        return JobResponse(
+            id=job_id,
+            title=job.title,
+            description=job.description,
+            budget=job.budget,
+            created_at=created_at
+        )
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
