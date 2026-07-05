@@ -37,10 +37,12 @@ def get_text_embedding(text: str) -> list:
             
     elif settings.AI_PROVIDER == "gemini" and settings.GEMINI_API_KEY:
         try:
-            # Fallback/dynamic import for Google Embeddings
-            from langchain_core.embeddings import Embeddings
-            # Standard Langchain Google GenAI embeddings can be initialized here
-            pass 
+            from langchain_google_genai import GoogleGenAIEmbeddings
+            embeddings = GoogleGenAIEmbeddings(
+                google_api_key=settings.GEMINI_API_KEY,
+                model="models/text-embedding-004"
+            )
+            return embeddings.embed_query(text)
         except Exception as e:
             logger.error(f"Failed to generate Gemini embedding: {e}")
             
