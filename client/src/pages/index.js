@@ -298,12 +298,15 @@ export default function Home() {
 
         .hero-section {
           max-width: 1200px;
-          margin: 60px auto;
-          padding: 0 40px;
+          margin: 40px auto;
+          padding: 60px 40px;
           display: grid;
           grid-template-columns: 1.12fr 0.88fr;
           gap: 60px;
           align-items: center;
+          background: linear-gradient(135deg, #ffffff 0%, #eef5ff 100%) !important;
+          border-radius: 16px;
+          border: 1px solid #cce0ff;
         }
 
         .hero-content h1 {
@@ -364,7 +367,7 @@ export default function Home() {
 
         /* Stats Section */
         .stats-section {
-          background-color: #f7f9fc;
+          background: linear-gradient(135deg, #0c3dae 0%, #104fdf 100%) !important;
           padding: 60px 0;
           border-top: 1px solid #dadbdd;
           border-bottom: 1px solid #dadbdd;
@@ -379,13 +382,13 @@ export default function Home() {
 
         .stat-card h3 {
           font-size: 36px;
-          color: #104fdf;
+          color: #ffffff !important;
           font-weight: 700;
           margin-bottom: 8px;
         }
 
         .stat-card p {
-          color: #62646a;
+          color: rgba(255, 255, 255, 0.9) !important;
           font-size: 14px;
           font-weight: 600;
         }
@@ -480,11 +483,16 @@ export default function Home() {
           border: 1px solid #dadbdd;
           border-radius: 6px;
           overflow: hidden;
-          transition: border-color 0.2s;
+          transition: all 0.2s;
         }
 
         .faq-item:hover {
           border-color: #104fdf;
+        }
+
+        .faq-item.active {
+          border-color: #104fdf;
+          background-color: #f7faff;
         }
 
         .faq-question {
