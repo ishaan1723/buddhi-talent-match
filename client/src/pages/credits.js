@@ -31,14 +31,14 @@ export default function Credits() {
   return (
     <div className="credits-container">
       <Head>
-        <title>Project Credits & Framework Details | AI Talent Match</title>
+        <title>Project Credits & Framework Details | AI Shop International</title>
       </Head>
 
       {/* Header */}
       <header className="navbar">
         <a href="/" className="brand">
-          <span className="brand-logo">B</span>
-          <span className="brand-name">Buddhi Talent Ecosystem</span>
+          <img src="/logo.png" alt="AI Shop Logo" className="logo-img" />
+          <span className="brand-name">AI Shop International</span>
         </a>
         <div className="nav-actions">
           <a href="/dashboard" className="btn btn-secondary">Back to Dashboard</a>
@@ -49,9 +49,9 @@ export default function Credits() {
       <main className="credits-content">
         <section className="framework-section card">
           <span className="framework-badge">ARCHITECTURE</span>
-          <h2>Powered by the Buddhi Framework</h2>
+          <h2>Powered by the AI Shop Framework</h2>
           <p>
-            This application was engineered utilizing the **Buddhi Framework**—a specialized design and development blueprint created to help recruitment agencies leverage semantic AI screening at scale. By enforcing strict separation between high-performance APIs and responsive client pages, it ensures zero latency and unmatched scalability for SMEs in the placement industry.
+            This application was engineered utilizing the **AI Shop Framework**—a specialized design and development blueprint created to help recruitment agencies leverage semantic AI screening at scale. By enforcing strict separation between high-performance APIs and responsive client pages, it ensures zero latency and unmatched scalability for SMEs in the placement industry.
           </p>
         </section>
 
@@ -96,18 +96,11 @@ export default function Credits() {
           align-items: center;
           gap: 12px;
         }
-
-        .brand-logo {
-          background-color: #104fdf;
-          color: #ffffff;
-          font-weight: 700;
-          font-size: 20px;
-          width: 36px;
-          height: 36px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          border-radius: 4px;
+        .logo-img {
+          height: 40px;
+          width: auto;
+          display: block;
+          object-fit: contain;
         }
 
         .brand-name {

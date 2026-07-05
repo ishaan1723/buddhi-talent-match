@@ -158,14 +158,14 @@ export default function Dashboard() {
   return (
     <div className="dashboard-container">
       <Head>
-        <title>Agency Admin Dashboard | AI Talent Match</title>
+        <title>Agency Admin Dashboard | AI Shop International</title>
       </Head>
 
       {/* Modern Top Header Navigation */}
       <header className="navbar">
         <div className="nav-brand">
-          <span className="brand-logo">B</span>
-          <span className="brand-name">Buddhi Talent Ecosystem</span>
+          <img src="/logo.png" alt="AI Shop Logo" className="logo-img" />
+          <span className="brand-name">AI Shop International</span>
           <span className="badge">Agency Portal</span>
         </div>
         <div className="nav-links">
@@ -472,17 +472,11 @@ export default function Dashboard() {
           gap: 12px;
         }
 
-        .brand-logo {
-          background-color: #104fdf;
-          color: #ffffff;
-          font-weight: 700;
-          font-size: 20px;
-          width: 36px;
-          height: 36px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          border-radius: 4px;
+        .logo-img {
+          height: 40px;
+          width: auto;
+          display: block;
+          object-fit: contain;
         }
 
         .brand-name {

@@ -30,14 +30,14 @@ export default function Home() {
   return (
     <div className="home-container">
       <Head>
-        <title>Buddhi Talent Ecosystem | Connect with AI Freelancers</title>
+        <title>AI Shop International | Connect with AI Freelancers</title>
       </Head>
 
       {/* Modern Enhanced Header */}
       <header className="navbar">
         <div className="brand">
-          <span className="brand-logo">B</span>
-          <span className="brand-name">Buddhi Talent Ecosystem</span>
+          <img src="/logo.png" alt="AI Shop Logo" className="logo-img" />
+          <span className="brand-name">AI Shop International</span>
         </div>
         <nav className="nav-links">
           <a href="#how-it-works" className="nav-link">How it Works</a>
@@ -153,11 +153,11 @@ export default function Home() {
       <footer className="footer">
         <div className="container footer-content">
           <div className="footer-brand">
-            <span className="brand-logo-small">B</span>
-            <span>Buddhi Talent Ecosystem</span>
+            <img src="/logo.png" alt="AI Shop Logo" className="logo-img-small" />
+            <span>AI Shop International</span>
           </div>
           <div className="footer-links">
-            <a href="/credits">Buddhi Framework Credits</a>
+            <a href="/credits">AI Shop Framework Credits</a>
             <span>•</span>
             <span>© 2026 AI Placement Solutions. All rights reserved.</span>
           </div>
@@ -192,17 +192,18 @@ export default function Home() {
           gap: 12px;
         }
 
-        .brand-logo {
-          background-color: #104fdf;
-          color: #ffffff;
-          font-weight: 700;
-          font-size: 20px;
-          width: 36px;
-          height: 36px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          border-radius: 4px;
+        .logo-img {
+          height: 42px;
+          width: auto;
+          display: block;
+          object-fit: contain;
+        }
+
+        .logo-img-small {
+          height: 26px;
+          width: auto;
+          display: block;
+          object-fit: contain;
         }
 
         .brand-name {
@@ -325,17 +326,17 @@ export default function Home() {
         .how-it-works {
           padding: 80px 0;
           text-align: center;
-          background-color: #ffffff;
+          background-color: #ffffff !important;
         }
 
         .how-it-works h2 {
           font-size: 28px;
-          color: #222325;
+          color: #222325 !important;
           margin-bottom: 8px;
         }
 
         .section-subtitle {
-          color: #62646a;
+          color: #62646a !important;
           margin-bottom: 50px;
         }
 
@@ -347,7 +348,7 @@ export default function Home() {
 
         .step-card {
           padding: 30px;
-          background: #ffffff;
+          background-color: #ffffff !important;
           border: 1px solid #dadbdd;
           border-radius: 8px;
           transition: transform 0.2s;
@@ -359,8 +360,8 @@ export default function Home() {
         }
 
         .step-num {
-          background-color: #eef5ff;
-          color: #104fdf;
+          background-color: #eef5ff !important;
+          color: #104fdf !important;
           font-weight: 700;
           font-size: 18px;
           width: 44px;
@@ -374,12 +375,12 @@ export default function Home() {
 
         .step-card h4 {
           font-size: 18px;
-          color: #222325;
+          color: #222325 !important;
           margin-bottom: 12px;
         }
 
         .step-card p {
-          color: #62646a;
+          color: #62646a !important;
           font-size: 14px;
           line-height: 1.6;
         }

@@ -137,13 +137,13 @@ export default function ClientPosting() {
   return (
     <div className="posting-page">
       <Head>
-        <title>Post an AI Requirement | AI Talent Match</title>
+        <title>Post an AI Requirement | AI Shop International</title>
       </Head>
 
       <header className="navbar">
         <a href="/" className="brand">
-          <span className="brand-logo">B</span>
-          <span className="brand-name">Buddhi Talent Ecosystem</span>
+          <img src="/logo.png" alt="AI Shop Logo" className="logo-img" />
+          <span className="brand-name">AI Shop International</span>
         </a>
       </header>
 
@@ -239,17 +239,11 @@ export default function ClientPosting() {
           align-items: center;
           gap: 12px;
         }
-        .brand-logo {
-          background-color: #104fdf;
-          color: #ffffff;
-          font-weight: 700;
-          font-size: 20px;
-          width: 36px;
-          height: 36px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          border-radius: 4px;
+        .logo-img {
+          height: 40px;
+          width: auto;
+          display: block;
+          object-fit: contain;
         }
         .brand-name {
           font-weight: 700;
