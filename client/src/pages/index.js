@@ -799,6 +799,112 @@ export default function Home() {
           background-color: #f8fafc;
           border-color: #101828;
         }
+
+        /* Mobile & Tablet Responsiveness */
+        @media (max-width: 768px) {
+          .navbar {
+            padding: 15px 20px;
+            height: auto;
+            flex-direction: column;
+            gap: 16px;
+            text-align: center;
+          }
+          
+          .nav-links {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 16px;
+          }
+          
+          .nav-link {
+            font-size: 13px;
+          }
+          
+          .hero-section {
+            grid-template-columns: 1fr;
+            margin: 20px 15px;
+            padding: 40px 24px;
+            gap: 30px;
+            text-align: center;
+            border-radius: 16px;
+          }
+          
+          .hero-content h1 {
+            font-size: 32px;
+            line-height: 1.2;
+          }
+          
+          .hero-content p {
+            font-size: 15px;
+            margin-bottom: 24px;
+            text-align: center;
+          }
+          
+          .cta-buttons {
+            flex-direction: column;
+            width: 100%;
+            gap: 12px;
+          }
+          
+          .cta-btn {
+            width: 100%;
+            padding: 14px 20px;
+            font-size: 14px;
+            border-radius: 8px;
+          }
+
+          .image-wrapper {
+            max-width: 320px;
+          }
+          
+          .stats-grid {
+            grid-template-columns: 1fr;
+            gap: 20px;
+            padding: 0 20px;
+          }
+          
+          .steps-grid {
+            grid-template-columns: 1fr;
+            gap: 20px;
+            padding: 0 20px;
+          }
+          
+          .faq-list {
+            padding: 0 20px;
+          }
+          
+          .faq-question {
+            padding: 16px;
+            font-size: 14px;
+          }
+
+          .faq-answer p {
+            font-size: 13px;
+          }
+          
+          .footer-content {
+            flex-direction: column;
+            gap: 16px;
+            text-align: center;
+            padding: 0 20px;
+          }
+          
+          .footer-links {
+            flex-direction: column;
+            gap: 8px;
+          }
+          
+          .chatbot-widget {
+            bottom: 20px;
+            right: 20px;
+          }
+          
+          .chat-card {
+            width: calc(100vw - 40px);
+            height: 420px;
+          }
+        }
       `}</style>
     </div>
   );
