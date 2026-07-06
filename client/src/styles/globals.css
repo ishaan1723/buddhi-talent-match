@@ -6,11 +6,11 @@
   --primary-blue-light: #eaf2ff;
   --navy-deep: #071a3f;
   --navy-mid: #0e2f7a;
-  --text-dark: #101828;
-  --text-muted: #64748b;
-  --bg-light: #eef4ff;
+  --text-dark: #0e2f7a;
+  --text-muted: #1e40af;
+  --bg-light: #dbe8ff;
   --bg-white: #ffffff;
-  --border-color: #e2e8f0;
+  --border-color: #bcd5ff;
   --success-green: #1dbf73;
   --shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.05);
   --shadow-md: 0 10px 30px rgba(15, 23, 42, 0.08);
@@ -24,6 +24,7 @@
 h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-display) !important;
   letter-spacing: -0.02em;
+  color: #0c2d6b !important;
 }
 
 * {
@@ -108,4 +109,36 @@ button {
   background-color: var(--bg-light);
   border-color: var(--primary-blue);
   color: var(--primary-blue);
+}
+
+/* Global Header Navbar Dark Blue styling */
+.navbar {
+  background-color: #071a3f !important;
+  border-bottom: 2px solid #1656d8 !important;
+  color: #ffffff !important;
+}
+.navbar a, .navbar span, .navbar .brand-name, .navbar .logo-img {
+  color: #ffffff !important;
+}
+.navbar .nav-link {
+  color: #cbd5e1 !important;
+}
+.navbar .nav-link:hover {
+  color: #38bdf8 !important;
+}
+.navbar .logo-img {
+  filter: brightness(0) invert(1);
+}
+
+/* Global Footer Dark Blue styling */
+.footer {
+  background-color: #071a3f !important;
+  border-top: 2px solid #1656d8 !important;
+  color: #cbd5e1 !important;
+}
+.footer a {
+  color: #ffffff !important;
+}
+.footer a:hover {
+  color: #38bdf8 !important;
 }
