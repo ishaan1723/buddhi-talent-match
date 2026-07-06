@@ -76,7 +76,7 @@ export default function Credits() {
       <style jsx>{`
         .credits-container {
           min-height: 100vh;
-          background-color: #f8fafc;
+          background-color: #eef4ff;
           font-family: 'Inter', sans-serif;
           padding-bottom: 80px;
         }
@@ -249,7 +249,7 @@ export default function Credits() {
         }
 
         .btn-secondary:hover {
-          background-color: #f8fafc;
+          background-color: #eef4ff;
         }
       `}</style>
     </div>

@@ -75,7 +75,7 @@ export default function FreelancerOnboarding() {
             display: flex;
             align-items: center;
             justify-content: center;
-            background-color: #f8fafc;
+            background-color: #eef4ff;
           }
           .success-card {
             text-align: center;
@@ -226,7 +226,7 @@ export default function FreelancerOnboarding() {
       <style jsx>{`
         .onboarding-page {
           min-height: 100vh;
-          background-color: #f8fafc;
+          background-color: #eef4ff;
           font-family: 'Inter', sans-serif;
           padding-bottom: 60px;
         }

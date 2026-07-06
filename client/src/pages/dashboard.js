@@ -455,7 +455,7 @@ export default function Dashboard() {
       <style jsx>{`
         .dashboard-container {
           min-height: 100vh;
-          background-color: #f8fafc;
+          background-color: #eef4ff;
           font-family: 'Inter', sans-serif;
           display: flex;
           flex-direction: column;
@@ -541,7 +541,7 @@ export default function Dashboard() {
 
         .sidebar-tabs {
           display: flex;
-          background-color: #f8fafc;
+          background-color: #eef4ff;
           padding: 4px;
           border-radius: 10px;
           border: 1px solid #e2e8f0;
@@ -587,7 +587,7 @@ export default function Dashboard() {
         }
 
         .job-item:hover {
-          background-color: #f8fafc;
+          background-color: #eef4ff;
         }
 
         .job-item.active {
@@ -838,7 +838,7 @@ export default function Dashboard() {
         }
 
         .btn-action.reject {
-          background-color: #f8fafc;
+          background-color: #eef4ff;
           border: 1px solid #e2e8f0;
           color: #64748b;
         }
@@ -937,7 +937,7 @@ export default function Dashboard() {
 
         .details-table td {
           padding: 12px 0;
-          border-bottom: 1px solid #f8fafc;
+          border-bottom: 1px solid #eef4ff;
           font-size: 14px;
           color: #101828;
         }
@@ -1028,7 +1028,7 @@ export default function Dashboard() {
         }
 
         .email-preview-box {
-          background-color: #f8fafc;
+          background-color: #eef4ff;
           border: 1px solid #e2e8f0;
           border-radius: 10px;
           padding: 20px;
@@ -1099,7 +1099,7 @@ export default function Dashboard() {
         }
 
         .btn-secondary:hover {
-          background-color: #f8fafc;
+          background-color: #eef4ff;
           border-color: #101828;
         }
       `}</style>

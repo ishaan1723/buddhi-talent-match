@@ -462,7 +462,7 @@ export default function Home() {
         /* FAQ Section */
         .faq-section {
           padding: 80px 0;
-          background-color: #f8fafc;
+          background-color: #eef4ff;
           border-top: 1px solid #e2e8f0;
         }
 
@@ -679,7 +679,7 @@ export default function Home() {
           display: flex;
           flex-direction: column;
           gap: 16px;
-          background-color: #f8fafc;
+          background-color: #eef4ff;
         }
 
         .chat-message {
@@ -733,7 +733,7 @@ export default function Home() {
           font-size: 12px;
           font-weight: 600;
           text-align: left;
-          background-color: #f8fafc;
+          background-color: #eef4ff;
           border: 1px solid #e2e8f0;
           border-radius: 10px;
           color: #101828;
@@ -796,7 +796,7 @@ export default function Home() {
         }
 
         .btn-secondary:hover {
-          background-color: #f8fafc;
+          background-color: #eef4ff;
           border-color: #101828;
         }
 

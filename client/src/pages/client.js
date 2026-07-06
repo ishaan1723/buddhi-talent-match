@@ -95,7 +95,7 @@ export default function ClientPosting() {
             display: flex;
             align-items: center;
             justify-content: center;
-            background-color: #f8fafc;
+            background-color: #eef4ff;
           }
           .success-card {
             text-align: center;
@@ -222,7 +222,7 @@ export default function ClientPosting() {
       <style jsx>{`
         .posting-page {
           min-height: 100vh;
-          background-color: #f8fafc;
+          background-color: #eef4ff;
           font-family: 'Inter', sans-serif;
           padding-bottom: 60px;
         }
@@ -290,7 +290,7 @@ export default function ClientPosting() {
           flex-wrap: wrap;
         }
         .btn-template {
-          background-color: #f8fafc;
+          background-color: #eef4ff;
           border: 1px solid #e2e8f0;
           color: #101828;
           padding: 6px 12px;
