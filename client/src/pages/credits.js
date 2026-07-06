@@ -83,7 +83,7 @@ export default function Credits() {
 
         .navbar {
           height: 70px;
-          background-color: var(--bg-white);
+          background-color: var(--bg-light) !important;
           border-bottom: 1px solid var(--border-color);
           display: flex;
           justify-content: space-between;
@@ -101,12 +101,13 @@ export default function Credits() {
           width: auto;
           display: block;
           object-fit: contain;
+          filter: brightness(0) invert(1);
         }
 
         .brand-name {
           font-weight: 700;
           font-size: 18px;
-          color: var(--text-dark);
+          color: var(--text-dark) !important;
         }
 
         .credits-content {
@@ -141,7 +142,7 @@ export default function Credits() {
 
         .framework-section h2 {
           font-size: 26px;
-          color: var(--text-dark);
+          color: var(--text-dark) !important;
           margin-bottom: 16px;
         }
 
@@ -159,7 +160,7 @@ export default function Credits() {
 
         .team-section h2 {
           font-size: 26px;
-          color: var(--text-dark);
+          color: var(--text-dark) !important;
           margin-bottom: 8px;
         }
 
@@ -209,7 +210,7 @@ export default function Credits() {
 
         .member-card h3 {
           font-size: 18px;
-          color: var(--text-dark);
+          color: var(--text-dark) !important;
         }
 
         .role-tag {
@@ -243,8 +244,8 @@ export default function Credits() {
         }
 
         .btn-secondary {
-          background-color: var(--bg-white);
-          color: var(--text-dark);
+          background-color: var(--bg-light) !important;
+          color: var(--text-dark) !important;
           border: 1px solid var(--border-color);
         }
 

@@ -463,7 +463,7 @@ export default function Dashboard() {
 
         .navbar {
           height: 70px;
-          background-color: var(--bg-white);
+          background-color: var(--bg-light) !important;
           border-bottom: 1px solid var(--border-color);
           display: flex;
           justify-content: space-between;
@@ -482,12 +482,13 @@ export default function Dashboard() {
           width: auto;
           display: block;
           object-fit: contain;
+          filter: brightness(0) invert(1);
         }
 
         .brand-name {
           font-weight: 700;
           font-size: 18px;
-          color: var(--text-dark);
+          color: var(--text-dark) !important;
         }
 
         .badge {
@@ -521,7 +522,7 @@ export default function Dashboard() {
 
         .jobs-sidebar {
           width: 320px;
-          background-color: var(--bg-white);
+          background-color: var(--bg-light) !important;
           border-right: 1px solid var(--border-color);
           border-top: 6px solid #1656d8;
           display: flex;
@@ -535,7 +536,7 @@ export default function Dashboard() {
 
         .sidebar-header h3 {
           font-size: 16px;
-          color: var(--text-dark);
+          color: var(--text-dark) !important;
           margin-bottom: 12px;
         }
 
@@ -561,7 +562,7 @@ export default function Dashboard() {
         }
 
         .tab-btn.active {
-          background-color: var(--bg-white);
+          background-color: var(--bg-light) !important;
           color: #1656d8;
           box-shadow: 0 1px 3px rgba(0,0,0,0.05);
         }
@@ -597,7 +598,7 @@ export default function Dashboard() {
 
         .job-item h4 {
           font-size: 14px;
-          color: var(--text-dark);
+          color: var(--text-dark) !important;
           margin-bottom: 6px;
         }
 
@@ -609,7 +610,7 @@ export default function Dashboard() {
         .sidebar-footer {
           padding: 24px;
           border-top: 1px solid #e2e8f0;
-          background-color: var(--bg-white);
+          background-color: var(--bg-light) !important;
         }
 
         .btn-add-job {
@@ -634,7 +635,7 @@ export default function Dashboard() {
 
         .matches-header h2 {
           font-size: 22px;
-          color: var(--text-dark);
+          color: var(--text-dark) !important;
           margin-bottom: 6px;
         }
 
@@ -650,7 +651,7 @@ export default function Dashboard() {
 
         /* Filter Bar card */
         .filter-bar {
-          background-color: var(--bg-white);
+          background-color: var(--bg-light) !important;
           border: 1px solid var(--border-color);
           border-radius: 14px;
           padding: 20px;
@@ -679,7 +680,7 @@ export default function Dashboard() {
           border: 1px solid var(--border-color);
           border-radius: 10px;
           font-size: 14px;
-          color: var(--text-dark);
+          color: var(--text-dark) !important;
           outline: none;
         }
 
@@ -733,7 +734,7 @@ export default function Dashboard() {
 
         .candidate-info h3 {
           font-size: 18px;
-          color: var(--text-dark);
+          color: var(--text-dark) !important;
           margin-bottom: 4px;
         }
 
@@ -792,7 +793,7 @@ export default function Dashboard() {
         .val {
           font-size: 14px;
           font-weight: 600;
-          color: var(--text-dark);
+          color: var(--text-dark) !important;
         }
 
         .card-actions {
@@ -881,7 +882,7 @@ export default function Dashboard() {
 
         .drawer-content {
           width: 500px;
-          background-color: var(--bg-white);
+          background-color: var(--bg-light) !important;
           height: 100%;
           box-shadow: -4px 0 30px rgba(0,0,0,0.1);
           padding: 40px;
@@ -911,7 +912,7 @@ export default function Dashboard() {
 
         .drawer-header h2 {
           font-size: 20px;
-          color: var(--text-dark);
+          color: var(--text-dark) !important;
           margin-bottom: 8px;
         }
 
@@ -939,7 +940,7 @@ export default function Dashboard() {
           padding: 12px 0;
           border-bottom: 1px solid #eef4ff;
           font-size: 14px;
-          color: var(--text-dark);
+          color: var(--text-dark) !important;
         }
 
         .table-lbl {
@@ -981,7 +982,7 @@ export default function Dashboard() {
 
         .breakdown-text {
           font-size: 14px;
-          color: var(--text-dark);
+          color: var(--text-dark) !important;
           line-height: 1.6;
         }
 
@@ -1001,7 +1002,7 @@ export default function Dashboard() {
         }
 
         .modal-content {
-          background-color: var(--bg-white);
+          background-color: var(--bg-light) !important;
           border-radius: 14px;
           width: 600px;
           padding: 36px;
@@ -1019,7 +1020,7 @@ export default function Dashboard() {
 
         .modal-header h3 {
           font-size: 18px;
-          color: var(--text-dark);
+          color: var(--text-dark) !important;
         }
 
         .modal-intro {
@@ -1034,7 +1035,7 @@ export default function Dashboard() {
           padding: 20px;
           font-size: 13.5px;
           line-height: 1.6;
-          color: var(--text-dark);
+          color: var(--text-dark) !important;
           max-height: 280px;
           overflow-y: auto;
           font-family: monospace;
@@ -1059,7 +1060,7 @@ export default function Dashboard() {
         }
 
         .toast-notification {
-          background-color: var(--text-dark);
+          background-color: var(--text-dark) !important;
           color: #ffffff;
           padding: 10px 20px;
           border-radius: 10px;
@@ -1093,14 +1094,14 @@ export default function Dashboard() {
         }
 
         .btn-secondary {
-          background-color: var(--bg-white);
-          color: var(--text-dark);
+          background-color: var(--bg-light) !important;
+          color: var(--text-dark) !important;
           border: 1px solid var(--border-color);
         }
 
         .btn-secondary:hover {
           background-color: #eef4ff;
-          border-color: var(--text-dark);
+          border-color: var(--text-dark) !important;
         }
       `}</style>
     </div>

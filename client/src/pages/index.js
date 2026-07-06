@@ -235,7 +235,7 @@ export default function Home() {
       <style jsx>{`
         .home-container {
           min-height: 100vh;
-          background-color: var(--bg-white);
+          background-color: var(--bg-light) !important;
           font-family: 'Inter', sans-serif;
           display: flex;
           flex-direction: column;
@@ -248,7 +248,7 @@ export default function Home() {
           justify-content: space-between;
           align-items: center;
           padding: 0 40px;
-          background: rgba(255, 255, 255, 0.85);
+          background: rgba(5, 8, 17, 0.85) !important;
           backdrop-filter: blur(10px);
           -webkit-backdrop-filter: blur(10px);
           position: sticky;
@@ -267,6 +267,7 @@ export default function Home() {
           width: auto;
           display: block;
           object-fit: contain;
+          filter: brightness(0) invert(1);
         }
 
         .logo-img-small {
@@ -274,12 +275,13 @@ export default function Home() {
           width: auto;
           display: block;
           object-fit: contain;
+          filter: brightness(0) invert(1);
         }
 
         .brand-name {
           font-weight: 700;
           font-size: 18px;
-          color: var(--text-dark);
+          color: var(--text-dark) !important;
         }
 
         .nav-links {
@@ -295,7 +297,7 @@ export default function Home() {
         }
 
         .nav-link:hover {
-          color: #1656d8;
+          color: var(--primary-blue) !important;
         }
 
         .hero-section {
@@ -468,7 +470,7 @@ export default function Home() {
 
         .faq-section h2 {
           font-size: 28px;
-          color: var(--text-dark);
+          color: var(--text-dark) !important;
           margin-bottom: 40px;
           text-align: center;
         }
@@ -506,7 +508,7 @@ export default function Home() {
           text-align: left;
           font-size: 16px;
           font-weight: 600;
-          color: var(--text-dark);
+          color: var(--text-dark) !important;
           display: flex;
           justify-content: space-between;
           align-items: center;
@@ -538,7 +540,7 @@ export default function Home() {
 
         /* Footer */
         .footer {
-          background-color: var(--bg-white);
+          background-color: var(--bg-light) !important;
           border-top: 1px solid #e2e8f0;
           padding: 30px 0;
           margin-top: auto;
@@ -557,7 +559,7 @@ export default function Home() {
           align-items: center;
           gap: 8px;
           font-weight: 700;
-          color: var(--text-dark);
+          color: var(--text-dark) !important;
         }
 
         .footer-links {
@@ -621,7 +623,7 @@ export default function Home() {
         .chat-card {
           width: 360px;
           height: 500px;
-          background-color: var(--bg-white);
+          background-color: var(--bg-light) !important;
           border-radius: 12px;
           display: flex;
           flex-direction: column;
@@ -691,8 +693,8 @@ export default function Home() {
         }
 
         .chat-message.bot {
-          background-color: var(--bg-white);
-          color: var(--text-dark);
+          background-color: var(--bg-light) !important;
+          color: var(--text-dark) !important;
           align-self: flex-start;
           border-bottom-left-radius: 2px;
           border: 1px solid var(--border-color);
@@ -708,7 +710,7 @@ export default function Home() {
         .chat-footer {
           padding: 16px 20px;
           border-top: 1px solid #e2e8f0;
-          background-color: var(--bg-white);
+          background-color: var(--bg-light) !important;
           display: flex;
           flex-direction: column;
           gap: 8px;
@@ -736,7 +738,7 @@ export default function Home() {
           background-color: #eef4ff;
           border: 1px solid var(--border-color);
           border-radius: 10px;
-          color: var(--text-dark);
+          color: var(--text-dark) !important;
           cursor: pointer;
           transition: all 0.2s;
         }
@@ -790,14 +792,14 @@ export default function Home() {
         }
 
         .btn-secondary {
-          background-color: var(--bg-white);
-          color: var(--text-dark);
+          background-color: var(--bg-light) !important;
+          color: var(--text-dark) !important;
           border: 1px solid var(--border-color);
         }
 
         .btn-secondary:hover {
           background-color: #eef4ff;
-          border-color: var(--text-dark);
+          border-color: var(--text-dark) !important;
         }
 
         /* Mobile & Tablet Responsiveness */

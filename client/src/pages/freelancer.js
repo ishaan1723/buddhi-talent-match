@@ -107,7 +107,7 @@ export default function FreelancerOnboarding() {
             justify-content: center;
             margin: 0 auto 24px;
           }
-          h2 { margin-bottom: 12px; color: var(--text-dark); font-size: 24px; }
+          h2 { margin-bottom: 12px; color: var(--text-dark) !important; font-size: 24px; }
           p { margin-bottom: 30px; color: var(--text-muted); line-height: 1.6; }
           .btn-primary {
             display: inline-block;
@@ -253,7 +253,7 @@ export default function FreelancerOnboarding() {
         }
         .navbar {
           height: 70px;
-          background-color: var(--bg-white);
+          background-color: var(--bg-light) !important;
           border-bottom: 1px solid var(--border-color);
           display: flex;
           align-items: center;
@@ -269,11 +269,12 @@ export default function FreelancerOnboarding() {
           width: auto;
           display: block;
           object-fit: contain;
+          filter: brightness(0) invert(1);
         }
         .brand-name {
           font-weight: 700;
           font-size: 18px;
-          color: var(--text-dark);
+          color: var(--text-dark) !important;
         }
         .form-container {
           max-width: 580px;
@@ -286,7 +287,7 @@ export default function FreelancerOnboarding() {
         }
         .form-header h1 {
           font-size: 28px;
-          color: var(--text-dark);
+          color: var(--text-dark) !important;
           margin-bottom: 8px;
         }
         .form-header p {
@@ -311,7 +312,7 @@ export default function FreelancerOnboarding() {
         .form-group label {
           font-size: 14px;
           font-weight: 600;
-          color: var(--text-dark);
+          color: var(--text-dark) !important;
           display: flex;
           justify-content: space-between;
         }
@@ -325,7 +326,7 @@ export default function FreelancerOnboarding() {
           border: 1px solid var(--border-color);
           border-radius: 10px;
           font-size: 14px;
-          color: var(--text-dark);
+          color: var(--text-dark) !important;
           outline: none;
           transition: border-color 0.2s;
         }
