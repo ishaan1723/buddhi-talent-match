@@ -83,8 +83,8 @@ export default function Credits() {
 
         .navbar {
           height: 70px;
-          background-color: #ffffff;
-          border-bottom: 1px solid #e2e8f0;
+          background-color: var(--bg-white);
+          border-bottom: 1px solid var(--border-color);
           display: flex;
           justify-content: space-between;
           align-items: center;
@@ -106,7 +106,7 @@ export default function Credits() {
         .brand-name {
           font-weight: 700;
           font-size: 18px;
-          color: #101828;
+          color: var(--text-dark);
         }
 
         .credits-content {
@@ -119,8 +119,8 @@ export default function Credits() {
         }
 
         .framework-section {
-          background: #ffffff;
-          border: 1px solid #e2e8f0;
+          background: var(--bg-white);
+          border: 1px solid var(--border-color);
           padding: 40px;
           border-radius: 14px;
           text-align: center;
@@ -141,12 +141,12 @@ export default function Credits() {
 
         .framework-section h2 {
           font-size: 26px;
-          color: #101828;
+          color: var(--text-dark);
           margin-bottom: 16px;
         }
 
         .framework-section p {
-          color: #64748b;
+          color: var(--text-muted);
           line-height: 1.7;
           font-size: 15px;
           max-width: 800px;
@@ -159,12 +159,12 @@ export default function Credits() {
 
         .team-section h2 {
           font-size: 26px;
-          color: #101828;
+          color: var(--text-dark);
           margin-bottom: 8px;
         }
 
         .subtitle {
-          color: #64748b;
+          color: var(--text-muted);
           margin-bottom: 40px;
         }
 
@@ -175,8 +175,8 @@ export default function Credits() {
         }
 
         .member-card {
-          background: #ffffff;
-          border: 1px solid #e2e8f0;
+          background: var(--bg-white);
+          border: 1px solid var(--border-color);
           border-top: 4px solid #1656d8;
           padding: 30px 20px;
           border-radius: 14px;
@@ -209,7 +209,7 @@ export default function Credits() {
 
         .member-card h3 {
           font-size: 18px;
-          color: #101828;
+          color: var(--text-dark);
         }
 
         .role-tag {
@@ -223,7 +223,7 @@ export default function Credits() {
 
         .contribution {
           font-size: 13px;
-          color: #64748b;
+          color: var(--text-muted);
           line-height: 1.5;
           margin-top: 8px;
         }
@@ -243,9 +243,9 @@ export default function Credits() {
         }
 
         .btn-secondary {
-          background-color: #ffffff;
-          color: #101828;
-          border: 1px solid #e2e8f0;
+          background-color: var(--bg-white);
+          color: var(--text-dark);
+          border: 1px solid var(--border-color);
         }
 
         .btn-secondary:hover {

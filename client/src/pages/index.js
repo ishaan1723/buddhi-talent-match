@@ -235,7 +235,7 @@ export default function Home() {
       <style jsx>{`
         .home-container {
           min-height: 100vh;
-          background-color: #ffffff;
+          background-color: var(--bg-white);
           font-family: 'Inter', sans-serif;
           display: flex;
           flex-direction: column;
@@ -243,7 +243,7 @@ export default function Home() {
 
         .navbar {
           height: 75px;
-          border-bottom: 1px solid #e2e8f0;
+          border-bottom: 1px solid var(--border-color);
           display: flex;
           justify-content: space-between;
           align-items: center;
@@ -279,7 +279,7 @@ export default function Home() {
         .brand-name {
           font-weight: 700;
           font-size: 18px;
-          color: #101828;
+          color: var(--text-dark);
         }
 
         .nav-links {
@@ -290,7 +290,7 @@ export default function Home() {
         .nav-link {
           font-size: 14px;
           font-weight: 600;
-          color: #64748b;
+          color: var(--text-muted);
           transition: color 0.2s;
         }
 
@@ -353,8 +353,8 @@ export default function Home() {
           border-radius: 12px;
           overflow: hidden;
           box-shadow: 0 10px 30px rgba(16, 79, 223, 0.1);
-          border: 1px solid #e2e8f0;
-          background: #ffffff;
+          border: 1px solid var(--border-color);
+          background: var(--bg-white);
         }
 
         .hero-img {
@@ -373,7 +373,7 @@ export default function Home() {
           background: linear-gradient(120deg, #071a3f 0%, #0e2f7a 45%, #1656d8 100%) !important;
           padding: 64px 0;
           border-top: 1px solid #e2e8f0;
-          border-bottom: 1px solid #e2e8f0;
+          border-bottom: 1px solid var(--border-color);
         }
 
         .stats-grid {
@@ -400,17 +400,17 @@ export default function Home() {
         .how-it-works {
           padding: 80px 0;
           text-align: center;
-          background-color: #ffffff !important;
+          background-color: var(--bg-white) !important;
         }
 
         .how-it-works h2 {
           font-size: 28px;
-          color: #101828 !important;
+          color: var(--text-dark) !important;
           margin-bottom: 8px;
         }
 
         .section-subtitle {
-          color: #64748b !important;
+          color: var(--text-muted) !important;
           margin-bottom: 50px;
         }
 
@@ -422,8 +422,8 @@ export default function Home() {
 
         .step-card {
           padding: 30px;
-          background-color: #ffffff !important;
-          border: 1px solid #e2e8f0;
+          background-color: var(--bg-white) !important;
+          border: 1px solid var(--border-color);
           border-radius: 14px;
           transition: transform 0.2s;
         }
@@ -449,12 +449,12 @@ export default function Home() {
 
         .step-card h4 {
           font-size: 18px;
-          color: #101828 !important;
+          color: var(--text-dark) !important;
           margin-bottom: 12px;
         }
 
         .step-card p {
-          color: #64748b !important;
+          color: var(--text-muted) !important;
           font-size: 14px;
           line-height: 1.6;
         }
@@ -468,7 +468,7 @@ export default function Home() {
 
         .faq-section h2 {
           font-size: 28px;
-          color: #101828;
+          color: var(--text-dark);
           margin-bottom: 40px;
           text-align: center;
         }
@@ -482,8 +482,8 @@ export default function Home() {
         }
 
         .faq-item {
-          background: #ffffff;
-          border: 1px solid #e2e8f0;
+          background: var(--bg-white);
+          border: 1px solid var(--border-color);
           border-radius: 10px;
           overflow: hidden;
           transition: all 0.2s;
@@ -506,7 +506,7 @@ export default function Home() {
           text-align: left;
           font-size: 16px;
           font-weight: 600;
-          color: #101828;
+          color: var(--text-dark);
           display: flex;
           justify-content: space-between;
           align-items: center;
@@ -531,14 +531,14 @@ export default function Home() {
         }
 
         .faq-answer p {
-          color: #64748b;
+          color: var(--text-muted);
           line-height: 1.6;
           font-size: 14px;
         }
 
         /* Footer */
         .footer {
-          background-color: #ffffff;
+          background-color: var(--bg-white);
           border-top: 1px solid #e2e8f0;
           padding: 30px 0;
           margin-top: auto;
@@ -549,7 +549,7 @@ export default function Home() {
           justify-content: space-between;
           align-items: center;
           font-size: 13px;
-          color: #64748b;
+          color: var(--text-muted);
         }
 
         .footer-brand {
@@ -557,7 +557,7 @@ export default function Home() {
           align-items: center;
           gap: 8px;
           font-weight: 700;
-          color: #101828;
+          color: var(--text-dark);
         }
 
         .footer-links {
@@ -621,7 +621,7 @@ export default function Home() {
         .chat-card {
           width: 360px;
           height: 500px;
-          background-color: #ffffff;
+          background-color: var(--bg-white);
           border-radius: 12px;
           display: flex;
           flex-direction: column;
@@ -691,11 +691,11 @@ export default function Home() {
         }
 
         .chat-message.bot {
-          background-color: #ffffff;
-          color: #101828;
+          background-color: var(--bg-white);
+          color: var(--text-dark);
           align-self: flex-start;
           border-bottom-left-radius: 2px;
-          border: 1px solid #e2e8f0;
+          border: 1px solid var(--border-color);
         }
 
         .chat-message.user {
@@ -708,7 +708,7 @@ export default function Home() {
         .chat-footer {
           padding: 16px 20px;
           border-top: 1px solid #e2e8f0;
-          background-color: #ffffff;
+          background-color: var(--bg-white);
           display: flex;
           flex-direction: column;
           gap: 8px;
@@ -717,7 +717,7 @@ export default function Home() {
         .footer-lbl {
           font-size: 11px;
           font-weight: 700;
-          color: #64748b;
+          color: var(--text-muted);
           text-transform: uppercase;
         }
 
@@ -734,9 +734,9 @@ export default function Home() {
           font-weight: 600;
           text-align: left;
           background-color: #eef4ff;
-          border: 1px solid #e2e8f0;
+          border: 1px solid var(--border-color);
           border-radius: 10px;
-          color: #101828;
+          color: var(--text-dark);
           cursor: pointer;
           transition: all 0.2s;
         }
@@ -790,14 +790,14 @@ export default function Home() {
         }
 
         .btn-secondary {
-          background-color: #ffffff;
-          color: #101828;
-          border: 1px solid #e2e8f0;
+          background-color: var(--bg-white);
+          color: var(--text-dark);
+          border: 1px solid var(--border-color);
         }
 
         .btn-secondary:hover {
           background-color: #eef4ff;
-          border-color: #101828;
+          border-color: var(--text-dark);
         }
 
         /* Mobile & Tablet Responsiveness */

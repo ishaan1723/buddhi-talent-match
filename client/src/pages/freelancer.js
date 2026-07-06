@@ -15,6 +15,7 @@ export default function FreelancerOnboarding() {
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
+  const [resumeFile, setResumeFile] = useState(null);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -37,12 +38,20 @@ export default function FreelancerOnboarding() {
     }
 
     try {
+      const formDataPayload = new FormData();
+      formDataPayload.append('name', formData.name);
+      formDataPayload.append('email', formData.email);
+      formDataPayload.append('linkedin_url', formData.linkedin_url);
+      formDataPayload.append('primary_skill', formData.primary_skill);
+      formDataPayload.append('experience', formData.experience);
+      formDataPayload.append('hourly_rate', formData.hourly_rate);
+      if (resumeFile) {
+        formDataPayload.append('resume', resumeFile);
+      }
+
       const res = await fetch(`${API_URL}/api/freelancers/`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(formData)
+        body: formDataPayload
       });
 
       if (res.ok) {
@@ -81,9 +90,9 @@ export default function FreelancerOnboarding() {
             text-align: center;
             max-width: 450px;
             padding: 40px;
-            background: #ffffff;
+            background: var(--bg-white);
             border-radius: 14px;
-            border: 1px solid #e2e8f0;
+            border: 1px solid var(--border-color);
             box-shadow: 0 4px 20px rgba(0,0,0,0.08);
           }
           .success-icon {
@@ -98,8 +107,8 @@ export default function FreelancerOnboarding() {
             justify-content: center;
             margin: 0 auto 24px;
           }
-          h2 { margin-bottom: 12px; color: #101828; font-size: 24px; }
-          p { margin-bottom: 30px; color: #64748b; line-height: 1.6; }
+          h2 { margin-bottom: 12px; color: var(--text-dark); font-size: 24px; }
+          p { margin-bottom: 30px; color: var(--text-muted); line-height: 1.6; }
           .btn-primary {
             display: inline-block;
             background-color: #1656d8;
@@ -217,6 +226,18 @@ export default function FreelancerOnboarding() {
             />
           </div>
 
+          {/* PDF Resume Upload Field */}
+          <div className="form-group">
+            <label htmlFor="resume">Upload Resume (PDF format only)</label>
+            <input 
+              type="file" 
+              id="resume" 
+              accept=".pdf" 
+              onChange={(e) => setResumeFile(e.target.files[0])}
+              className="file-input"
+            />
+          </div>
+
           <button type="submit" disabled={loading} className="btn btn-primary submit-btn">
             {loading ? "Submitting Profile..." : "Submit Application"}
           </button>
@@ -232,8 +253,8 @@ export default function FreelancerOnboarding() {
         }
         .navbar {
           height: 70px;
-          background-color: #ffffff;
-          border-bottom: 1px solid #e2e8f0;
+          background-color: var(--bg-white);
+          border-bottom: 1px solid var(--border-color);
           display: flex;
           align-items: center;
           padding: 0 40px;
@@ -252,7 +273,7 @@ export default function FreelancerOnboarding() {
         .brand-name {
           font-weight: 700;
           font-size: 18px;
-          color: #101828;
+          color: var(--text-dark);
         }
         .form-container {
           max-width: 580px;
@@ -265,17 +286,17 @@ export default function FreelancerOnboarding() {
         }
         .form-header h1 {
           font-size: 28px;
-          color: #101828;
+          color: var(--text-dark);
           margin-bottom: 8px;
         }
         .form-header p {
-          color: #64748b;
+          color: var(--text-muted);
           font-size: 15px;
           line-height: 1.5;
         }
         .form-card {
-          background: #ffffff;
-          border: 1px solid #e2e8f0;
+          background: var(--bg-white);
+          border: 1px solid var(--border-color);
           border-top: 6px solid #1656d8;
           border-radius: 16px;
           padding: 36px;
@@ -290,7 +311,7 @@ export default function FreelancerOnboarding() {
         .form-group label {
           font-size: 14px;
           font-weight: 600;
-          color: #101828;
+          color: var(--text-dark);
           display: flex;
           justify-content: space-between;
         }
@@ -298,14 +319,19 @@ export default function FreelancerOnboarding() {
           color: #1656d8;
         }
         .form-group input[type="text"],
-        .form-group input[type="email"] {
+        .form-group input[type="email"],
+        .file-input {
           padding: 12px;
-          border: 1px solid #e2e8f0;
+          border: 1px solid var(--border-color);
           border-radius: 10px;
           font-size: 14px;
-          color: #101828;
+          color: var(--text-dark);
           outline: none;
           transition: border-color 0.2s;
+        }
+        .file-input {
+          background-color: var(--bg-light);
+          cursor: pointer;
         }
         .form-group input[type="text"]:focus,
         .form-group input[type="email"]:focus {

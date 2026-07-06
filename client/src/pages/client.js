@@ -101,9 +101,9 @@ export default function ClientPosting() {
             text-align: center;
             max-width: 450px;
             padding: 40px;
-            background: #ffffff;
+            background: var(--bg-white);
             border-radius: 14px;
-            border: 1px solid #e2e8f0;
+            border: 1px solid var(--border-color);
             box-shadow: 0 4px 20px rgba(0,0,0,0.08);
           }
           .success-icon {
@@ -118,8 +118,8 @@ export default function ClientPosting() {
             justify-content: center;
             margin: 0 auto 24px;
           }
-          h2 { margin-bottom: 12px; color: #101828; font-size: 24px; }
-          p { margin-bottom: 30px; color: #64748b; line-height: 1.6; }
+          h2 { margin-bottom: 12px; color: var(--text-dark); font-size: 24px; }
+          p { margin-bottom: 30px; color: var(--text-muted); line-height: 1.6; }
           .btn-primary {
             display: inline-block;
             background-color: #1656d8;
@@ -228,8 +228,8 @@ export default function ClientPosting() {
         }
         .navbar {
           height: 70px;
-          background-color: #ffffff;
-          border-bottom: 1px solid #e2e8f0;
+          background-color: var(--bg-white);
+          border-bottom: 1px solid var(--border-color);
           display: flex;
           align-items: center;
           padding: 0 40px;
@@ -248,7 +248,7 @@ export default function ClientPosting() {
         .brand-name {
           font-weight: 700;
           font-size: 18px;
-          color: #101828;
+          color: var(--text-dark);
         }
         .form-container {
           max-width: 580px;
@@ -261,11 +261,11 @@ export default function ClientPosting() {
         }
         .form-header h1 {
           font-size: 28px;
-          color: #101828;
+          color: var(--text-dark);
           margin-bottom: 8px;
         }
         .form-header p {
-          color: #64748b;
+          color: var(--text-muted);
           font-size: 15px;
           line-height: 1.5;
         }
@@ -274,15 +274,15 @@ export default function ClientPosting() {
           align-items: center;
           gap: 12px;
           margin-bottom: 20px;
-          background-color: #ffffff;
+          background-color: var(--bg-white);
           padding: 12px 18px;
           border-radius: 14px;
-          border: 1px solid #e2e8f0;
+          border: 1px solid var(--border-color);
         }
         .template-lbl {
           font-size: 13px;
           font-weight: 700;
-          color: #64748b;
+          color: var(--text-muted);
         }
         .template-buttons {
           display: flex;
@@ -291,8 +291,8 @@ export default function ClientPosting() {
         }
         .btn-template {
           background-color: #eef4ff;
-          border: 1px solid #e2e8f0;
-          color: #101828;
+          border: 1px solid var(--border-color);
+          color: var(--text-dark);
           padding: 6px 12px;
           border-radius: 10px;
           font-size: 12px;
@@ -306,8 +306,8 @@ export default function ClientPosting() {
           color: #1656d8;
         }
         .form-card {
-          background: #ffffff;
-          border: 1px solid #e2e8f0;
+          background: var(--bg-white);
+          border: 1px solid var(--border-color);
           border-top: 6px solid #1656d8;
           border-radius: 16px;
           padding: 36px;
@@ -322,7 +322,7 @@ export default function ClientPosting() {
         .form-group label {
           font-size: 14px;
           font-weight: 600;
-          color: #101828;
+          color: var(--text-dark);
           display: flex;
           justify-content: space-between;
         }
@@ -332,10 +332,10 @@ export default function ClientPosting() {
         .form-group input[type="text"],
         .form-group textarea {
           padding: 12px;
-          border: 1px solid #e2e8f0;
+          border: 1px solid var(--border-color);
           border-radius: 10px;
           font-size: 14px;
-          color: #101828;
+          color: var(--text-dark);
           outline: none;
           transition: border-color 0.2s;
           font-family: inherit;

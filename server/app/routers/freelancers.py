@@ -1,9 +1,14 @@
-from fastapi import APIRouter, HTTPException, status
-from typing import List
-from app.models.schemas import FreelancerCreate, FreelancerResponse
+from fastapi import APIRouter, HTTPException, status, UploadFile, File, Form
+from typing import List, Optional
+from app.models.schemas import FreelancerResponse
 from app.database.connection import get_db_cursor
 from app.services.matching import run_match_for_freelancer
 import psycopg2
+import pypdf
+import io
+import logging
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter(
     prefix="/api/freelancers",
@@ -11,22 +16,46 @@ router = APIRouter(
 )
 
 @router.post("/", response_model=FreelancerResponse, status_code=status.HTTP_201_CREATED)
-def create_freelancer(freelancer: FreelancerCreate):
+async def create_freelancer(
+    name: str = Form(...),
+    email: str = Form(...),
+    linkedin_url: str = Form(...),
+    primary_skill: str = Form(...),
+    experience: int = Form(...),
+    hourly_rate: float = Form(...),
+    resume: Optional[UploadFile] = File(None)
+):
+    resume_text = ""
+    if resume:
+        try:
+            pdf_bytes = await resume.read()
+            pdf_file = io.BytesIO(pdf_bytes)
+            reader = pypdf.PdfReader(pdf_file)
+            extracted_pages = []
+            for page in reader.pages:
+                text = page.extract_text()
+                if text:
+                    extracted_pages.append(text)
+            resume_text = "\n".join(extracted_pages)
+        except Exception as e:
+            logger.error(f"Error parsing resume PDF: {e}")
+
     try:
         with get_db_cursor() as cursor:
-            # Insert freelancer details into database
+            # Insert freelancer details into database including resume text
             query = """
-            INSERT INTO freelancers (name, email, linkedin_url, primary_skill, experience, hourly_rate)
-            VALUES (%s, %s, %s, %s, %s, %s)
+            INSERT INTO freelancers (name, email, linkedin_url, primary_skill, experience, hourly_rate, resume_text)
+            VALUES (%s, %s, %s, %s, %s, %s, %s)
             RETURNING id, created_at;
             """
             cursor.execute(query, (
-                freelancer.name,
-                freelancer.email,
-                freelancer.linkedin_url,
-                freelancer.primary_skill,
-                freelancer.experience,
-                freelancer.hourly_rate
+                name,
+                email,
+                linkedin_url,
+                primary_skill,
+                experience,
+                hourly_rate,
+                resume_text
             ))
             result = cursor.fetchone()
             f_id, created_at = result[0], result[1]
@@ -36,12 +65,12 @@ def create_freelancer(freelancer: FreelancerCreate):
         
         return FreelancerResponse(
             id=f_id,
-            name=freelancer.name,
-            email=freelancer.email,
-            linkedin_url=freelancer.linkedin_url,
-            primary_skill=freelancer.primary_skill,
-            experience=freelancer.experience,
-            hourly_rate=freelancer.hourly_rate,
+            name=name,
+            email=email,
+            linkedin_url=linkedin_url,
+            primary_skill=primary_skill,
+            experience=experience,
+            hourly_rate=hourly_rate,
             created_at=created_at
         )
             

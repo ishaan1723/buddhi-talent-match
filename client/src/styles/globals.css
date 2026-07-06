@@ -1,20 +1,20 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap');
 
 :root {
-  --primary-blue: #0a2f7c;
-  --primary-blue-hover: #061f52;
-  --primary-blue-light: #dbe8ff;
-  --navy-deep: #071a3f;
-  --navy-mid: #0a2f7c;
-  --text-dark: #061f52;
-  --text-muted: #0a2f7c;
-  --bg-light: #cbdfff;
-  --bg-white: #ffffff;
-  --border-color: #a4c6fc;
-  --success-green: #1dbf73;
-  --shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.05);
-  --shadow-md: 0 10px 30px rgba(15, 23, 42, 0.08);
-  --shadow-lg: 0 20px 45px rgba(7, 26, 63, 0.14);
+  --primary-blue: #3b82f6;
+  --primary-blue-hover: #2563eb;
+  --primary-blue-light: rgba(59, 130, 246, 0.1);
+  --navy-deep: #0b0f19;
+  --navy-mid: #1e293b;
+  --text-dark: #f8fafc;
+  --text-muted: #94a3b8;
+  --bg-light: #0b0f19;
+  --bg-white: #1e293b;
+  --border-color: #334155;
+  --success-green: #10b981;
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 10px 30px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 20px 45px rgba(0, 0, 0, 0.5);
   --border-radius: 14px;
   --border-radius-sm: 10px;
   --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -24,7 +24,7 @@
 h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-display) !important;
   letter-spacing: -0.02em;
-  color: #0c2d6b !important;
+  color: #f8fafc !important;
 }
 
 * {
