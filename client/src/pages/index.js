@@ -306,27 +306,27 @@ export default function Home() {
           grid-template-columns: 1.12fr 0.88fr;
           gap: 60px;
           align-items: center;
-          background: radial-gradient(120% 140% at 0% 0%, #eaf2ff 0%, #ffffff 55%) !important;
+          background: linear-gradient(135deg, #071936 0%, #0e2e5e 100%) !important;
           border-radius: 24px;
-          border: 1px solid #dbe8ff;
-          box-shadow: 0 20px 50px rgba(22, 86, 216, 0.08);
+          border: 1px solid #153970;
+          box-shadow: 0 20px 50px rgba(7, 25, 54, 0.15);
         }
 
         .hero-content h1 {
           font-size: 48px;
           font-weight: 800;
           line-height: 1.15;
-          color: #101828;
+          color: #ffffff !important;
           margin-bottom: 24px;
         }
 
         .highlight {
-          color: #1656d8;
+          color: #38bdf8 !important;
         }
 
         .hero-content p {
           font-size: 18px;
-          color: #64748b;
+          color: #e2e8f0 !important;
           line-height: 1.6;
           margin-bottom: 40px;
         }
