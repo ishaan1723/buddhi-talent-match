@@ -177,6 +177,7 @@ export default function Credits() {
         .member-card {
           background: #ffffff;
           border: 1px solid #e2e8f0;
+          border-top: 4px solid #1656d8;
           padding: 30px 20px;
           border-radius: 14px;
           display: flex;

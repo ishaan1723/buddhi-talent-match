@@ -276,6 +276,7 @@ export default function FreelancerOnboarding() {
         .form-card {
           background: #ffffff;
           border: 1px solid #e2e8f0;
+          border-top: 6px solid #1656d8;
           border-radius: 16px;
           padding: 36px;
           box-shadow: 0 10px 30px rgba(15, 23, 42, 0.06);

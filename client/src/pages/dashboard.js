@@ -523,6 +523,7 @@ export default function Dashboard() {
           width: 320px;
           background-color: #ffffff;
           border-right: 1px solid #e2e8f0;
+          border-top: 6px solid #1656d8;
           display: flex;
           flex-direction: column;
         }
