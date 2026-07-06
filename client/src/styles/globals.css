@@ -1,20 +1,20 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap');
 
 :root {
-  --primary-blue: #3b82f6;
-  --primary-blue-hover: #2563eb;
-  --primary-blue-light: rgba(59, 130, 246, 0.1);
-  --navy-deep: #0b0f19;
-  --navy-mid: #1e293b;
-  --text-dark: #f8fafc;
-  --text-muted: #94a3b8;
-  --bg-light: #050811;
-  --bg-white: #1e293b;
-  --border-color: #334155;
-  --success-green: #10b981;
-  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
-  --shadow-md: 0 10px 30px rgba(0, 0, 0, 0.4);
-  --shadow-lg: 0 20px 45px rgba(0, 0, 0, 0.5);
+  --primary-blue: #0a2f7c;
+  --primary-blue-hover: #061f52;
+  --primary-blue-light: #dbe8ff;
+  --navy-deep: #071a3f;
+  --navy-mid: #0a2f7c;
+  --text-dark: #061f52;
+  --text-muted: #0a2f7c;
+  --bg-light: #cbdfff;
+  --bg-white: #ffffff;
+  --border-color: #a4c6fc;
+  --success-green: #1dbf73;
+  --shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.05);
+  --shadow-md: 0 10px 30px rgba(15, 23, 42, 0.08);
+  --shadow-lg: 0 20px 45px rgba(7, 26, 63, 0.14);
   --border-radius: 14px;
   --border-radius-sm: 10px;
   --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -24,7 +24,7 @@
 h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-display) !important;
   letter-spacing: -0.02em;
-  color: #f8fafc !important;
+  color: #0c2d6b !important;
 }
 
 * {
@@ -58,21 +58,19 @@ button {
   padding: 0 24px;
 }
 
-/* Premium luxury glassmorphic card layout */
+/* Card layout inspired by Fiverr's marketplace */
 .card {
-  background-color: rgba(30, 41, 59, 0.45) !important;
-  backdrop-filter: blur(12px) !important;
-  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  background-color: var(--bg-white);
+  border: 1px solid var(--border-color);
   border-radius: var(--border-radius);
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3) !important;
+  box-shadow: var(--shadow-sm);
   padding: 24px;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  transition: box-shadow 0.2s ease, border-color 0.2s ease;
 }
 
 .card:hover {
-  border-color: var(--primary-blue) !important;
-  box-shadow: 0 0 25px rgba(59, 130, 246, 0.18) !important;
-  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+  border-color: var(--primary-blue);
 }
 
 /* Standard Premium Buttons */

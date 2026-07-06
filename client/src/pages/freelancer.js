@@ -90,9 +90,9 @@ export default function FreelancerOnboarding() {
             text-align: center;
             max-width: 450px;
             padding: 40px;
-            background: var(--bg-white);
+            background: #ffffff;
             border-radius: 14px;
-            border: 1px solid var(--border-color);
+            border: 1px solid #e2e8f0;
             box-shadow: 0 4px 20px rgba(0,0,0,0.08);
           }
           .success-icon {
@@ -107,8 +107,8 @@ export default function FreelancerOnboarding() {
             justify-content: center;
             margin: 0 auto 24px;
           }
-          h2 { margin-bottom: 12px; color: var(--text-dark) !important; font-size: 24px; }
-          p { margin-bottom: 30px; color: var(--text-muted); line-height: 1.6; }
+          h2 { margin-bottom: 12px; color: #101828; font-size: 24px; }
+          p { margin-bottom: 30px; color: #64748b; line-height: 1.6; }
           .btn-primary {
             display: inline-block;
             background-color: #1656d8;
@@ -234,7 +234,14 @@ export default function FreelancerOnboarding() {
               id="resume" 
               accept=".pdf" 
               onChange={(e) => setResumeFile(e.target.files[0])}
-              className="file-input"
+              style={{
+                padding: '10px',
+                border: '1px solid #e2e8f0',
+                borderRadius: '10px',
+                backgroundColor: '#f8fafc',
+                color: '#101828',
+                cursor: 'pointer'
+              }}
             />
           </div>
 
@@ -253,8 +260,8 @@ export default function FreelancerOnboarding() {
         }
         .navbar {
           height: 70px;
-          background-color: var(--bg-light) !important;
-          border-bottom: 1px solid var(--border-color);
+          background-color: #ffffff;
+          border-bottom: 1px solid #e2e8f0;
           display: flex;
           align-items: center;
           padding: 0 40px;
@@ -269,12 +276,11 @@ export default function FreelancerOnboarding() {
           width: auto;
           display: block;
           object-fit: contain;
-          filter: brightness(0) invert(1);
         }
         .brand-name {
           font-weight: 700;
           font-size: 18px;
-          color: var(--text-dark) !important;
+          color: #101828;
         }
         .form-container {
           max-width: 580px;
@@ -287,17 +293,17 @@ export default function FreelancerOnboarding() {
         }
         .form-header h1 {
           font-size: 28px;
-          color: var(--text-dark) !important;
+          color: #101828;
           margin-bottom: 8px;
         }
         .form-header p {
-          color: var(--text-muted);
+          color: #64748b;
           font-size: 15px;
           line-height: 1.5;
         }
         .form-card {
-          background: var(--bg-white);
-          border: 1px solid var(--border-color);
+          background: #ffffff;
+          border: 1px solid #e2e8f0;
           border-top: 6px solid #1656d8;
           border-radius: 16px;
           padding: 36px;
@@ -312,7 +318,7 @@ export default function FreelancerOnboarding() {
         .form-group label {
           font-size: 14px;
           font-weight: 600;
-          color: var(--text-dark) !important;
+          color: #101828;
           display: flex;
           justify-content: space-between;
         }
@@ -320,19 +326,14 @@ export default function FreelancerOnboarding() {
           color: #1656d8;
         }
         .form-group input[type="text"],
-        .form-group input[type="email"],
-        .file-input {
+        .form-group input[type="email"] {
           padding: 12px;
-          border: 1px solid var(--border-color);
+          border: 1px solid #e2e8f0;
           border-radius: 10px;
           font-size: 14px;
-          color: var(--text-dark) !important;
+          color: #101828;
           outline: none;
           transition: border-color 0.2s;
-        }
-        .file-input {
-          background-color: var(--bg-light);
-          cursor: pointer;
         }
         .form-group input[type="text"]:focus,
         .form-group input[type="email"]:focus {

@@ -463,8 +463,8 @@ export default function Dashboard() {
 
         .navbar {
           height: 70px;
-          background-color: var(--bg-light) !important;
-          border-bottom: 1px solid var(--border-color);
+          background-color: #ffffff;
+          border-bottom: 1px solid #e2e8f0;
           display: flex;
           justify-content: space-between;
           align-items: center;
@@ -482,13 +482,12 @@ export default function Dashboard() {
           width: auto;
           display: block;
           object-fit: contain;
-          filter: brightness(0) invert(1);
         }
 
         .brand-name {
           font-weight: 700;
           font-size: 18px;
-          color: var(--text-dark) !important;
+          color: #101828;
         }
 
         .badge {
@@ -507,7 +506,7 @@ export default function Dashboard() {
 
         .nav-link {
           font-weight: 600;
-          color: var(--text-muted);
+          color: #64748b;
           font-size: 14px;
         }
 
@@ -522,8 +521,8 @@ export default function Dashboard() {
 
         .jobs-sidebar {
           width: 320px;
-          background-color: var(--bg-light) !important;
-          border-right: 1px solid var(--border-color);
+          background-color: #ffffff;
+          border-right: 1px solid #e2e8f0;
           border-top: 6px solid #1656d8;
           display: flex;
           flex-direction: column;
@@ -531,12 +530,12 @@ export default function Dashboard() {
 
         .sidebar-header {
           padding: 24px;
-          border-bottom: 1px solid var(--border-color);
+          border-bottom: 1px solid #e2e8f0;
         }
 
         .sidebar-header h3 {
           font-size: 16px;
-          color: var(--text-dark) !important;
+          color: #101828;
           margin-bottom: 12px;
         }
 
@@ -545,7 +544,7 @@ export default function Dashboard() {
           background-color: #eef4ff;
           padding: 4px;
           border-radius: 10px;
-          border: 1px solid var(--border-color);
+          border: 1px solid #e2e8f0;
         }
 
         .tab-btn {
@@ -555,14 +554,14 @@ export default function Dashboard() {
           padding: 6px;
           font-size: 12px;
           font-weight: 600;
-          color: var(--text-muted);
+          color: #64748b;
           cursor: pointer;
           border-radius: 10px;
           transition: background-color 0.2s;
         }
 
         .tab-btn.active {
-          background-color: var(--bg-light) !important;
+          background-color: #ffffff;
           color: #1656d8;
           box-shadow: 0 1px 3px rgba(0,0,0,0.05);
         }
@@ -582,7 +581,7 @@ export default function Dashboard() {
 
         .job-item {
           padding: 20px 24px;
-          border-bottom: 1px solid var(--border-color);
+          border-bottom: 1px solid #e2e8f0;
           cursor: pointer;
           transition: background-color 0.2s ease;
         }
@@ -598,19 +597,19 @@ export default function Dashboard() {
 
         .job-item h4 {
           font-size: 14px;
-          color: var(--text-dark) !important;
+          color: #101828;
           margin-bottom: 6px;
         }
 
         .job-meta {
           font-size: 12px;
-          color: var(--text-muted);
+          color: #64748b;
         }
 
         .sidebar-footer {
           padding: 24px;
           border-top: 1px solid #e2e8f0;
-          background-color: var(--bg-light) !important;
+          background-color: #ffffff;
         }
 
         .btn-add-job {
@@ -635,13 +634,13 @@ export default function Dashboard() {
 
         .matches-header h2 {
           font-size: 22px;
-          color: var(--text-dark) !important;
+          color: #101828;
           margin-bottom: 6px;
         }
 
         .job-desc-preview {
           font-size: 14px;
-          color: var(--text-muted);
+          color: #64748b;
           max-width: 800px;
         }
 
@@ -651,8 +650,8 @@ export default function Dashboard() {
 
         /* Filter Bar card */
         .filter-bar {
-          background-color: var(--bg-light) !important;
-          border: 1px solid var(--border-color);
+          background-color: #ffffff;
+          border: 1px solid #e2e8f0;
           border-radius: 14px;
           padding: 20px;
           margin-bottom: 30px;
@@ -671,16 +670,16 @@ export default function Dashboard() {
         .filter-group label {
           font-size: 12px;
           font-weight: 700;
-          color: var(--text-muted);
+          color: #64748b;
           text-transform: uppercase;
         }
 
         .filter-input {
           padding: 10px;
-          border: 1px solid var(--border-color);
+          border: 1px solid #e2e8f0;
           border-radius: 10px;
           font-size: 14px;
-          color: var(--text-dark) !important;
+          color: #101828;
           outline: none;
         }
 
@@ -702,8 +701,8 @@ export default function Dashboard() {
         }
 
         .candidate-card {
-          background: var(--bg-white);
-          border: 1px solid var(--border-color);
+          background: #ffffff;
+          border: 1px solid #e2e8f0;
           border-radius: 14px;
           padding: 24px;
           box-shadow: 0 1px 3px rgba(0,0,0,0.05);
@@ -734,7 +733,7 @@ export default function Dashboard() {
 
         .candidate-info h3 {
           font-size: 18px;
-          color: var(--text-dark) !important;
+          color: #101828;
           margin-bottom: 4px;
         }
 
@@ -774,7 +773,7 @@ export default function Dashboard() {
           display: flex;
           gap: 40px;
           border-top: 1px solid #e2e8f0;
-          border-bottom: 1px solid var(--border-color);
+          border-bottom: 1px solid #e2e8f0;
           padding: 12px 0;
         }
 
@@ -786,14 +785,14 @@ export default function Dashboard() {
 
         .lbl {
           font-size: 11px;
-          color: var(--text-muted);
+          color: #64748b;
           text-transform: uppercase;
         }
 
         .val {
           font-size: 14px;
           font-weight: 600;
-          color: var(--text-dark) !important;
+          color: #101828;
         }
 
         .card-actions {
@@ -840,8 +839,8 @@ export default function Dashboard() {
 
         .btn-action.reject {
           background-color: #eef4ff;
-          border: 1px solid var(--border-color);
-          color: var(--text-muted);
+          border: 1px solid #e2e8f0;
+          color: #64748b;
         }
 
         .btn-action.reject:hover {
@@ -882,7 +881,7 @@ export default function Dashboard() {
 
         .drawer-content {
           width: 500px;
-          background-color: var(--bg-light) !important;
+          background-color: #ffffff;
           height: 100%;
           box-shadow: -4px 0 30px rgba(0,0,0,0.1);
           padding: 40px;
@@ -900,19 +899,19 @@ export default function Dashboard() {
           background: none;
           border: none;
           font-size: 32px;
-          color: var(--text-muted);
+          color: #64748b;
           cursor: pointer;
         }
 
         .drawer-header {
-          border-bottom: 1px solid var(--border-color);
+          border-bottom: 1px solid #e2e8f0;
           padding-bottom: 20px;
           margin-top: 10px;
         }
 
         .drawer-header h2 {
           font-size: 20px;
-          color: var(--text-dark) !important;
+          color: #101828;
           margin-bottom: 8px;
         }
 
@@ -925,7 +924,7 @@ export default function Dashboard() {
 
         .drawer-section h3 {
           font-size: 14px;
-          color: var(--text-muted);
+          color: #64748b;
           text-transform: uppercase;
           margin-bottom: 12px;
           letter-spacing: 0.5px;
@@ -940,12 +939,12 @@ export default function Dashboard() {
           padding: 12px 0;
           border-bottom: 1px solid #eef4ff;
           font-size: 14px;
-          color: var(--text-dark) !important;
+          color: #101828;
         }
 
         .table-lbl {
           font-weight: 600;
-          color: var(--text-muted);
+          color: #64748b;
           width: 140px;
         }
 
@@ -960,7 +959,7 @@ export default function Dashboard() {
 
         .ai-breakdown-card {
           background-color: #eaf2ff;
-          border: 1px solid var(--border-color);
+          border: 1px solid #e2e8f0;
           border-radius: 14px;
           padding: 20px;
         }
@@ -982,7 +981,7 @@ export default function Dashboard() {
 
         .breakdown-text {
           font-size: 14px;
-          color: var(--text-dark) !important;
+          color: #101828;
           line-height: 1.6;
         }
 
@@ -1002,7 +1001,7 @@ export default function Dashboard() {
         }
 
         .modal-content {
-          background-color: var(--bg-light) !important;
+          background-color: #ffffff;
           border-radius: 14px;
           width: 600px;
           padding: 36px;
@@ -1014,28 +1013,28 @@ export default function Dashboard() {
         }
 
         .modal-header {
-          border-bottom: 1px solid var(--border-color);
+          border-bottom: 1px solid #e2e8f0;
           padding-bottom: 16px;
         }
 
         .modal-header h3 {
           font-size: 18px;
-          color: var(--text-dark) !important;
+          color: #101828;
         }
 
         .modal-intro {
           font-size: 14px;
-          color: var(--text-muted);
+          color: #64748b;
         }
 
         .email-preview-box {
           background-color: #eef4ff;
-          border: 1px solid var(--border-color);
+          border: 1px solid #e2e8f0;
           border-radius: 10px;
           padding: 20px;
           font-size: 13.5px;
           line-height: 1.6;
-          color: var(--text-dark) !important;
+          color: #101828;
           max-height: 280px;
           overflow-y: auto;
           font-family: monospace;
@@ -1060,7 +1059,7 @@ export default function Dashboard() {
         }
 
         .toast-notification {
-          background-color: var(--text-dark) !important;
+          background-color: #101828;
           color: #ffffff;
           padding: 10px 20px;
           border-radius: 10px;
@@ -1070,7 +1069,7 @@ export default function Dashboard() {
         .loading-spinner, .empty-state {
           padding: 40px;
           text-align: center;
-          color: var(--text-muted);
+          color: #64748b;
         }
 
         /* Common Buttons */
@@ -1094,14 +1093,14 @@ export default function Dashboard() {
         }
 
         .btn-secondary {
-          background-color: var(--bg-light) !important;
-          color: var(--text-dark) !important;
-          border: 1px solid var(--border-color);
+          background-color: #ffffff;
+          color: #101828;
+          border: 1px solid #e2e8f0;
         }
 
         .btn-secondary:hover {
           background-color: #eef4ff;
-          border-color: var(--text-dark) !important;
+          border-color: #101828;
         }
       `}</style>
     </div>

@@ -235,7 +235,7 @@ export default function Home() {
       <style jsx>{`
         .home-container {
           min-height: 100vh;
-          background-color: var(--bg-light) !important;
+          background-color: #ffffff;
           font-family: 'Inter', sans-serif;
           display: flex;
           flex-direction: column;
@@ -243,12 +243,12 @@ export default function Home() {
 
         .navbar {
           height: 75px;
-          border-bottom: 1px solid var(--border-color);
+          border-bottom: 1px solid #e2e8f0;
           display: flex;
           justify-content: space-between;
           align-items: center;
           padding: 0 40px;
-          background: rgba(5, 8, 17, 0.85) !important;
+          background: rgba(255, 255, 255, 0.85);
           backdrop-filter: blur(10px);
           -webkit-backdrop-filter: blur(10px);
           position: sticky;
@@ -267,7 +267,6 @@ export default function Home() {
           width: auto;
           display: block;
           object-fit: contain;
-          filter: brightness(0) invert(1);
         }
 
         .logo-img-small {
@@ -275,13 +274,12 @@ export default function Home() {
           width: auto;
           display: block;
           object-fit: contain;
-          filter: brightness(0) invert(1);
         }
 
         .brand-name {
           font-weight: 700;
           font-size: 18px;
-          color: var(--text-dark) !important;
+          color: #101828;
         }
 
         .nav-links {
@@ -292,12 +290,12 @@ export default function Home() {
         .nav-link {
           font-size: 14px;
           font-weight: 600;
-          color: var(--text-muted);
+          color: #64748b;
           transition: color 0.2s;
         }
 
         .nav-link:hover {
-          color: var(--primary-blue) !important;
+          color: #1656d8;
         }
 
         .hero-section {
@@ -355,8 +353,8 @@ export default function Home() {
           border-radius: 12px;
           overflow: hidden;
           box-shadow: 0 10px 30px rgba(16, 79, 223, 0.1);
-          border: 1px solid var(--border-color);
-          background: var(--bg-white);
+          border: 1px solid #e2e8f0;
+          background: #ffffff;
         }
 
         .hero-img {
@@ -375,7 +373,7 @@ export default function Home() {
           background: linear-gradient(120deg, #071a3f 0%, #0e2f7a 45%, #1656d8 100%) !important;
           padding: 64px 0;
           border-top: 1px solid #e2e8f0;
-          border-bottom: 1px solid var(--border-color);
+          border-bottom: 1px solid #e2e8f0;
         }
 
         .stats-grid {
@@ -402,17 +400,17 @@ export default function Home() {
         .how-it-works {
           padding: 80px 0;
           text-align: center;
-          background-color: var(--bg-white) !important;
+          background-color: #ffffff !important;
         }
 
         .how-it-works h2 {
           font-size: 28px;
-          color: var(--text-dark) !important;
+          color: #101828 !important;
           margin-bottom: 8px;
         }
 
         .section-subtitle {
-          color: var(--text-muted) !important;
+          color: #64748b !important;
           margin-bottom: 50px;
         }
 
@@ -424,8 +422,8 @@ export default function Home() {
 
         .step-card {
           padding: 30px;
-          background-color: var(--bg-white) !important;
-          border: 1px solid var(--border-color);
+          background-color: #ffffff !important;
+          border: 1px solid #e2e8f0;
           border-radius: 14px;
           transition: transform 0.2s;
         }
@@ -451,12 +449,12 @@ export default function Home() {
 
         .step-card h4 {
           font-size: 18px;
-          color: var(--text-dark) !important;
+          color: #101828 !important;
           margin-bottom: 12px;
         }
 
         .step-card p {
-          color: var(--text-muted) !important;
+          color: #64748b !important;
           font-size: 14px;
           line-height: 1.6;
         }
@@ -470,7 +468,7 @@ export default function Home() {
 
         .faq-section h2 {
           font-size: 28px;
-          color: var(--text-dark) !important;
+          color: #101828;
           margin-bottom: 40px;
           text-align: center;
         }
@@ -484,8 +482,8 @@ export default function Home() {
         }
 
         .faq-item {
-          background: var(--bg-white);
-          border: 1px solid var(--border-color);
+          background: #ffffff;
+          border: 1px solid #e2e8f0;
           border-radius: 10px;
           overflow: hidden;
           transition: all 0.2s;
@@ -508,7 +506,7 @@ export default function Home() {
           text-align: left;
           font-size: 16px;
           font-weight: 600;
-          color: var(--text-dark) !important;
+          color: #101828;
           display: flex;
           justify-content: space-between;
           align-items: center;
@@ -533,14 +531,14 @@ export default function Home() {
         }
 
         .faq-answer p {
-          color: var(--text-muted);
+          color: #64748b;
           line-height: 1.6;
           font-size: 14px;
         }
 
         /* Footer */
         .footer {
-          background-color: var(--bg-light) !important;
+          background-color: #ffffff;
           border-top: 1px solid #e2e8f0;
           padding: 30px 0;
           margin-top: auto;
@@ -551,7 +549,7 @@ export default function Home() {
           justify-content: space-between;
           align-items: center;
           font-size: 13px;
-          color: var(--text-muted);
+          color: #64748b;
         }
 
         .footer-brand {
@@ -559,7 +557,7 @@ export default function Home() {
           align-items: center;
           gap: 8px;
           font-weight: 700;
-          color: var(--text-dark) !important;
+          color: #101828;
         }
 
         .footer-links {
@@ -623,7 +621,7 @@ export default function Home() {
         .chat-card {
           width: 360px;
           height: 500px;
-          background-color: var(--bg-light) !important;
+          background-color: #ffffff;
           border-radius: 12px;
           display: flex;
           flex-direction: column;
@@ -693,11 +691,11 @@ export default function Home() {
         }
 
         .chat-message.bot {
-          background-color: var(--bg-light) !important;
-          color: var(--text-dark) !important;
+          background-color: #ffffff;
+          color: #101828;
           align-self: flex-start;
           border-bottom-left-radius: 2px;
-          border: 1px solid var(--border-color);
+          border: 1px solid #e2e8f0;
         }
 
         .chat-message.user {
@@ -710,7 +708,7 @@ export default function Home() {
         .chat-footer {
           padding: 16px 20px;
           border-top: 1px solid #e2e8f0;
-          background-color: var(--bg-light) !important;
+          background-color: #ffffff;
           display: flex;
           flex-direction: column;
           gap: 8px;
@@ -719,7 +717,7 @@ export default function Home() {
         .footer-lbl {
           font-size: 11px;
           font-weight: 700;
-          color: var(--text-muted);
+          color: #64748b;
           text-transform: uppercase;
         }
 
@@ -736,9 +734,9 @@ export default function Home() {
           font-weight: 600;
           text-align: left;
           background-color: #eef4ff;
-          border: 1px solid var(--border-color);
+          border: 1px solid #e2e8f0;
           border-radius: 10px;
-          color: var(--text-dark) !important;
+          color: #101828;
           cursor: pointer;
           transition: all 0.2s;
         }
@@ -780,26 +778,29 @@ export default function Home() {
           cursor: pointer;
           transition: all 0.2s ease;
           border: none;
+          text-decoration: none !important;
         }
 
         .btn-primary {
-          background-color: #1656d8;
-          color: #ffffff;
+          background-color: #1656d8 !important;
+          color: #ffffff !important;
+          text-decoration: none !important;
         }
 
         .btn-primary:hover {
-          background-color: #0e3fa3;
+          background-color: #0e3fa3 !important;
         }
 
         .btn-secondary {
-          background-color: var(--bg-light) !important;
-          color: var(--text-dark) !important;
-          border: 1px solid var(--border-color);
+          background-color: #ffffff !important;
+          color: #0a2f7c !important;
+          border: 1.5px solid #ffffff !important;
+          text-decoration: none !important;
         }
 
         .btn-secondary:hover {
           background-color: #eef4ff;
-          border-color: var(--text-dark) !important;
+          border-color: #101828;
         }
 
         /* Mobile & Tablet Responsiveness */
