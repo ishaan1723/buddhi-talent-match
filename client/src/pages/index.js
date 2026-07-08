@@ -571,15 +571,15 @@ export default function Home() {
           position: sticky;
           top: 0;
           z-index: 200;
-          background: rgba(11, 14, 23, 0.72);
+          background: rgba(250, 249, 246, 0.82) !important;
           backdrop-filter: blur(14px);
           -webkit-backdrop-filter: blur(14px);
-          border-bottom: 1px solid transparent;
+          border-bottom: 1px solid var(--paper-line) !important;
           transition: border-color 0.3s ease, background 0.3s ease;
         }
         .nav-scrolled {
-          background: rgba(11, 14, 23, 0.92);
-          border-bottom-color: var(--ink-line);
+          background: rgba(250, 249, 246, 0.95) !important;
+          border-bottom-color: var(--paper-line) !important;
         }
         .nav-inner {
           height: 72px;
@@ -602,12 +602,12 @@ export default function Home() {
           font-family: var(--font-display);
           font-size: 17px;
           font-weight: 600;
-          color: var(--text-on-ink);
+          color: var(--text) !important;
           letter-spacing: -0.01em;
         }
         .brand-word em {
           font-style: italic;
-          color: var(--text-on-ink-muted);
+          color: var(--text-muted) !important;
           font-weight: 400;
         }
         .nav-links {
@@ -617,11 +617,11 @@ export default function Home() {
         .nav-links a {
           font-size: 14px;
           font-weight: 500;
-          color: var(--text-on-ink-muted);
+          color: var(--text-muted) !important;
           transition: color 0.2s;
         }
         .nav-links a:hover {
-          color: #fff;
+          color: var(--indigo) !important;
         }
         .nav-actions {
           display: flex;
@@ -631,10 +631,10 @@ export default function Home() {
         .nav-ghost {
           font-size: 14px;
           font-weight: 500;
-          color: var(--text-on-ink-muted);
+          color: var(--text-muted) !important;
         }
         .nav-ghost:hover {
-          color: #fff;
+          color: var(--indigo) !important;
         }
         .nav-cta {
           padding: 10px 20px;

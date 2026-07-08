@@ -180,20 +180,20 @@ textarea:focus-visible,
   color: var(--indigo);
 }
 
-/* Global dark navbar (used across pages via shared classes) */
+/* Global light navbar for clear logo contrast across all pages */
 .navbar {
-  background-color: var(--ink) !important;
-  border-bottom: 1px solid var(--ink-line) !important;
-  color: var(--text-on-ink) !important;
+  background-color: var(--paper) !important;
+  border-bottom: 1px solid var(--paper-line) !important;
+  color: var(--text) !important;
 }
-.navbar a, .navbar span, .navbar .brand-name, .navbar .logo-img {
-  color: var(--text-on-ink) !important;
+.navbar a, .navbar span, .navbar .brand-name {
+  color: var(--text) !important;
 }
 .navbar .nav-link {
-  color: var(--text-on-ink-muted) !important;
+  color: var(--text-muted) !important;
 }
 .navbar .nav-link:hover {
-  color: #ffffff !important;
+  color: var(--indigo) !important;
 }
 .navbar .logo-img {
   filter: none !important;
