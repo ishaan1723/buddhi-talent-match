@@ -196,7 +196,7 @@ textarea:focus-visible,
   color: #ffffff !important;
 }
 .navbar .logo-img {
-  filter: brightness(0) invert(1);
+  filter: none !important;
 }
 
 /* Global dark footer */
