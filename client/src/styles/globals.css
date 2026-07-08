@@ -1,30 +1,62 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap');
+/* ===========================================================
+   DESIGN SYSTEM — AI Shop International
+   Ink/Paper/Signal token system. See tokens below before
+   touching any color, spacing, or type value in this file.
+=========================================================== */
 
 :root {
-  --primary-blue: #0a2f7c;
-  --primary-blue-hover: #061f52;
-  --primary-blue-light: #dbe8ff;
-  --navy-deep: #071a3f;
-  --navy-mid: #0a2f7c;
-  --text-dark: #061f52;
-  --text-muted: #0a2f7c;
-  --bg-light: #cbdfff;
-  --bg-white: #ffffff;
-  --border-color: #a4c6fc;
-  --success-green: #1dbf73;
-  --shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.05);
-  --shadow-md: 0 10px 30px rgba(15, 23, 42, 0.08);
-  --shadow-lg: 0 20px 45px rgba(7, 26, 63, 0.14);
-  --border-radius: 14px;
-  --border-radius-sm: 10px;
-  --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  --font-display: 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-}
+  /* Surfaces */
+  --ink: #0b0e17;           /* primary dark surface: nav, hero, footer */
+  --ink-soft: #141928;      /* secondary dark surface: cards on dark bg */
+  --ink-line: #242b3d;      /* hairline borders on dark surfaces */
+  --paper: #faf9f6;         /* primary light surface */
+  --paper-dim: #f1efe8;     /* secondary light surface / section break */
+  --paper-line: #e4e1d8;    /* hairline borders on light surfaces */
 
-h1, h2, h3, h4, h5, h6 {
-  font-family: var(--font-display) !important;
-  letter-spacing: -0.02em;
-  color: #0c2d6b !important;
+  /* Text */
+  --text: #14151a;          /* body text on paper */
+  --text-muted: #6b6f7b;    /* secondary text on paper */
+  --text-on-ink: #f5f4f0;   /* body text on ink */
+  --text-on-ink-muted: #9498a6; /* secondary text on ink */
+
+  /* Signal colors */
+  --indigo: #5b4fe8;        /* primary interactive / AI accent */
+  --indigo-hover: #4a3fd1;
+  --indigo-soft: #eeecfd;   /* indigo tint for light chips */
+  --gold: #c9a227;          /* reserved: verified / vetted moments only */
+  --gold-soft: #f6ecc9;
+  --success: #1f9d63;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 2px rgba(11, 14, 23, 0.06);
+  --shadow-md: 0 12px 32px rgba(11, 14, 23, 0.10);
+  --shadow-lg: 0 24px 60px rgba(11, 14, 23, 0.18);
+  --shadow-gold: 0 8px 24px rgba(201, 162, 39, 0.25);
+
+  /* Geometry */
+  --radius-sm: 10px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
+
+  /* Type */
+  --font-display: 'Fraunces', 'Iowan Old Style', ui-serif, Georgia, serif;
+  --font-body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'IBM Plex Mono', 'SF Mono', ui-monospace, monospace;
+
+  /* Legacy aliases kept so untouched pages don't break */
+  --primary-blue: var(--indigo);
+  --primary-blue-hover: var(--indigo-hover);
+  --primary-blue-light: var(--indigo-soft);
+  --navy-deep: var(--ink);
+  --navy-mid: var(--ink-soft);
+  --text-dark: var(--text);
+  --bg-light: var(--paper-dim);
+  --bg-white: #ffffff;
+  --border-color: var(--paper-line);
+  --success-green: var(--success);
+  --border-radius: var(--radius-md);
+  --border-radius-sm: var(--radius-sm);
+  --font-family: var(--font-body);
 }
 
 * {
@@ -33,12 +65,24 @@ h1, h2, h3, h4, h5, h6 {
   padding: 0;
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 body {
-  font-family: var(--font-family);
-  background-color: var(--bg-light);
-  color: var(--text-dark);
+  font-family: var(--font-body);
+  background-color: var(--paper);
+  color: var(--text);
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-display);
+  letter-spacing: -0.01em;
+  color: var(--text);
+  font-weight: 600;
 }
 
 a {
@@ -50,7 +94,30 @@ button {
   font-family: inherit;
 }
 
-/* Premium Layout & Container Utilities */
+img {
+  max-width: 100%;
+}
+
+/* Visible focus states everywhere — accessibility floor */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+[tabindex]:focus-visible {
+  outline: 2px solid var(--indigo);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
 .container {
   width: 100%;
   max-width: 1200px;
@@ -58,87 +125,89 @@ button {
   padding: 0 24px;
 }
 
-/* Card layout inspired by Fiverr's marketplace */
+/* Card */
 .card {
-  background-color: var(--bg-white);
-  border: 1px solid var(--border-color);
-  border-radius: var(--border-radius);
+  background-color: #ffffff;
+  border: 1px solid var(--paper-line);
+  border-radius: var(--radius-md);
   box-shadow: var(--shadow-sm);
   padding: 24px;
-  transition: box-shadow 0.2s ease, border-color 0.2s ease;
+  transition: box-shadow 0.25s ease, border-color 0.25s ease, transform 0.25s ease;
 }
 
 .card:hover {
   box-shadow: var(--shadow-md);
-  border-color: var(--primary-blue);
+  border-color: var(--indigo);
+  transform: translateY(-2px);
 }
 
-/* Standard Premium Buttons */
+/* Buttons */
 .btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 12px 26px;
+  gap: 8px;
+  padding: 13px 26px;
   border-radius: 999px;
   font-weight: 600;
   font-size: 15px;
   cursor: pointer;
   transition: all 0.2s ease;
   border: none;
+  font-family: var(--font-body);
 }
 
 .btn-primary {
-  background-color: var(--primary-blue);
-  color: var(--bg-white);
-  box-shadow: 0 8px 20px rgba(22, 86, 216, 0.25);
+  background-color: var(--indigo);
+  color: #ffffff;
+  box-shadow: 0 8px 20px rgba(91, 79, 232, 0.28);
 }
 
 .btn-primary:hover {
-  background-color: var(--primary-blue-hover);
-  box-shadow: 0 10px 24px rgba(22, 86, 216, 0.32);
+  background-color: var(--indigo-hover);
+  box-shadow: 0 10px 26px rgba(91, 79, 232, 0.36);
   transform: translateY(-1px);
 }
 
 .btn-secondary {
-  background-color: var(--bg-white);
-  color: var(--text-dark);
-  border: 1px solid var(--border-color);
+  background-color: transparent;
+  color: var(--text);
+  border: 1.5px solid var(--paper-line);
 }
 
 .btn-secondary:hover {
-  background-color: var(--bg-light);
-  border-color: var(--primary-blue);
-  color: var(--primary-blue);
+  border-color: var(--indigo);
+  color: var(--indigo);
 }
 
-/* Global Header Navbar Dark Blue styling */
+/* Global dark navbar (used across pages via shared classes) */
 .navbar {
-  background-color: #071a3f !important;
-  border-bottom: 2px solid #1656d8 !important;
-  color: #ffffff !important;
+  background-color: var(--ink) !important;
+  border-bottom: 1px solid var(--ink-line) !important;
+  color: var(--text-on-ink) !important;
 }
 .navbar a, .navbar span, .navbar .brand-name, .navbar .logo-img {
-  color: #ffffff !important;
+  color: var(--text-on-ink) !important;
 }
 .navbar .nav-link {
-  color: #cbd5e1 !important;
+  color: var(--text-on-ink-muted) !important;
 }
 .navbar .nav-link:hover {
-  color: #38bdf8 !important;
+  color: #ffffff !important;
 }
 .navbar .logo-img {
   filter: brightness(0) invert(1);
 }
 
-/* Global Footer Dark Blue styling */
+/* Global dark footer */
 .footer {
-  background-color: #071a3f !important;
-  border-top: 2px solid #1656d8 !important;
-  color: #cbd5e1 !important;
+  background-color: var(--ink) !important;
+  border-top: 1px solid var(--ink-line) !important;
+  color: var(--text-on-ink-muted) !important;
 }
 .footer a {
-  color: #ffffff !important;
+  color: var(--text-on-ink) !important;
 }
 .footer a:hover {
-  color: #38bdf8 !important;
+  color: var(--gold) !important;
 }

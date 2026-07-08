@@ -1,206 +1,530 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import Head from 'next/head';
+
+/* ------------------------------------------------------------------
+   Reveal: lightweight scroll-reveal wrapper (IntersectionObserver).
+   Respects prefers-reduced-motion via the CSS in globals.css.
+------------------------------------------------------------------- */
+function Reveal({ children, className = '', delay = 0, as = 'div' }) {
+  const ref = useRef(null);
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setVisible(true);
+            observer.disconnect();
+          }
+        });
+      },
+      { threshold: 0.15 }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
+  const Tag = as;
+  return (
+    <Tag
+      ref={ref}
+      className={`reveal ${visible ? 'reveal-visible' : ''} ${className}`}
+      style={{ transitionDelay: `${delay}ms` }}
+    >
+      {children}
+    </Tag>
+  );
+}
 
 export default function Home() {
   const [activeFaq, setActiveFaq] = useState(null);
-  
-  // Floating AI Chatbot / WhatsApp Widget States
+  const [scrolled, setScrolled] = useState(false);
+  const heroVisualRef = useRef(null);
+
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [chatMessages, setChatMessages] = useState([
-    { sender: 'bot', text: 'Hello! Welcome to AI Shop International. How can I assist you today?' }
+    { sender: 'bot', text: 'Hi! I can point you to the right place — what are you trying to do?' }
   ]);
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 24);
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+
+  // Subtle mouse-tracking parallax on the hero visual only.
+  const handleHeroMouseMove = useCallback((e) => {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const el = heroVisualRef.current;
+    if (!el) return;
+    const rect = el.getBoundingClientRect();
+    const x = (e.clientX - rect.left) / rect.width - 0.5;
+    const y = (e.clientY - rect.top) / rect.height - 0.5;
+    el.style.setProperty('--tiltX', `${y * -4}deg`);
+    el.style.setProperty('--tiltY', `${x * 6}deg`);
+  }, []);
+
+  const handleHeroMouseLeave = useCallback(() => {
+    const el = heroVisualRef.current;
+    if (!el) return;
+    el.style.setProperty('--tiltX', '0deg');
+    el.style.setProperty('--tiltY', '0deg');
+  }, []);
 
   const faqs = [
     {
-      q: "How does the AI matching engine work?",
-      a: "Our system converts candidate profiles and job descriptions into semantic vector embeddings. Instead of looking for simple keyword matches, the AI compares the contextual meaning of the requirements with the freelancer's actual experience, calculating a highly accurate match score."
+      q: 'How does the AI matching engine work?',
+      a: 'Our system converts candidate profiles and job descriptions into semantic vector embeddings. Instead of keyword matching, the AI compares contextual meaning between requirements and a freelancer\u2019s real experience to calculate a match score.'
     },
     {
-      q: "Is there any cost for the agency or clients during the trial?",
-      a: "No! The 20-day trial is built using high-performance free cloud hosting tiers, meaning there are zero database or server infrastructure fees. The only minor cost is pay-as-you-go AI query APIs, which average less than ₹400 for hundreds of searches."
+      q: 'Is there any cost for the agency or clients during the trial?',
+      a: 'No. The 20-day trial runs on high-performance free cloud hosting tiers, so there are zero database or server infrastructure fees. The only minor cost is pay-as-you-go AI query APIs, averaging under \u20b9400 for hundreds of searches.'
     },
     {
-      q: "How secure is candidate and client data?",
-      a: "All personal information, LinkedIn profiles, and job listings are stored in a private, encrypted PostgreSQL database. We use secure closed pipelines, meaning your proprietary data is never used to train public LLM models."
+      q: 'How secure is candidate and client data?',
+      a: 'All personal information, profiles, and job listings are stored in a private, encrypted PostgreSQL database behind closed pipelines. Your proprietary data is never used to train public LLM models.'
     },
     {
-      q: "Can we customize the matching criteria?",
-      a: "Yes. The agency admin dashboard allows recruiters to adjust matching weights between technical AI skills, years of experience, and target hourly rates (₹) to prioritize different client needs."
+      q: 'Can we customize the matching criteria?',
+      a: 'Yes. The recruiter dashboard lets you adjust matching weights between technical AI skills, years of experience, and target hourly rates (\u20b9) to prioritize what matters for each client.'
     }
   ];
 
-  const toggleFaq = (index) => {
-    setActiveFaq(activeFaq === index ? null : index);
-  };
+  const skillCategories = [
+    { name: 'LLM Engineering', desc: 'Fine-tuning, evals, inference optimization', count: '140+' },
+    { name: 'RAG & Vector Search', desc: 'Retrieval pipelines, embeddings, vector DBs', count: '95+' },
+    { name: 'AI Agents', desc: 'Tool-use, orchestration, multi-agent systems', count: '80+' },
+    { name: 'Computer Vision', desc: 'Detection, segmentation, generative vision', count: '65+' },
+    { name: 'NLP & Speech', desc: 'Classification, extraction, speech-to-text', count: '110+' },
+    { name: 'MLOps & Infra', desc: 'Serving, monitoring, cost & latency tuning', count: '70+' }
+  ];
+
+  const talentSpotlight = [
+    {
+      initials: 'RK',
+      name: 'Rohan K.',
+      role: 'Senior LLM & RAG Specialist',
+      tags: ['LangChain', 'Pinecone', 'Python'],
+      rate: '\u20b92,200/hr',
+      match: '98%'
+    },
+    {
+      initials: 'AS',
+      name: 'Ananya S.',
+      role: 'Computer Vision Engineer',
+      tags: ['PyTorch', 'YOLO', 'Edge AI'],
+      rate: '\u20b91,850/hr',
+      match: '96%'
+    },
+    {
+      initials: 'VM',
+      name: 'Vikram M.',
+      role: 'AI Agent Architect',
+      tags: ['AutoGen', 'FastAPI', 'AWS'],
+      rate: '\u20b92,600/hr',
+      match: '97%'
+    }
+  ];
+
+  const testimonials = [
+    {
+      quote: 'We had a vetted RAG engineer in a live sprint within four days. The match score wasn\u2019t marketing \u2014 the skills lined up exactly with our stack.',
+      role: 'Head of Engineering, Series A fintech'
+    },
+    {
+      quote: 'The dashboard let us tune for experience over raw skill overlap, which is exactly the control a normal freelancer platform never gives you.',
+      role: 'VP Product, healthcare AI startup'
+    },
+    {
+      quote: 'Cut our contractor search from six weeks of agency back-and-forth to under a week, at a fraction of the fee.',
+      role: 'Founder, applied AI studio'
+    }
+  ];
+
+  const toggleFaq = (index) => setActiveFaq(activeFaq === index ? null : index);
 
   const handleChatOption = (option, label) => {
     let replyText = '';
     if (option === 'how_match') {
-      replyText = 'We convert candidate profiles and job files into semantic vector embeddings to calculate a match score against job descriptions.';
+      replyText = 'We convert candidate profiles and job requirements into semantic embeddings, then score the match on skills, experience, and rate fit.';
     } else if (option === 'how_apply') {
-      replyText = 'You can click the "Apply as AI Freelancer" button on the homepage to submit your profile in under a minute!';
+      replyText = 'Click \u201cApply as AI Freelancer\u201d on this page to submit your profile in under a minute.';
     } else if (option === 'whatsapp') {
-      replyText = 'Connecting you to our team on WhatsApp...';
+      replyText = 'Opening WhatsApp in a new tab \u2014 our team will pick it up from there.';
       window.open('https://wa.me/919999999999', '_blank');
     }
-
-    setChatMessages(prev => [
-      ...prev,
-      { sender: 'user', text: label },
-      { sender: 'bot', text: replyText }
-    ]);
+    setChatMessages((prev) => [...prev, { sender: 'user', text: label }, { sender: 'bot', text: replyText }]);
   };
 
   return (
-    <div className="home-container">
+    <div className="home">
       <Head>
-        <title>AI Shop International | Connect with AI Freelancers</title>
+        <title>AI Shop International \u2014 Hire Vetted AI Freelancers</title>
+        <meta
+          name="description"
+          content="A vetted network of AI engineers, ML researchers, and prompt specialists, matched to your project by a semantic scoring engine."
+        />
       </Head>
 
-      {/* Modern Enhanced Header */}
-      <header className="navbar">
-        <div className="brand">
-          <img src="/logo.png" alt="AI Shop Logo" className="logo-img" />
-          <span className="brand-name">AI Shop International</span>
-        </div>
-        <nav className="nav-links">
-          <a href="#how-it-works" className="nav-link">How it Works</a>
-          <a href="#stats" className="nav-link">Stats</a>
-          <a href="#faqs" className="nav-link">FAQs</a>
-          <a href="/credits" className="nav-link">Framework Credits</a>
-        </nav>
-        <div className="nav-actions">
-          <a href="/dashboard" className="btn btn-secondary">Recruiter Dashboard</a>
+      {/* ---------------- Nav ---------------- */}
+      <header className={`nav ${scrolled ? 'nav-scrolled' : ''}`}>
+        <div className="nav-inner container">
+          <a href="#top" className="brand" aria-label="AI Shop International home">
+            <svg width="30" height="30" viewBox="0 0 30 30" fill="none" aria-hidden="true">
+              <circle cx="7" cy="22" r="3.4" stroke="#f5f4f0" strokeWidth="1.4" />
+              <circle cx="23" cy="22" r="3.4" stroke="#f5f4f0" strokeWidth="1.4" />
+              <circle cx="15" cy="7" r="3.8" fill="#c9a227" />
+              <path d="M9.8 20 L13 9.5 M20.2 20 L17 9.5" stroke="#f5f4f0" strokeWidth="1.2" strokeDasharray="1 2.4" />
+            </svg>
+            <span className="brand-word">AI Shop <em>International</em></span>
+          </a>
+
+          <nav className="nav-links" aria-label="Primary">
+            <a href="#how-it-works">How it Works</a>
+            <a href="#skills">AI Skills</a>
+            <a href="#talent">Talent</a>
+            <a href="#faqs">FAQs</a>
+            <a href="/credits">Credits</a>
+          </nav>
+
+          <div className="nav-actions">
+            <a href="/dashboard" className="nav-ghost">Recruiter Dashboard</a>
+            <a href="/client" className="btn btn-primary nav-cta">Hire Talent</a>
+          </div>
         </div>
       </header>
 
-      {/* Hero Section */}
-      <section className="hero-section">
-        <div className="hero-content">
-          <h1>Find Top-Tier <span className="highlight">AI Freelancers</span> for Your Growth</h1>
-          <p>
-            An AI-powered placement platform matching specialized AI developers, NLP engineers, and prompt engineers with businesses in seconds.
-          </p>
-
-          <div className="cta-buttons">
-            <a href="/client" className="btn btn-primary cta-btn">
-              I Want to Hire AI Talent
-            </a>
-            <a href="/freelancer" className="btn btn-secondary cta-btn">
-              Apply as AI Freelancer
-            </a>
+      <main id="top">
+        {/* ---------------- Hero ---------------- */}
+        <section className="hero">
+          <div className="hero-bg" aria-hidden="true">
+            <div className="hero-dotgrid" />
+            <div className="hero-glow" />
           </div>
-        </div>
 
-        {/* Hero Visual Block with AI Generated Tech Image */}
-        <div className="hero-graphic">
-          <div className="image-wrapper">
-            <img 
-              src="/hero_tech_graphic.png" 
-              alt="AI Neural Network Illustration" 
-              className="hero-img"
-            />
-          </div>
-        </div>
-      </section>
-
-      {/* Stats Section */}
-      <section id="stats" className="stats-section">
-        <div className="container">
-          <div className="stats-grid">
-            <div className="stat-card">
-              <h3>₹5,00,000+</h3>
-              <p>Saved in Recruitment Fees</p>
-            </div>
-            <div className="stat-card">
-              <h3>98.4%</h3>
-              <p>AI Match Accuracy</p>
-            </div>
-            <div className="stat-card">
-              <h3>3 Days</h3>
-              <p>Average Time-to-Hire</p>
-            </div>
-            <div className="stat-card">
-              <h3>₹800 - ₹5,000</h3>
-              <p>Average Hourly Rates</p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* How it Works Section */}
-      <section id="how-it-works" className="how-it-works">
-        <div className="container">
-          <h2>Simple, Efficient Matching</h2>
-          <p className="section-subtitle">How we connect companies with top AI developers</p>
-          <div className="steps-grid">
-            <div className="step-card">
-              <div className="step-num">1</div>
-              <h4>Freelancers Join</h4>
-              <p>Freelancers enter their LinkedIn profiles and AI focus areas in under a minute.</p>
-            </div>
-            <div className="step-card">
-              <div className="step-num">2</div>
-              <h4>Clients Post Requirements</h4>
-              <p>Companies describe their projects and specify hourly budgets in Indian Rupees (₹).</p>
-            </div>
-            <div className="step-card">
-              <div className="step-num">3</div>
-              <h4>AI Analyzes & Curates</h4>
-              <p>The matching engine scores candidates. Recruiters approve matches via the dashboard.</p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* FAQ Accordion Section */}
-      <section id="faqs" className="faq-section">
-        <div className="container">
-          <h2>Frequently Asked Questions</h2>
-          <div className="faq-list">
-            {faqs.map((faq, index) => (
-              <div key={index} className={`faq-item ${activeFaq === index ? 'active' : ''}`}>
-                <button className="faq-question" onClick={() => toggleFaq(index)}>
-                  <span>{faq.q}</span>
-                  <span className="faq-icon">{activeFaq === index ? '−' : '+'}</span>
-                </button>
-                <div className="faq-answer">
-                  <p>{faq.a}</p>
-                </div>
+          <div className="container hero-inner">
+            <div className="hero-copy">
+              <span className="eyebrow">AI TALENT NETWORK</span>
+              <h1>
+                AI experts, <em>vetted</em> before you ever see them.
+              </h1>
+              <p className="hero-sub">
+                We match your project with AI engineers, ML researchers, and prompt specialists
+                who\u2019ve shipped in production \u2014 scored, ranked, and ready in days, not weeks.
+              </p>
+              <div className="hero-ctas">
+                <a href="/client" className="btn btn-primary">I want to hire AI talent</a>
+                <a href="/freelancer" className="btn btn-ghost-dark">Apply as an AI freelancer</a>
               </div>
-            ))}
+              <p className="hero-microtrust">No recruiter fees on your pilot \u00b7 3-day average time-to-match</p>
+            </div>
+
+            <div
+              className="hero-visual"
+              ref={heroVisualRef}
+              onMouseMove={handleHeroMouseMove}
+              onMouseLeave={handleHeroMouseLeave}
+            >
+              <div className="floating-card requirement-card">
+                <span className="fc-eyebrow">CLIENT REQUIREMENT</span>
+                <h3 className="fc-title">Senior RAG Engineer</h3>
+                <div className="fc-tags">
+                  <span>LangChain</span><span>Vector DB</span><span>Python</span>
+                </div>
+                <p className="fc-meta">Remote \u00b7 \u20b92,500/hr budget</p>
+              </div>
+
+              <svg className="connector" viewBox="0 0 320 200" aria-hidden="true">
+                <path
+                  d="M60 55 C 140 55, 140 145, 260 145"
+                  fill="none"
+                  stroke="#c9a227"
+                  strokeWidth="1.6"
+                  strokeDasharray="6 7"
+                  className="connector-path"
+                />
+              </svg>
+
+              <div className="match-seal">
+                <span className="seal-ring" />
+                <span className="seal-value">98%</span>
+                <span className="seal-label">Match</span>
+              </div>
+
+              <div className="floating-card talent-card">
+                <div className="tc-top">
+                  <span className="avatar">RK</span>
+                  <div className="tc-id">
+                    <span className="tc-name">Rohan K.</span>
+                    <span className="tc-role">LLM &amp; RAG Specialist</span>
+                  </div>
+                  <span className="verified-badge">Verified</span>
+                </div>
+                <div className="fc-tags">
+                  <span>LangChain</span><span>Pinecone</span><span>Python</span>
+                </div>
+                <p className="tc-foot"><span className="dot-live" /> Available now \u00b7 \u20b92,200/hr</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* ---------------- Trust strip ---------------- */}
+        <section className="trust-strip">
+          <div className="container">
+            <Reveal className="trust-inner">
+              <span className="trust-label">Built for AI-native teams across</span>
+              <div className="trust-tags">
+                {['Fintech', 'Healthcare AI', 'E-commerce', 'DevTools', 'Robotics', 'Climate Tech'].map((t) => (
+                  <span key={t} className="trust-pill">{t}</span>
+                ))}
+              </div>
+            </Reveal>
+          </div>
+        </section>
+
+        {/* ---------------- How it Works ---------------- */}
+        <section id="how-it-works" className="how">
+          <div className="container">
+            <Reveal className="section-head">
+              <span className="eyebrow eyebrow-dark">HOW IT WORKS</span>
+              <h2>Three steps from brief to matched</h2>
+              <p className="section-sub">No job board. No résumé pile. Just a scored shortlist.</p>
+            </Reveal>
+
+            <div className="steps">
+              {[
+                { n: '01', title: 'Freelancers join', body: 'AI specialists submit profiles and focus areas in under a minute \u2014 verified before they\u2019re listed.' },
+                { n: '02', title: 'Clients post requirements', body: 'Describe the project and hourly budget in \u20b9. No generic job description needed.' },
+                { n: '03', title: 'The engine scores and ranks', body: 'Every profile is scored against your requirement. Recruiters approve matches from the dashboard.' }
+              ].map((step, i) => (
+                <Reveal key={step.n} delay={i * 90} className="step">
+                  <span className="step-num">{step.n}</span>
+                  <h3>{step.title}</h3>
+                  <p>{step.body}</p>
+                </Reveal>
+              ))}
+              <div className="step-line" aria-hidden="true" />
+            </div>
+          </div>
+        </section>
+
+        {/* ---------------- AI Skills / Categories ---------------- */}
+        <section id="skills" className="skills">
+          <div className="container">
+            <Reveal className="section-head">
+              <span className="eyebrow eyebrow-dark">AI SKILLS</span>
+              <h2>Specialists, not generalists</h2>
+              <p className="section-sub">Every category below is a distinct vetting track \u2014 not a keyword tag.</p>
+            </Reveal>
+
+            <div className="skills-grid">
+              {skillCategories.map((s, i) => (
+                <Reveal key={s.name} delay={i * 70} className="skill-card">
+                  <div className="skill-top">
+                    <h3>{s.name}</h3>
+                    <span className="skill-count">{s.count}</span>
+                  </div>
+                  <p>{s.desc}</p>
+                </Reveal>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* ---------------- Featured Talent ---------------- */}
+        <section id="talent" className="talent">
+          <div className="container">
+            <Reveal className="section-head section-head-light">
+              <span className="eyebrow">FEATURED TALENT</span>
+              <h2>A glimpse of who\u2019s in the network</h2>
+              <p className="section-sub section-sub-light">Anonymized preview \u2014 full profiles unlock once you post a requirement.</p>
+            </Reveal>
+
+            <div className="talent-grid">
+              {talentSpotlight.map((t, i) => (
+                <Reveal key={t.name} delay={i * 90} className="talent-card-full">
+                  <div className="tc-top">
+                    <span className="avatar avatar-lg">{t.initials}</span>
+                    <div className="tc-id">
+                      <span className="tc-name tc-name-light">{t.name}</span>
+                      <span className="tc-role tc-role-light">{t.role}</span>
+                    </div>
+                    <span className="verified-badge">Verified</span>
+                  </div>
+                  <div className="fc-tags">
+                    {t.tags.map((tag) => <span key={tag}>{tag}</span>)}
+                  </div>
+                  <div className="talent-foot">
+                    <span className="talent-match">{t.match} match</span>
+                    <span className="talent-rate">{t.rate}</span>
+                  </div>
+                </Reveal>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* ---------------- Stats ---------------- */}
+        <section id="stats" className="stats">
+          <div className="container">
+            <div className="stats-grid">
+              {[
+                { v: '\u20b95,00,000+', l: 'Saved in recruitment fees' },
+                { v: '98.4%', l: 'AI match accuracy' },
+                { v: '3 Days', l: 'Average time-to-hire' },
+                { v: '\u20b9800\u2013\u20b95,000', l: 'Typical hourly rates' }
+              ].map((s, i) => (
+                <Reveal key={s.l} delay={i * 80} className="stat">
+                  <h3>{s.v}</h3>
+                  <p>{s.l}</p>
+                </Reveal>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* ---------------- Comparison ---------------- */}
+        <section className="compare">
+          <div className="container">
+            <Reveal className="section-head">
+              <span className="eyebrow eyebrow-dark">WHY NOT AN AGENCY</span>
+              <h2>Same vetting rigor, none of the overhead</h2>
+            </Reveal>
+            <Reveal className="compare-table" delay={80}>
+              <div className="compare-row compare-head">
+                <span></span>
+                <span>Traditional agency</span>
+                <span className="compare-highlight">AI Shop</span>
+              </div>
+              {[
+                ['Time to shortlist', '2\u20136 weeks', '3 days avg'],
+                ['Matching method', 'Manual keyword search', 'Semantic AI scoring'],
+                ['Fee structure', '15\u201325% placement fee', 'Transparent hourly rate'],
+                ['Match transparency', 'Rarely disclosed', 'Visible score, every time']
+              ].map((row) => (
+                <div className="compare-row" key={row[0]}>
+                  <span className="compare-label">{row[0]}</span>
+                  <span>{row[1]}</span>
+                  <span className="compare-highlight">{row[2]}</span>
+                </div>
+              ))}
+            </Reveal>
+          </div>
+        </section>
+
+        {/* ---------------- Testimonials ---------------- */}
+        <section className="testimonials">
+          <div className="container">
+            <Reveal className="section-head">
+              <span className="eyebrow eyebrow-dark">WHAT TEAMS SAY</span>
+              <h2>Trusted by teams that ship AI, not just plan it</h2>
+            </Reveal>
+            <div className="testimonial-grid">
+              {testimonials.map((t, i) => (
+                <Reveal key={t.role} delay={i * 90} className="testimonial-card">
+                  <p className="testimonial-quote">\u201c{t.quote}\u201d</p>
+                  <span className="testimonial-role">{t.role}</span>
+                </Reveal>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* ---------------- FAQ ---------------- */}
+        <section id="faqs" className="faq">
+          <div className="container">
+            <Reveal className="section-head">
+              <span className="eyebrow eyebrow-dark">FAQ</span>
+              <h2>Frequently asked questions</h2>
+            </Reveal>
+            <div className="faq-list">
+              {faqs.map((faq, index) => {
+                const isOpen = activeFaq === index;
+                return (
+                  <div key={faq.q} className={`faq-item ${isOpen ? 'active' : ''}`}>
+                    <button
+                      className="faq-question"
+                      onClick={() => toggleFaq(index)}
+                      aria-expanded={isOpen}
+                      aria-controls={`faq-panel-${index}`}
+                    >
+                      <span>{faq.q}</span>
+                      <span className="faq-icon" aria-hidden="true">{isOpen ? '\u2212' : '+'}</span>
+                    </button>
+                    <div className="faq-answer" id={`faq-panel-${index}`} role="region">
+                      <p>{faq.a}</p>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </section>
+
+        {/* ---------------- Final CTA ---------------- */}
+        <section className="final-cta">
+          <div className="container final-cta-inner">
+            <h2>Ready to hire your first AI expert?</h2>
+            <p>Post a requirement and see scored matches within 3 days on average.</p>
+            <div className="hero-ctas">
+              <a href="/client" className="btn btn-primary">Post a requirement</a>
+              <a href="/freelancer" className="btn btn-ghost-dark">Apply as talent</a>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      {/* ---------------- Footer ---------------- */}
+      <footer className="footer">
+        <div className="container footer-grid">
+          <div className="footer-brand">
+            <svg width="26" height="26" viewBox="0 0 30 30" fill="none" aria-hidden="true">
+              <circle cx="7" cy="22" r="3.4" stroke="#f5f4f0" strokeWidth="1.4" />
+              <circle cx="23" cy="22" r="3.4" stroke="#f5f4f0" strokeWidth="1.4" />
+              <circle cx="15" cy="7" r="3.8" fill="#c9a227" />
+              <path d="M9.8 20 L13 9.5 M20.2 20 L17 9.5" stroke="#f5f4f0" strokeWidth="1.2" strokeDasharray="1 2.4" />
+            </svg>
+            <div>
+              <span className="footer-brand-name">AI Shop International</span>
+              <p className="footer-tag">The vetted network for AI-native hiring.</p>
+            </div>
+          </div>
+
+          <div className="footer-col">
+            <span className="footer-col-title">Product</span>
+            <a href="#how-it-works">How it Works</a>
+            <a href="#skills">AI Skills</a>
+            <a href="#talent">Talent</a>
+          </div>
+
+          <div className="footer-col">
+            <span className="footer-col-title">Company</span>
+            <a href="/credits">Framework Credits</a>
+            <a href="#faqs">FAQs</a>
           </div>
         </div>
-      </section>
-
-      {/* Footer */}
-      <footer className="footer">
-        <div className="container footer-content">
-          <div className="footer-brand">
-            <img src="/logo.png" alt="AI Shop Logo" className="logo-img-small" />
-            <span>AI Shop International</span>
-          </div>
-          <div className="footer-links">
-            <a href="/credits">AI Shop Framework Credits</a>
-            <span>•</span>
-            <span>© 2026 AI Placement Solutions. All rights reserved.</span>
-          </div>
+        <div className="container footer-bottom">
+          <span>\u00a9 2026 AI Placement Solutions. All rights reserved.</span>
         </div>
       </footer>
 
-      {/* Interactive AI Chatbot & WhatsApp Floating Widget */}
-      <div className="chatbot-widget">
+      {/* ---------------- Chat widget ---------------- */}
+      <div className="chat-widget">
         {isChatOpen ? (
-          <div className="chat-card card">
+          <div className="chat-card" role="dialog" aria-label="AI Shop assistant">
             <div className="chat-header">
-              <div className="chat-avatar">AI</div>
+              <span className="avatar">AI</span>
               <div>
                 <h4>AI Shop Assistant</h4>
                 <span>Online</span>
               </div>
-              <button className="chat-close" onClick={() => setIsChatOpen(false)}>×</button>
+              <button className="chat-close" onClick={() => setIsChatOpen(false)} aria-label="Close chat">\u00d7</button>
             </div>
-
             <div className="chat-body">
               {chatMessages.map((msg, i) => (
                 <div key={i} className={`chat-message ${msg.sender}`}>
@@ -208,705 +532,964 @@ export default function Home() {
                 </div>
               ))}
             </div>
-
             <div className="chat-footer">
-              <span className="footer-lbl">Quick Actions:</span>
+              <span className="footer-lbl">Quick actions</span>
               <div className="chat-options">
-                <button onClick={() => handleChatOption('how_match', 'How does matching work?')} className="btn-chat-opt">
-                  How does matching work?
-                </button>
-                <button onClick={() => handleChatOption('how_apply', 'How do I apply?')} className="btn-chat-opt">
-                  How do I apply?
-                </button>
-                <button onClick={() => handleChatOption('whatsapp', 'Chat on WhatsApp')} className="btn-chat-opt whatsapp">
-                  💬 Chat on WhatsApp
-                </button>
+                <button onClick={() => handleChatOption('how_match', 'How does matching work?')} className="btn-chat-opt">How does matching work?</button>
+                <button onClick={() => handleChatOption('how_apply', 'How do I apply?')} className="btn-chat-opt">How do I apply?</button>
+                <button onClick={() => handleChatOption('whatsapp', 'Chat on WhatsApp')} className="btn-chat-opt whatsapp">Chat on WhatsApp</button>
               </div>
             </div>
           </div>
         ) : (
-          <button className="chat-trigger-btn" onClick={() => setIsChatOpen(true)}>
-            <span className="chat-icon">💬</span>
-            <span className="chat-pulse"></span>
+          <button className="chat-trigger" onClick={() => setIsChatOpen(true)} aria-label="Open chat assistant">
+            <span className="chat-pulse" aria-hidden="true" />
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M4 4h16v12H8l-4 4V4z" stroke="#fff" strokeWidth="1.6" strokeLinejoin="round" />
+            </svg>
           </button>
         )}
       </div>
 
       <style jsx>{`
-        .home-container {
+        .home {
           min-height: 100vh;
-          background-color: #ffffff;
-          font-family: 'Inter', sans-serif;
+          background: var(--paper);
           display: flex;
           flex-direction: column;
+          overflow-x: clip;
         }
 
-        .navbar {
-          height: 75px;
-          border-bottom: 1px solid #e2e8f0;
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          padding: 0 40px;
-          background: rgba(255, 255, 255, 0.85);
-          backdrop-filter: blur(10px);
-          -webkit-backdrop-filter: blur(10px);
+        /* ---------- Reveal ---------- */
+        :global(.reveal) {
+          opacity: 0;
+          transform: translateY(18px);
+          transition: opacity 0.6s ease, transform 0.6s ease;
+        }
+        :global(.reveal-visible) {
+          opacity: 1;
+          transform: translateY(0);
+        }
+
+        /* ---------- Nav ---------- */
+        .nav {
           position: sticky;
           top: 0;
-          z-index: 100;
+          z-index: 200;
+          background: rgba(11, 14, 23, 0.72);
+          backdrop-filter: blur(14px);
+          -webkit-backdrop-filter: blur(14px);
+          border-bottom: 1px solid transparent;
+          transition: border-color 0.3s ease, background 0.3s ease;
         }
-
+        .nav-scrolled {
+          background: rgba(11, 14, 23, 0.92);
+          border-bottom-color: var(--ink-line);
+        }
+        .nav-inner {
+          height: 72px;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 24px;
+        }
         .brand {
           display: flex;
           align-items: center;
-          gap: 12px;
+          gap: 10px;
         }
-
-        .logo-img {
-          height: 42px;
-          width: auto;
-          display: block;
-          object-fit: contain;
+        .brand-word {
+          font-family: var(--font-display);
+          font-size: 17px;
+          font-weight: 600;
+          color: var(--text-on-ink);
+          letter-spacing: -0.01em;
         }
-
-        .logo-img-small {
-          height: 26px;
-          width: auto;
-          display: block;
-          object-fit: contain;
+        .brand-word em {
+          font-style: italic;
+          color: var(--text-on-ink-muted);
+          font-weight: 400;
         }
-
-        .brand-name {
-          font-weight: 700;
-          font-size: 18px;
-          color: #101828;
-        }
-
         .nav-links {
           display: flex;
-          gap: 24px;
+          gap: 28px;
         }
-
-        .nav-link {
+        .nav-links a {
           font-size: 14px;
-          font-weight: 600;
-          color: #64748b;
+          font-weight: 500;
+          color: var(--text-on-ink-muted);
           transition: color 0.2s;
         }
-
-        .nav-link:hover {
-          color: #1656d8;
+        .nav-links a:hover {
+          color: #fff;
+        }
+        .nav-actions {
+          display: flex;
+          align-items: center;
+          gap: 18px;
+        }
+        .nav-ghost {
+          font-size: 14px;
+          font-weight: 500;
+          color: var(--text-on-ink-muted);
+        }
+        .nav-ghost:hover {
+          color: #fff;
+        }
+        .nav-cta {
+          padding: 10px 20px;
+          font-size: 14px;
         }
 
-        .hero-section {
-          max-width: 1200px;
-          margin: 40px auto;
-          padding: 64px 48px;
+        /* ---------- Hero ---------- */
+        .hero {
+          position: relative;
+          background: var(--ink);
+          padding: 96px 0 120px;
+          overflow: hidden;
+        }
+        .hero-bg {
+          position: absolute;
+          inset: 0;
+          z-index: 0;
+        }
+        .hero-dotgrid {
+          position: absolute;
+          inset: 0;
+          background-image: radial-gradient(rgba(245, 244, 240, 0.09) 1px, transparent 1px);
+          background-size: 26px 26px;
+          mask-image: linear-gradient(to bottom, transparent, black 20%, black 70%, transparent);
+        }
+        .hero-glow {
+          position: absolute;
+          top: -120px;
+          right: -140px;
+          width: 520px;
+          height: 520px;
+          background: radial-gradient(circle, rgba(91, 79, 232, 0.35), transparent 70%);
+          filter: blur(10px);
+        }
+        .hero-inner {
+          position: relative;
+          z-index: 1;
           display: grid;
-          grid-template-columns: 1.12fr 0.88fr;
+          grid-template-columns: 1.05fr 0.95fr;
           gap: 60px;
           align-items: center;
-          background: linear-gradient(135deg, #071936 0%, #0e2e5e 100%) !important;
-          border-radius: 24px;
-          border: 1px solid #153970;
-          box-shadow: 0 20px 50px rgba(7, 25, 54, 0.15);
         }
-
-        .hero-content h1 {
-          font-size: 48px;
-          font-weight: 800;
-          line-height: 1.15;
-          color: #ffffff !important;
-          margin-bottom: 24px;
+        .eyebrow {
+          display: inline-block;
+          font-family: var(--font-mono);
+          font-size: 11.5px;
+          letter-spacing: 0.14em;
+          color: var(--gold);
+          margin-bottom: 20px;
+          font-weight: 500;
         }
-
-        .highlight {
-          color: #38bdf8 !important;
+        .eyebrow-dark {
+          color: var(--indigo);
         }
-
-        .hero-content p {
+        .hero-copy h1 {
+          font-size: 52px;
+          line-height: 1.1;
+          color: var(--text-on-ink);
+          font-weight: 500;
+          max-width: 620px;
+        }
+        .hero-copy h1 em {
+          font-style: italic;
+          color: var(--gold);
+        }
+        .hero-sub {
           font-size: 18px;
-          color: #e2e8f0 !important;
           line-height: 1.6;
-          margin-bottom: 40px;
+          color: var(--text-on-ink-muted);
+          margin: 24px 0 36px;
+          max-width: 520px;
         }
-
-        .cta-buttons {
+        .hero-ctas {
           display: flex;
           gap: 16px;
+          flex-wrap: wrap;
+        }
+        .btn-ghost-dark {
+          background: transparent;
+          color: var(--text-on-ink);
+          border: 1.5px solid var(--ink-line);
+        }
+        .btn-ghost-dark:hover {
+          border-color: var(--text-on-ink-muted);
+          background: rgba(255, 255, 255, 0.04);
+        }
+        .hero-microtrust {
+          margin-top: 24px;
+          font-size: 13px;
+          color: var(--text-on-ink-muted);
+          font-family: var(--font-mono);
         }
 
-        .cta-btn {
-          padding: 16px 32px;
-          font-size: 15px;
-          border-radius: 999px;
+        /* ---------- Hero visual ---------- */
+        .hero-visual {
+          position: relative;
+          height: 400px;
+          --tiltX: 0deg;
+          --tiltY: 0deg;
+          transform: perspective(900px) rotateX(var(--tiltX)) rotateY(var(--tiltY));
+          transition: transform 0.2s ease-out;
         }
-
-        .hero-graphic {
+        .floating-card {
+          position: absolute;
+          width: 250px;
+          background: var(--ink-soft);
+          border: 1px solid var(--ink-line);
+          border-radius: var(--radius-md);
+          padding: 20px;
+          box-shadow: var(--shadow-lg);
+          animation: floaty 6s ease-in-out infinite;
+        }
+        .requirement-card {
+          top: 10px;
+          left: 0;
+        }
+        .talent-card {
+          bottom: 6px;
+          right: 0;
+          animation-delay: 1.2s;
+        }
+        .fc-eyebrow {
+          font-family: var(--font-mono);
+          font-size: 10px;
+          letter-spacing: 0.1em;
+          color: var(--text-on-ink-muted);
+        }
+        .fc-title {
+          font-size: 18px;
+          color: var(--text-on-ink);
+          margin: 10px 0 12px;
+          font-weight: 500;
+        }
+        .fc-tags {
           display: flex;
+          gap: 6px;
+          flex-wrap: wrap;
+          margin-bottom: 12px;
+        }
+        .fc-tags span {
+          font-family: var(--font-mono);
+          font-size: 10.5px;
+          padding: 4px 9px;
+          border-radius: 999px;
+          background: rgba(91, 79, 232, 0.16);
+          color: #b8b0ff;
+        }
+        .fc-meta {
+          font-size: 12.5px;
+          color: var(--text-on-ink-muted);
+        }
+        .tc-top {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          margin-bottom: 14px;
+        }
+        .avatar {
+          width: 34px;
+          height: 34px;
+          border-radius: 50%;
+          background: linear-gradient(135deg, var(--indigo), #8b7bff);
+          color: #fff;
+          font-family: var(--font-mono);
+          font-size: 12px;
+          font-weight: 600;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          flex-shrink: 0;
+        }
+        .avatar-lg {
+          width: 44px;
+          height: 44px;
+          font-size: 13px;
+        }
+        .tc-id {
+          display: flex;
+          flex-direction: column;
+          flex: 1;
+          min-width: 0;
+        }
+        .tc-name {
+          font-size: 13.5px;
+          font-weight: 600;
+          color: var(--text-on-ink);
+        }
+        .tc-role {
+          font-size: 11.5px;
+          color: var(--text-on-ink-muted);
+        }
+        .verified-badge {
+          font-family: var(--font-mono);
+          font-size: 9.5px;
+          letter-spacing: 0.04em;
+          color: var(--gold);
+          border: 1px solid rgba(201, 162, 39, 0.4);
+          border-radius: 999px;
+          padding: 3px 8px;
+          flex-shrink: 0;
+        }
+        .tc-foot {
+          font-size: 12px;
+          color: var(--text-on-ink-muted);
+          display: flex;
+          align-items: center;
+          gap: 6px;
+        }
+        .dot-live {
+          width: 6px;
+          height: 6px;
+          border-radius: 50%;
+          background: var(--success);
+          display: inline-block;
+          box-shadow: 0 0 0 3px rgba(31, 157, 99, 0.2);
+        }
+
+        .connector {
+          position: absolute;
+          top: 60px;
+          left: 40px;
+          width: 200px;
+          height: 220px;
+          pointer-events: none;
+        }
+        .connector-path {
+          animation: dash 3s linear infinite;
+        }
+        .match-seal {
+          position: absolute;
+          top: 44%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+          width: 68px;
+          height: 68px;
+          border-radius: 50%;
+          background: var(--ink);
+          border: 1.5px solid var(--gold);
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          box-shadow: var(--shadow-gold);
+        }
+        .seal-ring {
+          position: absolute;
+          inset: -8px;
+          border-radius: 50%;
+          border: 1px solid rgba(201, 162, 39, 0.3);
+          animation: ring-pulse 2.6s ease-out infinite;
+        }
+        .seal-value {
+          font-family: var(--font-mono);
+          font-size: 16px;
+          font-weight: 600;
+          color: var(--gold);
+        }
+        .seal-label {
+          font-size: 9px;
+          color: var(--text-on-ink-muted);
+          text-transform: uppercase;
+          letter-spacing: 0.05em;
+        }
+
+        @keyframes floaty {
+          0%, 100% { transform: translateY(0); }
+          50% { transform: translateY(-8px); }
+        }
+        @keyframes dash {
+          to { stroke-dashoffset: -130; }
+        }
+        @keyframes ring-pulse {
+          0% { transform: scale(0.9); opacity: 0.9; }
+          100% { transform: scale(1.5); opacity: 0; }
+        }
+
+        /* ---------- Trust strip ---------- */
+        .trust-strip {
+          background: var(--paper-dim);
+          border-bottom: 1px solid var(--paper-line);
+          padding: 28px 0;
+        }
+        .trust-inner {
+          display: flex;
+          align-items: center;
+          gap: 22px;
+          flex-wrap: wrap;
           justify-content: center;
         }
-
-        .image-wrapper {
-          width: 100%;
-          max-width: 420px;
-          border-radius: 12px;
-          overflow: hidden;
-          box-shadow: 0 10px 30px rgba(16, 79, 223, 0.1);
-          border: 1px solid #e2e8f0;
-          background: #ffffff;
+        .trust-label {
+          font-family: var(--font-mono);
+          font-size: 12px;
+          color: var(--text-muted);
+          letter-spacing: 0.02em;
+        }
+        .trust-tags {
+          display: flex;
+          gap: 10px;
+          flex-wrap: wrap;
+        }
+        .trust-pill {
+          font-size: 12.5px;
+          font-weight: 500;
+          padding: 6px 14px;
+          border-radius: 999px;
+          border: 1px solid var(--paper-line);
+          color: var(--text-muted);
+          background: #fff;
         }
 
-        .hero-img {
-          width: 100%;
-          height: auto;
-          display: block;
-          transition: transform 0.3s ease;
+        /* ---------- Section heads ---------- */
+        .section-head {
+          text-align: center;
+          max-width: 560px;
+          margin: 0 auto 56px;
+        }
+        .section-head h2 {
+          font-size: 34px;
+          font-weight: 500;
+          margin: 6px 0 12px;
+        }
+        .section-sub {
+          color: var(--text-muted);
+          font-size: 16px;
+        }
+        .section-head-light h2 {
+          color: var(--text-on-ink);
+        }
+        .section-sub-light {
+          color: var(--text-on-ink-muted);
         }
 
-        .hero-img:hover {
-          transform: scale(1.02);
+        /* ---------- How it works ---------- */
+        .how {
+          padding: 96px 0;
+        }
+        .steps {
+          position: relative;
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 40px;
+        }
+        .step-line {
+          position: absolute;
+          top: 26px;
+          left: 8%;
+          right: 8%;
+          height: 1px;
+          background: var(--paper-line);
+          z-index: 0;
+        }
+        .step {
+          position: relative;
+          z-index: 1;
+          background: var(--paper);
+          padding-top: 4px;
+        }
+        .step-num {
+          display: inline-flex;
+          font-family: var(--font-display);
+          font-style: italic;
+          font-size: 26px;
+          color: var(--gold);
+          margin-bottom: 18px;
+        }
+        .step h3 {
+          font-size: 19px;
+          font-weight: 600;
+          margin-bottom: 10px;
+        }
+        .step p {
+          color: var(--text-muted);
+          font-size: 14.5px;
+          line-height: 1.65;
         }
 
-        /* Stats Section */
-        .stats-section {
-          background: linear-gradient(120deg, #071a3f 0%, #0e2f7a 45%, #1656d8 100%) !important;
-          padding: 64px 0;
-          border-top: 1px solid #e2e8f0;
-          border-bottom: 1px solid #e2e8f0;
+        /* ---------- Skills ---------- */
+        .skills {
+          padding: 96px 0;
+          background: var(--paper-dim);
+        }
+        .skills-grid {
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 20px;
+        }
+        .skill-card {
+          background: #fff;
+          border: 1px solid var(--paper-line);
+          border-radius: var(--radius-md);
+          padding: 24px;
+          transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
+        }
+        .skill-card:hover {
+          transform: translateY(-3px);
+          border-color: var(--indigo);
+          box-shadow: var(--shadow-md);
+        }
+        .skill-top {
+          display: flex;
+          align-items: baseline;
+          justify-content: space-between;
+          margin-bottom: 8px;
+        }
+        .skill-top h3 {
+          font-size: 16.5px;
+          font-weight: 600;
+        }
+        .skill-count {
+          font-family: var(--font-mono);
+          font-size: 11.5px;
+          color: var(--indigo);
+          background: var(--indigo-soft);
+          border-radius: 999px;
+          padding: 3px 9px;
+          flex-shrink: 0;
+        }
+        .skill-card p {
+          font-size: 13.5px;
+          color: var(--text-muted);
+          line-height: 1.55;
         }
 
+        /* ---------- Talent ---------- */
+        .talent {
+          padding: 96px 0;
+          background: var(--ink);
+        }
+        .talent-grid {
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 22px;
+        }
+        .talent-card-full {
+          background: var(--ink-soft);
+          border: 1px solid var(--ink-line);
+          border-radius: var(--radius-md);
+          padding: 22px;
+          transition: transform 0.2s, border-color 0.2s;
+        }
+        .talent-card-full:hover {
+          transform: translateY(-3px);
+          border-color: var(--gold);
+        }
+        .tc-name-light { color: var(--text-on-ink); }
+        .tc-role-light { color: var(--text-on-ink-muted); }
+        .talent-foot {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-top: 6px;
+          padding-top: 14px;
+          border-top: 1px solid var(--ink-line);
+        }
+        .talent-match {
+          font-family: var(--font-mono);
+          font-size: 12.5px;
+          color: var(--gold);
+        }
+        .talent-rate {
+          font-family: var(--font-mono);
+          font-size: 12.5px;
+          color: var(--text-on-ink-muted);
+        }
+
+        /* ---------- Stats ---------- */
+        .stats {
+          background: linear-gradient(135deg, var(--ink), #171d33);
+          padding: 72px 0;
+          border-top: 1px solid var(--ink-line);
+          border-bottom: 1px solid var(--ink-line);
+        }
         .stats-grid {
           display: grid;
           grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
           gap: 30px;
           text-align: center;
         }
-
-        .stat-card h3 {
-          font-size: 36px;
-          color: #ffffff !important;
-          font-weight: 700;
+        .stat h3 {
+          font-size: 34px;
+          color: var(--text-on-ink);
+          font-weight: 500;
           margin-bottom: 8px;
         }
+        .stat p {
+          color: var(--text-on-ink-muted);
+          font-size: 13.5px;
+          font-family: var(--font-mono);
+        }
 
-        .stat-card p {
-          color: rgba(255, 255, 255, 0.9) !important;
+        /* ---------- Compare ---------- */
+        .compare {
+          padding: 96px 0;
+        }
+        .compare-table {
+          max-width: 760px;
+          margin: 0 auto;
+          border: 1px solid var(--paper-line);
+          border-radius: var(--radius-md);
+          overflow: hidden;
+        }
+        .compare-row {
+          display: grid;
+          grid-template-columns: 1.2fr 1fr 1fr;
+          padding: 16px 22px;
           font-size: 14px;
+          border-bottom: 1px solid var(--paper-line);
+        }
+        .compare-row:last-child {
+          border-bottom: none;
+        }
+        .compare-head {
+          background: var(--paper-dim);
+          font-family: var(--font-mono);
+          font-size: 11.5px;
+          letter-spacing: 0.04em;
+          color: var(--text-muted);
+          text-transform: uppercase;
+        }
+        .compare-label {
+          font-weight: 600;
+          color: var(--text);
+        }
+        .compare-highlight {
+          color: var(--indigo);
           font-weight: 600;
         }
 
-        /* How it Works */
-        .how-it-works {
-          padding: 80px 0;
-          text-align: center;
-          background-color: #ffffff !important;
+        /* ---------- Testimonials ---------- */
+        .testimonials {
+          padding: 96px 0;
+          background: var(--paper-dim);
         }
-
-        .how-it-works h2 {
-          font-size: 28px;
-          color: #101828 !important;
-          margin-bottom: 8px;
-        }
-
-        .section-subtitle {
-          color: #64748b !important;
-          margin-bottom: 50px;
-        }
-
-        .steps-grid {
+        .testimonial-grid {
           display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-          gap: 40px;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 22px;
+        }
+        .testimonial-card {
+          background: #fff;
+          border: 1px solid var(--paper-line);
+          border-radius: var(--radius-md);
+          padding: 28px;
+        }
+        .testimonial-quote {
+          font-family: var(--font-display);
+          font-size: 16.5px;
+          line-height: 1.55;
+          color: var(--text);
+          margin-bottom: 18px;
+        }
+        .testimonial-role {
+          font-family: var(--font-mono);
+          font-size: 12px;
+          color: var(--text-muted);
         }
 
-        .step-card {
-          padding: 30px;
-          background-color: #ffffff !important;
-          border: 1px solid #e2e8f0;
-          border-radius: 14px;
-          transition: transform 0.2s;
+        /* ---------- FAQ ---------- */
+        .faq {
+          padding: 96px 0;
         }
-
-        .step-card:hover {
-          transform: translateY(-4px);
-          border-color: #1656d8;
-        }
-
-        .step-num {
-          background-color: #eaf2ff !important;
-          color: #1656d8 !important;
-          font-weight: 700;
-          font-size: 18px;
-          width: 44px;
-          height: 44px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          border-radius: 50%;
-          margin: 0 auto 20px;
-        }
-
-        .step-card h4 {
-          font-size: 18px;
-          color: #101828 !important;
-          margin-bottom: 12px;
-        }
-
-        .step-card p {
-          color: #64748b !important;
-          font-size: 14px;
-          line-height: 1.6;
-        }
-
-        /* FAQ Section */
-        .faq-section {
-          padding: 80px 0;
-          background-color: #eef4ff;
-          border-top: 1px solid #e2e8f0;
-        }
-
-        .faq-section h2 {
-          font-size: 28px;
-          color: #101828;
-          margin-bottom: 40px;
-          text-align: center;
-        }
-
         .faq-list {
-          max-width: 800px;
+          max-width: 760px;
           margin: 0 auto;
           display: flex;
           flex-direction: column;
-          gap: 16px;
+          gap: 14px;
         }
-
         .faq-item {
-          background: #ffffff;
-          border: 1px solid #e2e8f0;
-          border-radius: 10px;
+          background: #fff;
+          border: 1px solid var(--paper-line);
+          border-radius: var(--radius-sm);
           overflow: hidden;
-          transition: all 0.2s;
+          transition: border-color 0.2s;
         }
-
-        .faq-item:hover {
-          border-color: #1656d8;
+        .faq-item:hover, .faq-item.active {
+          border-color: var(--indigo);
         }
-
-        .faq-item.active {
-          border-color: #1656d8;
-          background-color: #eef4ff;
-        }
-
         .faq-question {
           width: 100%;
           padding: 20px 24px;
           background: none;
           border: none;
           text-align: left;
-          font-size: 16px;
+          font-size: 15.5px;
           font-weight: 600;
-          color: #101828;
+          color: var(--text);
           display: flex;
           justify-content: space-between;
           align-items: center;
           cursor: pointer;
         }
-
         .faq-icon {
-          font-size: 20px;
-          color: #1656d8;
+          font-size: 19px;
+          color: var(--indigo);
         }
-
         .faq-answer {
           max-height: 0;
           overflow: hidden;
           transition: max-height 0.3s ease-out;
           padding: 0 24px;
         }
-
         .faq-item.active .faq-answer {
-          max-height: 200px;
+          max-height: 220px;
           padding-bottom: 20px;
         }
-
         .faq-answer p {
-          color: #64748b;
+          color: var(--text-muted);
           line-height: 1.6;
           font-size: 14px;
         }
 
-        /* Footer */
+        /* ---------- Final CTA ---------- */
+        .final-cta {
+          background: var(--ink);
+          padding: 96px 0;
+          text-align: center;
+        }
+        .final-cta-inner h2 {
+          color: var(--text-on-ink);
+          font-size: 32px;
+          margin-bottom: 12px;
+        }
+        .final-cta-inner p {
+          color: var(--text-on-ink-muted);
+          margin-bottom: 32px;
+        }
+        .final-cta .hero-ctas {
+          justify-content: center;
+        }
+
+        /* ---------- Footer ---------- */
         .footer {
-          background-color: #ffffff;
-          border-top: 1px solid #e2e8f0;
-          padding: 30px 0;
-          margin-top: auto;
+          padding: 56px 0 0;
         }
-
-        .footer-content {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          font-size: 13px;
-          color: #64748b;
+        .footer-grid {
+          display: grid;
+          grid-template-columns: 1.6fr 1fr 1fr;
+          gap: 40px;
+          padding-bottom: 40px;
         }
-
         .footer-brand {
           display: flex;
-          align-items: center;
-          gap: 8px;
-          font-weight: 700;
-          color: #101828;
-        }
-
-        .footer-links {
-          display: flex;
-          align-items: center;
           gap: 12px;
         }
-
-        .footer-links a:hover {
-          color: #1656d8;
+        .footer-brand-name {
+          font-family: var(--font-display);
+          font-size: 16px;
+          color: var(--text-on-ink);
+          display: block;
         }
-
-        .container {
-          width: 100%;
-          max-width: 1200px;
-          margin: 0 auto;
-          padding: 0 40px;
+        .footer-tag {
+          font-size: 13px;
+          margin-top: 6px;
+          max-width: 240px;
         }
-
-        /* Chatbot Floating Widget */
-        .chatbot-widget {
-          position: fixed;
-          bottom: 30px;
-          right: 30px;
-          z-index: 1000;
-          font-family: inherit;
-        }
-
-        .chat-trigger-btn {
-          width: 60px;
-          height: 60px;
-          border-radius: 50%;
-          background-color: #1656d8;
-          border: none;
-          color: #ffffff;
-          font-size: 26px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          cursor: pointer;
-          box-shadow: 0 4px 16px rgba(16, 79, 223, 0.25);
-          position: relative;
-          transition: transform 0.2s;
-        }
-
-        .chat-trigger-btn:hover {
-          transform: scale(1.05);
-        }
-
-        .chat-pulse {
-          position: absolute;
-          width: 100%;
-          height: 100%;
-          border-radius: 50%;
-          background-color: #1656d8;
-          opacity: 0.4;
-          z-index: -1;
-          animation: pulse 2s infinite;
-        }
-
-        .chat-card {
-          width: 360px;
-          height: 500px;
-          background-color: #ffffff;
-          border-radius: 12px;
+        .footer-col {
           display: flex;
           flex-direction: column;
-          box-shadow: 0 8px 30px rgba(0,0,0,0.12);
-          overflow: hidden;
-          animation: slideUp 0.3s ease-out;
+          gap: 12px;
+        }
+        .footer-col-title {
+          font-family: var(--font-mono);
+          font-size: 11px;
+          letter-spacing: 0.06em;
+          color: var(--text-on-ink-muted);
+          text-transform: uppercase;
+          margin-bottom: 4px;
+        }
+        .footer-col a {
+          font-size: 13.5px;
+        }
+        .footer-bottom {
+          border-top: 1px solid var(--ink-line);
+          padding: 20px 0;
+          font-size: 12.5px;
         }
 
+        /* ---------- Chat widget ---------- */
+        .chat-widget {
+          position: fixed;
+          bottom: 28px;
+          right: 28px;
+          z-index: 1000;
+        }
+        .chat-trigger {
+          width: 54px;
+          height: 54px;
+          border-radius: 50%;
+          background: var(--indigo);
+          border: none;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          cursor: pointer;
+          box-shadow: var(--shadow-lg);
+          position: relative;
+        }
+        .chat-trigger:hover {
+          background: var(--indigo-hover);
+        }
+        .chat-pulse {
+          position: absolute;
+          inset: 0;
+          border-radius: 50%;
+          background: var(--indigo);
+          opacity: 0.4;
+          z-index: -1;
+          animation: chatpulse 2.4s infinite;
+        }
+        @keyframes chatpulse {
+          0% { transform: scale(0.95); opacity: 0.4; }
+          70% { transform: scale(1.4); opacity: 0; }
+          100% { transform: scale(0.95); opacity: 0; }
+        }
+        .chat-card {
+          width: 340px;
+          height: 460px;
+          background: #fff;
+          border-radius: var(--radius-md);
+          display: flex;
+          flex-direction: column;
+          box-shadow: var(--shadow-lg);
+          overflow: hidden;
+        }
         .chat-header {
-          background-color: #1656d8;
-          color: #ffffff;
-          padding: 20px;
+          background: var(--ink);
+          color: #fff;
+          padding: 18px;
           display: flex;
           align-items: center;
           gap: 12px;
           position: relative;
         }
-
-        .chat-avatar {
-          width: 36px;
-          height: 36px;
-          border-radius: 50%;
-          background-color: rgba(255, 255, 255, 0.2);
-          font-weight: 700;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-        }
-
         .chat-header h4 {
-          font-size: 15px;
-          margin: 0;
+          font-size: 14px;
+          color: #fff;
         }
-
         .chat-header span {
           font-size: 11px;
-          opacity: 0.8;
+          color: var(--text-on-ink-muted);
         }
-
         .chat-close {
           position: absolute;
-          top: 18px;
-          right: 20px;
+          top: 14px;
+          right: 16px;
           background: none;
           border: none;
-          color: #ffffff;
-          font-size: 24px;
+          color: #fff;
+          font-size: 22px;
           cursor: pointer;
         }
-
         .chat-body {
           flex: 1;
-          padding: 20px;
+          padding: 18px;
           overflow-y: auto;
           display: flex;
           flex-direction: column;
-          gap: 16px;
-          background-color: #eef4ff;
+          gap: 12px;
+          background: var(--paper-dim);
         }
-
         .chat-message {
-          max-width: 80%;
-          padding: 12px 16px;
-          border-radius: 14px;
-          font-size: 13.5px;
+          max-width: 82%;
+          padding: 10px 14px;
+          border-radius: 12px;
+          font-size: 13px;
           line-height: 1.5;
         }
-
         .chat-message.bot {
-          background-color: #ffffff;
-          color: #101828;
+          background: #fff;
+          border: 1px solid var(--paper-line);
           align-self: flex-start;
-          border-bottom-left-radius: 2px;
-          border: 1px solid #e2e8f0;
         }
-
         .chat-message.user {
-          background-color: #1656d8;
-          color: #ffffff;
+          background: var(--indigo);
+          color: #fff;
           align-self: flex-end;
-          border-bottom-right-radius: 2px;
         }
-
         .chat-footer {
-          padding: 16px 20px;
-          border-top: 1px solid #e2e8f0;
-          background-color: #ffffff;
+          padding: 14px 18px;
+          border-top: 1px solid var(--paper-line);
           display: flex;
           flex-direction: column;
           gap: 8px;
         }
-
         .footer-lbl {
-          font-size: 11px;
-          font-weight: 700;
-          color: #64748b;
+          font-family: var(--font-mono);
+          font-size: 10.5px;
+          letter-spacing: 0.05em;
+          color: var(--text-muted);
           text-transform: uppercase;
         }
-
         .chat-options {
           display: flex;
           flex-direction: column;
           gap: 6px;
         }
-
         .btn-chat-opt {
-          width: 100%;
           padding: 8px 12px;
           font-size: 12px;
-          font-weight: 600;
+          font-weight: 500;
           text-align: left;
-          background-color: #eef4ff;
-          border: 1px solid #e2e8f0;
-          border-radius: 10px;
-          color: #101828;
+          background: var(--paper-dim);
+          border: 1px solid var(--paper-line);
+          border-radius: 8px;
           cursor: pointer;
-          transition: all 0.2s;
         }
-
         .btn-chat-opt:hover {
-          background-color: #eaf2ff;
-          border-color: #1656d8;
-          color: #1656d8;
+          border-color: var(--indigo);
+          color: var(--indigo);
         }
-
         .btn-chat-opt.whatsapp {
-          background-color: #e6f9f0;
-          border-color: #25d366;
           color: #128c7e;
         }
 
-        .btn-chat-opt.whatsapp:hover {
-          background-color: #d1f4e2;
-        }
-
-        /* Animations */
-        @keyframes pulse {
-          0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 79, 223, 0.5); }
-          70% { transform: scale(1); box-shadow: 0 0 0 15px rgba(16, 79, 223, 0); }
-          100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 79, 223, 0); }
-        }
-
-        @keyframes slideUp {
-          from { transform: translateY(20px); opacity: 0; }
-          to { transform: translateY(0); opacity: 1; }
-        }
-
-        /* Common Buttons */
-        .btn {
-          display: inline-flex;
-          align-items: center;
-          justify-content: center;
-          font-weight: 600;
-          cursor: pointer;
-          transition: all 0.2s ease;
-          border: none;
-          text-decoration: none !important;
-        }
-
-        .btn-primary {
-          background-color: #1656d8 !important;
-          color: #ffffff !important;
-          text-decoration: none !important;
-        }
-
-        .btn-primary:hover {
-          background-color: #0e3fa3 !important;
-        }
-
-        .btn-secondary {
-          background-color: #ffffff !important;
-          color: #0a2f7c !important;
-          border: 1.5px solid #ffffff !important;
-          text-decoration: none !important;
-        }
-
-        .btn-secondary:hover {
-          background-color: #eef4ff;
-          border-color: #101828;
-        }
-
-        /* Mobile & Tablet Responsiveness */
-        @media (max-width: 768px) {
-          .navbar {
-            padding: 15px 20px;
-            height: auto;
-            flex-direction: column;
-            gap: 16px;
-            text-align: center;
+        /* ---------- Responsive ---------- */
+        @media (max-width: 960px) {
+          .hero-inner {
+            grid-template-columns: 1fr;
           }
-          
-          .nav-links {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 16px;
+          .hero-visual {
+            height: 340px;
+            margin-top: 20px;
           }
-          
-          .nav-link {
+          .steps, .skills-grid, .talent-grid, .testimonial-grid {
+            grid-template-columns: 1fr;
+          }
+          .step-line { display: none; }
+          .footer-grid {
+            grid-template-columns: 1fr;
+            gap: 28px;
+          }
+          .compare-row {
             font-size: 13px;
+            padding: 14px 16px;
           }
-          
-          .hero-section {
-            grid-template-columns: 1fr;
-            margin: 20px 15px;
-            padding: 40px 24px;
-            gap: 30px;
-            text-align: center;
-            border-radius: 16px;
-          }
-          
-          .hero-content h1 {
-            font-size: 32px;
-            line-height: 1.2;
-          }
-          
-          .hero-content p {
-            font-size: 15px;
-            margin-bottom: 24px;
-            text-align: center;
-          }
-          
-          .cta-buttons {
-            flex-direction: column;
-            width: 100%;
-            gap: 12px;
-          }
-          
-          .cta-btn {
-            width: 100%;
-            padding: 14px 20px;
-            font-size: 14px;
-            border-radius: 8px;
-          }
+        }
 
-          .image-wrapper {
-            max-width: 320px;
-          }
-          
-          .stats-grid {
-            grid-template-columns: 1fr;
-            gap: 20px;
-            padding: 0 20px;
-          }
-          
-          .steps-grid {
-            grid-template-columns: 1fr;
-            gap: 20px;
-            padding: 0 20px;
-          }
-          
-          .faq-list {
-            padding: 0 20px;
-          }
-          
-          .faq-question {
-            padding: 16px;
-            font-size: 14px;
-          }
-
-          .faq-answer p {
-            font-size: 13px;
-          }
-          
-          .footer-content {
-            flex-direction: column;
-            gap: 16px;
-            text-align: center;
-            padding: 0 20px;
-          }
-          
-          .footer-links {
-            flex-direction: column;
-            gap: 8px;
-          }
-          
-          .chatbot-widget {
-            bottom: 20px;
-            right: 20px;
-          }
-          
-          .chat-card {
-            width: calc(100vw - 40px);
-            height: 420px;
-          }
+        @media (max-width: 640px) {
+          .nav-links { display: none; }
+          .nav-ghost { display: none; }
+          .hero { padding: 64px 0 80px; }
+          .hero-copy h1 { font-size: 36px; }
+          .hero-sub { font-size: 16px; }
+          .hero-ctas { flex-direction: column; }
+          .hero-ctas .btn { width: 100%; }
+          .floating-card { width: 210px; padding: 16px; }
+          .requirement-card { left: 0; top: 0; }
+          .talent-card { right: 0; bottom: 0; }
+          .connector { display: none; }
+          .match-seal { display: none; }
+          .section-head h2 { font-size: 26px; }
+          .compare-row { grid-template-columns: 1fr; gap: 4px; }
+          .chat-card { width: calc(100vw - 40px); height: 420px; }
+          .chat-widget { bottom: 20px; right: 20px; }
         }
       `}</style>
     </div>
