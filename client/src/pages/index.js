@@ -174,12 +174,7 @@ export default function Home() {
       <header className={`nav ${scrolled ? 'nav-scrolled' : ''}`}>
         <div className="nav-inner container">
           <a href="#top" className="brand" aria-label="AI Shop International home">
-            <svg width="30" height="30" viewBox="0 0 30 30" fill="none" aria-hidden="true">
-              <circle cx="7" cy="22" r="3.4" stroke="#f5f4f0" strokeWidth="1.4" />
-              <circle cx="23" cy="22" r="3.4" stroke="#f5f4f0" strokeWidth="1.4" />
-              <circle cx="15" cy="7" r="3.8" fill="#c9a227" />
-              <path d="M9.8 20 L13 9.5 M20.2 20 L17 9.5" stroke="#f5f4f0" strokeWidth="1.2" strokeDasharray="1 2.4" />
-            </svg>
+            <img src="/logo.png" className="logo-img" alt="AI Shop Logo" />
             <span className="brand-word">AI Shop <em>International</em></span>
           </a>
 
@@ -597,6 +592,11 @@ export default function Home() {
           display: flex;
           align-items: center;
           gap: 10px;
+        }
+        .logo-img {
+          height: 32px;
+          width: auto;
+          display: block;
         }
         .brand-word {
           font-family: var(--font-display);
