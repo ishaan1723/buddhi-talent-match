@@ -46,9 +46,17 @@ export default function Dashboard() {
       const res = await fetch(`${API_URL}/api/jobs/`);
       if (res.ok) {
         const data = await res.json();
-        setJobs(data);
-        if (data.length > 0) {
-          setSelectedJobId(data[0].id);
+        const archivedIds = JSON.parse(localStorage.getItem('archived_job_ids') || '[]');
+        const jobsWithStatus = data.map(j => ({
+          ...j,
+          status: archivedIds.includes(j.id) ? 'archived' : 'active'
+        }));
+        setJobs(jobsWithStatus);
+        const activeJob = jobsWithStatus.find(j => j.status !== 'archived');
+        if (activeJob) {
+          setSelectedJobId(activeJob.id);
+        } else if (jobsWithStatus.length > 0) {
+          setSelectedJobId(jobsWithStatus[0].id);
         }
       }
     } catch (err) {
@@ -58,8 +66,18 @@ export default function Dashboard() {
         { id: 2, title: "Computer Vision Expert for Defect Detection", description: "Build classification pipeline with PyTorch...", budget: 6000 },
         { id: 3, title: "NLP Researcher for Article Summarizer", description: "Financial news summarizer using Hugging Face...", budget: 4500 }
       ];
-      setJobs(mockJobs);
-      setSelectedJobId(mockJobs[0].id);
+      const archivedIds = JSON.parse(localStorage.getItem('archived_job_ids') || '[]');
+      const jobsWithStatus = mockJobs.map(j => ({
+        ...j,
+        status: archivedIds.includes(j.id) ? 'archived' : 'active'
+      }));
+      setJobs(jobsWithStatus);
+      const activeJob = jobsWithStatus.find(j => j.status !== 'archived');
+      if (activeJob) {
+        setSelectedJobId(activeJob.id);
+      } else {
+        setSelectedJobId(jobsWithStatus[0].id);
+      }
     } finally {
       setLoadingJobs(false);
     }
@@ -120,6 +138,35 @@ export default function Dashboard() {
     } finally {
       setLoadingMatches(false);
     }
+  };
+
+  const handleArchiveJob = (jobId) => {
+    const updatedJobs = jobs.map(j => j.id === jobId ? { ...j, status: 'archived' } : j);
+    setJobs(updatedJobs);
+    
+    const archived = JSON.parse(localStorage.getItem('archived_job_ids') || '[]');
+    if (!archived.includes(jobId)) {
+      archived.push(jobId);
+      localStorage.setItem('archived_job_ids', JSON.stringify(archived));
+    }
+    
+    setStatusMessage("Campaign archived successfully!");
+    setTimeout(() => setStatusMessage(''), 3000);
+    
+    const nextJob = updatedJobs.find(j => j.status !== 'archived');
+    if (nextJob) {
+      setSelectedJobId(nextJob.id);
+    } else {
+      setSelectedJobId(null);
+    }
+  };
+
+  const getFilteredJobs = () => {
+    return jobs.filter(job => {
+      const isArchived = job.status === 'archived';
+      if (sidebarTab === 'archived') return isArchived;
+      return !isArchived;
+    });
   };
 
   const handleUpdateStatus = async (matchId, newStatus) => {
@@ -189,13 +236,13 @@ export default function Dashboard() {
                 onClick={() => setSidebarTab('active')} 
                 className={`tab-btn ${sidebarTab === 'active' ? 'active' : ''}`}
               >
-                Active ({jobs.length})
+                Active ({jobs.filter(j => j.status !== 'archived').length})
               </button>
               <button 
                 onClick={() => setSidebarTab('archived')} 
                 className={`tab-btn ${sidebarTab === 'archived' ? 'active' : ''}`}
               >
-                Archived (0)
+                Archived ({jobs.filter(j => j.status === 'archived').length})
               </button>
             </div>
           </div>
@@ -205,7 +252,7 @@ export default function Dashboard() {
           ) : (
             <div className="jobs-list-wrapper">
               <ul className="jobs-list">
-                {jobs.map(job => (
+                {getFilteredJobs().map(job => (
                   <li 
                     key={job.id} 
                     className={`job-item ${selectedJobId === job.id ? 'active' : ''}`}
@@ -228,13 +275,27 @@ export default function Dashboard() {
 
         {/* Right column: Main Dashboard Area */}
         <section className="matches-content">
-          <div className="matches-header">
-            <div>
-              <h2>Recommendations for: <span className="highlight">{getSelectedJob().title}</span></h2>
-              <p className="job-desc-preview">{getSelectedJob().description}</p>
+          {!selectedJobId || !getSelectedJob().title ? (
+            <div className="empty-state" style={{ padding: '80px 40px', textAlign: 'center', backgroundColor: '#ffffff', borderRadius: '14px', border: '1px solid #e2e8f0', marginTop: '40px' }}>
+              <h3 style={{ fontSize: '20px', color: '#101828', marginBottom: '8px' }}>No Active Campaign Selected</h3>
+              <p style={{ color: '#64748b', fontSize: '14px' }}>Please choose an active campaign from the sidebar, or switch to the Archived tab to view past listings.</p>
             </div>
-            {statusMessage && <div className="toast-notification">{statusMessage}</div>}
-          </div>
+          ) : (
+            <>
+              <div className="matches-header">
+                <div>
+                  <h2>Recommendations for: <span className="highlight">{getSelectedJob().title}</span></h2>
+                  <p className="job-desc-preview">{getSelectedJob().description}</p>
+                </div>
+                <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+                  {getSelectedJob().status !== 'archived' && (
+                    <button className="btn btn-secondary" onClick={() => handleArchiveJob(getSelectedJob().id)} style={{ fontSize: '13px', padding: '8px 16px', borderRadius: '10px' }}>
+                      Archive Campaign
+                    </button>
+                  )}
+                  {statusMessage && <div className="toast-notification">{statusMessage}</div>}
+                </div>
+              </div>
 
           {/* Search & Dynamic Filter Bar */}
           <div className="filter-bar card">
@@ -350,6 +411,8 @@ export default function Dashboard() {
                 </div>
               ))}
             </div>
+          )}
+          </>
           )}
         </section>
       </main>
