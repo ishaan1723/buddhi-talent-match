@@ -1115,12 +1115,12 @@ export default function Home() {
         }
         .stat h3 {
           font-size: 34px;
-          color: var(--text-on-ink);
-          font-weight: 500;
+          color: #ffffff !important;
+          font-weight: 600;
           margin-bottom: 8px;
         }
         .stat p {
-          color: var(--text-on-ink-muted);
+          color: #cbd5e1 !important;
           font-size: 13.5px;
           font-family: var(--font-mono);
         }
@@ -1475,7 +1475,9 @@ export default function Home() {
 
         @media (max-width: 640px) {
           .nav-links { display: none; }
-          .nav-ghost { display: none; }
+          .nav-actions { gap: 10px; }
+          .nav-ghost { font-size: 12px; }
+          .nav-cta { padding: 8px 14px; font-size: 12px; }
           .hero { padding: 64px 0 80px; }
           .hero-copy h1 { font-size: 36px; }
           .hero-sub { font-size: 16px; }
