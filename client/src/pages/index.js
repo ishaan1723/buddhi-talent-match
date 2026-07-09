@@ -1113,13 +1113,13 @@ export default function Home() {
           gap: 30px;
           text-align: center;
         }
-        .stat h3 {
+        :global(.stat) h3 {
           font-size: 34px;
           color: #ffffff !important;
           font-weight: 600;
           margin-bottom: 8px;
         }
-        .stat p {
+        :global(.stat) p {
           color: #cbd5e1 !important;
           font-size: 13.5px;
           font-family: var(--font-mono);
