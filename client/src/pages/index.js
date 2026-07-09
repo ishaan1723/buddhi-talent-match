@@ -78,11 +78,11 @@ export default function Home() {
   const faqs = [
     {
       q: 'How does the AI matching engine work?',
-      a: 'Our system converts candidate profiles and job descriptions into semantic vector embeddings. Instead of keyword matching, the AI compares contextual meaning between requirements and a freelancer\u2019s real experience to calculate a match score.'
+      a: 'Our system converts candidate profiles and job descriptions into semantic vector embeddings. Instead of keyword matching, the AI compares contextual meaning between requirements and a freelancer’s real experience to calculate a match score.'
     },
     {
       q: 'Is there any cost for the agency or clients during the trial?',
-      a: 'No. The 20-day trial runs on high-performance free cloud hosting tiers, so there are zero database or server infrastructure fees. The only minor cost is pay-as-you-go AI query APIs, averaging under \u20b9400 for hundreds of searches.'
+      a: 'No. The 20-day trial runs on high-performance free cloud hosting tiers, so there are zero database or server infrastructure fees. The only minor cost is pay-as-you-go AI query APIs, averaging under ₹400 for hundreds of searches.'
     },
     {
       q: 'How secure is candidate and client data?',
@@ -90,7 +90,7 @@ export default function Home() {
     },
     {
       q: 'Can we customize the matching criteria?',
-      a: 'Yes. The recruiter dashboard lets you adjust matching weights between technical AI skills, years of experience, and target hourly rates (\u20b9) to prioritize what matters for each client.'
+      a: 'Yes. The recruiter dashboard lets you adjust matching weights between technical AI skills, years of experience, and target hourly rates (₹) to prioritize what matters for each client.'
     }
   ];
 
@@ -109,7 +109,7 @@ export default function Home() {
       name: 'Rohan K.',
       role: 'Senior LLM & RAG Specialist',
       tags: ['LangChain', 'Pinecone', 'Python'],
-      rate: '\u20b92,200/hr',
+      rate: '₹2,200/hr',
       match: '98%'
     },
     {
@@ -117,7 +117,7 @@ export default function Home() {
       name: 'Ananya S.',
       role: 'Computer Vision Engineer',
       tags: ['PyTorch', 'YOLO', 'Edge AI'],
-      rate: '\u20b91,850/hr',
+      rate: '₹1,850/hr',
       match: '96%'
     },
     {
@@ -125,14 +125,14 @@ export default function Home() {
       name: 'Vikram M.',
       role: 'AI Agent Architect',
       tags: ['AutoGen', 'FastAPI', 'AWS'],
-      rate: '\u20b92,600/hr',
+      rate: '₹2,600/hr',
       match: '97%'
     }
   ];
 
   const testimonials = [
     {
-      quote: 'We had a vetted RAG engineer in a live sprint within four days. The match score wasn\u2019t marketing \u2014 the skills lined up exactly with our stack.',
+      quote: 'We had a vetted RAG engineer in a live sprint within four days. The match score wasn’t marketing  —  the skills lined up exactly with our stack.',
       role: 'Head of Engineering, Series A fintech'
     },
     {
@@ -152,9 +152,9 @@ export default function Home() {
     if (option === 'how_match') {
       replyText = 'We convert candidate profiles and job requirements into semantic embeddings, then score the match on skills, experience, and rate fit.';
     } else if (option === 'how_apply') {
-      replyText = 'Click \u201cApply as AI Freelancer\u201d on this page to submit your profile in under a minute.';
+      replyText = 'Click “Apply as AI Freelancer” on this page to submit your profile in under a minute.';
     } else if (option === 'whatsapp') {
-      replyText = 'Opening WhatsApp in a new tab \u2014 our team will pick it up from there.';
+      replyText = 'Opening WhatsApp in a new tab  —  our team will pick it up from there.';
       window.open('https://wa.me/919999999999', '_blank');
     }
     setChatMessages((prev) => [...prev, { sender: 'user', text: label }, { sender: 'bot', text: replyText }]);
@@ -163,7 +163,7 @@ export default function Home() {
   return (
     <div className="home">
       <Head>
-        <title>AI Shop International \u2014 Hire Vetted AI Freelancers</title>
+        <title>AI Shop International  —  Hire Vetted AI Freelancers</title>
         <meta
           name="description"
           content="A vetted network of AI engineers, ML researchers, and prompt specialists, matched to your project by a semantic scoring engine."
@@ -209,13 +209,13 @@ export default function Home() {
               </h1>
               <p className="hero-sub">
                 We match your project with AI engineers, ML researchers, and prompt specialists
-                who\u2019ve shipped in production \u2014 scored, ranked, and ready in days, not weeks.
+                who’ve shipped in production  —  scored, ranked, and ready in days, not weeks.
               </p>
               <div className="hero-ctas">
                 <a href="/client" className="btn btn-primary">I want to hire AI talent</a>
                 <a href="/freelancer" className="btn btn-ghost-dark">Apply as an AI freelancer</a>
               </div>
-              <p className="hero-microtrust">No recruiter fees on your pilot \u00b7 3-day average time-to-match</p>
+              <p className="hero-microtrust">No recruiter fees on your pilot · 3-day average time-to-match</p>
             </div>
 
             <div
@@ -230,7 +230,7 @@ export default function Home() {
                 <div className="fc-tags">
                   <span>LangChain</span><span>Vector DB</span><span>Python</span>
                 </div>
-                <p className="fc-meta">Remote \u00b7 \u20b92,500/hr budget</p>
+                <p className="fc-meta">Remote · ₹2,500/hr budget</p>
               </div>
 
               <svg className="connector" viewBox="0 0 320 200" aria-hidden="true">
@@ -262,7 +262,7 @@ export default function Home() {
                 <div className="fc-tags">
                   <span>LangChain</span><span>Pinecone</span><span>Python</span>
                 </div>
-                <p className="tc-foot"><span className="dot-live" /> Available now \u00b7 \u20b92,200/hr</p>
+                <p className="tc-foot"><span className="dot-live" /> Available now · ₹2,200/hr</p>
               </div>
             </div>
           </div>
@@ -293,8 +293,8 @@ export default function Home() {
 
             <div className="steps">
               {[
-                { n: '01', title: 'Freelancers join', body: 'AI specialists submit profiles and focus areas in under a minute \u2014 verified before they\u2019re listed.' },
-                { n: '02', title: 'Clients post requirements', body: 'Describe the project and hourly budget in \u20b9. No generic job description needed.' },
+                { n: '01', title: 'Freelancers join', body: 'AI specialists submit profiles and focus areas in under a minute  —  verified before they’re listed.' },
+                { n: '02', title: 'Clients post requirements', body: 'Describe the project and hourly budget in ₹. No generic job description needed.' },
                 { n: '03', title: 'The engine scores and ranks', body: 'Every profile is scored against your requirement. Recruiters approve matches from the dashboard.' }
               ].map((step, i) => (
                 <Reveal key={step.n} delay={i * 90} className="step">
@@ -314,7 +314,7 @@ export default function Home() {
             <Reveal className="section-head">
               <span className="eyebrow eyebrow-dark">AI SKILLS</span>
               <h2>Specialists, not generalists</h2>
-              <p className="section-sub">Every category below is a distinct vetting track \u2014 not a keyword tag.</p>
+              <p className="section-sub">Every category below is a distinct vetting track  —  not a keyword tag.</p>
             </Reveal>
 
             <div className="skills-grid">
@@ -336,8 +336,8 @@ export default function Home() {
           <div className="container">
             <Reveal className="section-head section-head-light">
               <span className="eyebrow">FEATURED TALENT</span>
-              <h2>A glimpse of who\u2019s in the network</h2>
-              <p className="section-sub section-sub-light">Anonymized preview \u2014 full profiles unlock once you post a requirement.</p>
+              <h2>A glimpse of who’s in the network</h2>
+              <p className="section-sub section-sub-light">Anonymized preview  —  full profiles unlock once you post a requirement.</p>
             </Reveal>
 
             <div className="talent-grid">
@@ -369,10 +369,10 @@ export default function Home() {
           <div className="container">
             <div className="stats-grid">
               {[
-                { v: '\u20b95,00,000+', l: 'Saved in recruitment fees' },
+                { v: '₹5,00,000+', l: 'Saved in recruitment fees' },
                 { v: '98.4%', l: 'AI match accuracy' },
                 { v: '3 Days', l: 'Average time-to-hire' },
-                { v: '\u20b9800\u2013\u20b95,000', l: 'Typical hourly rates' }
+                { v: '₹800–₹5,000', l: 'Typical hourly rates' }
               ].map((s, i) => (
                 <Reveal key={s.l} delay={i * 80} className="stat">
                   <h3>{s.v}</h3>
@@ -397,9 +397,9 @@ export default function Home() {
                 <span className="compare-highlight">AI Shop</span>
               </div>
               {[
-                ['Time to shortlist', '2\u20136 weeks', '3 days avg'],
+                ['Time to shortlist', '2–6 weeks', '3 days avg'],
                 ['Matching method', 'Manual keyword search', 'Semantic AI scoring'],
-                ['Fee structure', '15\u201325% placement fee', 'Transparent hourly rate'],
+                ['Fee structure', '15–25% placement fee', 'Transparent hourly rate'],
                 ['Match transparency', 'Rarely disclosed', 'Visible score, every time']
               ].map((row) => (
                 <div className="compare-row" key={row[0]}>
@@ -422,7 +422,7 @@ export default function Home() {
             <div className="testimonial-grid">
               {testimonials.map((t, i) => (
                 <Reveal key={t.role} delay={i * 90} className="testimonial-card">
-                  <p className="testimonial-quote">\u201c{t.quote}\u201d</p>
+                  <p className="testimonial-quote">“{t.quote}”</p>
                   <span className="testimonial-role">{t.role}</span>
                 </Reveal>
               ))}
@@ -504,7 +504,7 @@ export default function Home() {
           </div>
         </div>
         <div className="container footer-bottom">
-          <span>\u00a9 2026 AI Placement Solutions. All rights reserved.</span>
+          <span>© 2026 AI Placement Solutions. All rights reserved.</span>
         </div>
       </footer>
 
@@ -518,7 +518,7 @@ export default function Home() {
                 <h4>AI Shop Assistant</h4>
                 <span>Online</span>
               </div>
-              <button className="chat-close" onClick={() => setIsChatOpen(false)} aria-label="Close chat">\u00d7</button>
+              <button className="chat-close" onClick={() => setIsChatOpen(false)} aria-label="Close chat">×</button>
             </div>
             <div className="chat-body">
               {chatMessages.map((msg, i) => (
