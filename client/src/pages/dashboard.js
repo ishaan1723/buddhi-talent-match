@@ -1102,6 +1102,43 @@ export default function Dashboard() {
           background-color: #eef4ff;
           border-color: #101828;
         }
+
+        /* Mobile Responsiveness media queries */
+        @media (max-width: 768px) {
+          .navbar {
+            padding: 0 16px;
+          }
+          .dashboard-layout {
+            flex-direction: column;
+          }
+          .jobs-sidebar {
+            width: 100%;
+            border-right: none;
+            border-bottom: 1px solid #e2e8f0;
+          }
+          .matches-content {
+            padding: 20px 16px;
+          }
+          .matches-header {
+            flex-direction: column;
+            gap: 16px;
+          }
+          .filter-bar {
+            grid-template-columns: 1fr;
+            gap: 16px;
+          }
+          .candidates-grid {
+            grid-template-columns: 1fr;
+          }
+          .drawer-content {
+            width: 100%;
+            padding: 24px;
+          }
+          .card-details {
+            gap: 20px;
+            flex-wrap: wrap;
+          }
+        }
       `}</style>
     </div>
   );
