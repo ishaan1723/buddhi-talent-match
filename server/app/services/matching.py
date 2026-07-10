@@ -85,7 +85,7 @@ def run_match_for_job(job_id: int):
             job_text = f"{job_title} {job_desc}"
             
             # 2. Fetch all Freelancers
-            cursor.execute("SELECT id, name, primary_skill, hourly_rate, resume_text FROM freelancers;")
+            cursor.execute("SELECT id, name, primary_skill, hourly_rate, resume_text, kpi_achieved, proud_situation FROM freelancers;")
             freelancers = cursor.fetchall()
             
             # 3. Calculate match score and insert/update matches table
@@ -97,10 +97,14 @@ def run_match_for_job(job_id: int):
             """
             
             for f in freelancers:
-                f_id, f_name, f_skill, f_rate, resume_text = f
-                f_text = f"{f_name} expert in {f_skill}"
+                f_id, f_name, f_skill, f_rate, resume_text, kpi_achieved, proud_situation = f
+                f_text = f"{f_name} expert in {f_skill}. "
+                if kpi_achieved:
+                    f_text += f"KPI Achieved: {kpi_achieved}. "
+                if proud_situation:
+                    f_text += f"Turnaround proud situation: {proud_situation}. "
                 if resume_text:
-                    f_text += f". Resume Details: {resume_text}"
+                    f_text += f"Resume Details: {resume_text}"
                 
                 score = calculate_match_score(f_text, job_text, float(f_rate), float(job_budget))
                 cursor.execute(match_query, (job_id, f_id, score))
@@ -114,15 +118,19 @@ def run_match_for_freelancer(freelancer_id: int):
     try:
         with get_db_cursor() as cursor:
             # 1. Fetch Freelancer Details
-            cursor.execute("SELECT id, name, primary_skill, hourly_rate, resume_text FROM freelancers WHERE id = %s;", (freelancer_id,))
+            cursor.execute("SELECT id, name, primary_skill, hourly_rate, resume_text, kpi_achieved, proud_situation FROM freelancers WHERE id = %s;", (freelancer_id,))
             freelancer = cursor.fetchone()
             if not freelancer:
                 return
             
-            f_id, f_name, f_skill, f_rate, resume_text = freelancer
-            f_text = f"{f_name} expert in {f_skill}"
+            f_id, f_name, f_skill, f_rate, resume_text, kpi_achieved, proud_situation = freelancer
+            f_text = f"{f_name} expert in {f_skill}. "
+            if kpi_achieved:
+                f_text += f"KPI Achieved: {kpi_achieved}. "
+            if proud_situation:
+                f_text += f"Turnaround proud situation: {proud_situation}. "
             if resume_text:
-                f_text += f". Resume Details: {resume_text}"
+                f_text += f"Resume Details: {resume_text}"
             
             # 2. Fetch all Jobs
             cursor.execute("SELECT id, title, description, budget FROM jobs;")

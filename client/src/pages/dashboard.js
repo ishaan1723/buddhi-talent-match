@@ -462,6 +462,18 @@ export default function Dashboard() {
               </div>
 
               <div className="drawer-section">
+                <h3>Strategic Achievements</h3>
+                <div style={{ padding: '16px', backgroundColor: '#f8fafc', borderRadius: '10px', border: '1px solid #e2e8f0', marginBottom: '16px' }}>
+                  <strong style={{ fontSize: '11px', color: '#64748b', textTransform: 'uppercase', display: 'block', marginBottom: '4px' }}>Main Career KPI:</strong>
+                  <p style={{ fontSize: '13.5px', color: '#101828', lineHeight: '1.4', margin: 0 }}>{activeDrawerCandidate.kpi_achieved || "Not provided"}</p>
+                </div>
+                <div style={{ padding: '16px', backgroundColor: '#f8fafc', borderRadius: '10px', border: '1px solid #e2e8f0' }}>
+                  <strong style={{ fontSize: '11px', color: '#64748b', textTransform: 'uppercase', display: 'block', marginBottom: '4px' }}>Challenge Turned Around:</strong>
+                  <p style={{ fontSize: '13.5px', color: '#101828', lineHeight: '1.4', margin: 0 }}>{activeDrawerCandidate.proud_situation || "Not provided"}</p>
+                </div>
+              </div>
+
+              <div className="drawer-section">
                 <h3>AI Recommendation Breakdown</h3>
                 <div className="ai-breakdown-card">
                   <div className="breakdown-score">

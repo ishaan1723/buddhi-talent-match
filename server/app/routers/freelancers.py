@@ -23,6 +23,8 @@ async def create_freelancer(
     primary_skill: str = Form(...),
     experience: int = Form(...),
     hourly_rate: float = Form(...),
+    kpi_achieved: Optional[str] = Form(None),
+    proud_situation: Optional[str] = Form(None),
     resume: Optional[UploadFile] = File(None)
 ):
     resume_text = ""
@@ -44,8 +46,8 @@ async def create_freelancer(
         with get_db_cursor() as cursor:
             # Insert freelancer details into database including resume text
             query = """
-            INSERT INTO freelancers (name, email, linkedin_url, primary_skill, experience, hourly_rate, resume_text)
-            VALUES (%s, %s, %s, %s, %s, %s, %s)
+            INSERT INTO freelancers (name, email, linkedin_url, primary_skill, experience, hourly_rate, resume_text, kpi_achieved, proud_situation)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
             RETURNING id, created_at;
             """
             cursor.execute(query, (
@@ -55,7 +57,9 @@ async def create_freelancer(
                 primary_skill,
                 experience,
                 hourly_rate,
-                resume_text
+                resume_text,
+                kpi_achieved,
+                proud_situation
             ))
             result = cursor.fetchone()
             f_id, created_at = result[0], result[1]
@@ -71,6 +75,8 @@ async def create_freelancer(
             primary_skill=primary_skill,
             experience=experience,
             hourly_rate=hourly_rate,
+            kpi_achieved=kpi_achieved,
+            proud_situation=proud_situation,
             created_at=created_at
         )
             
@@ -90,7 +96,7 @@ def list_freelancers():
     try:
         with get_db_cursor() as cursor:
             query = """
-            SELECT id, name, email, linkedin_url, primary_skill, experience, hourly_rate, created_at
+            SELECT id, name, email, linkedin_url, primary_skill, experience, hourly_rate, created_at, kpi_achieved, proud_situation
             FROM freelancers
             ORDER BY created_at DESC;
             """
@@ -107,7 +113,9 @@ def list_freelancers():
                     primary_skill=row[4],
                     experience=row[5],
                     hourly_rate=float(row[6]),
-                    created_at=row[7]
+                    created_at=row[7],
+                    kpi_achieved=row[8],
+                    proud_situation=row[9]
                 ))
             return freelancers
             

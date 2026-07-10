@@ -9,6 +9,8 @@ class FreelancerBase(BaseModel):
     primary_skill: str = Field(..., min_length=2, max_length=100)
     experience: int = Field(..., ge=0, le=50)
     hourly_rate: float = Field(..., gt=0)
+    kpi_achieved: Optional[str] = None
+    proud_situation: Optional[str] = None
 
 class FreelancerCreate(FreelancerBase):
     pass
@@ -48,3 +50,5 @@ class MatchResponse(BaseModel):
     experience: int
     hourly_rate: float
     created_at: datetime
+    kpi_achieved: Optional[str] = None
+    proud_situation: Optional[str] = None

@@ -15,7 +15,7 @@ def get_job_matches(job_id: int):
         with get_db_cursor() as cursor:
             query = """
             SELECT m.id, m.job_id, m.freelancer_id, m.match_score, m.status,
-                   f.name, f.email, f.linkedin_url, f.primary_skill, f.experience, f.hourly_rate, m.created_at
+                   f.name, f.email, f.linkedin_url, f.primary_skill, f.experience, f.hourly_rate, m.created_at, f.kpi_achieved, f.proud_situation
             FROM matches m
             JOIN freelancers f ON m.freelancer_id = f.id
             WHERE m.job_id = %s
@@ -38,7 +38,9 @@ def get_job_matches(job_id: int):
                     primary_skill=row[8],
                     experience=row[9],
                     hourly_rate=float(row[10]),
-                    created_at=row[11]
+                    created_at=row[11],
+                    kpi_achieved=row[12],
+                    proud_situation=row[13]
                 ))
             return matches
             

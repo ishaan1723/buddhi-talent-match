@@ -10,7 +10,9 @@ export default function FreelancerOnboarding() {
     linkedin_url: '',
     primary_skill: '',
     experience: 2,
-    hourly_rate: 1500
+    hourly_rate: 1500,
+    kpi_achieved: '',
+    proud_situation: ''
   });
 
   const [submitted, setSubmitted] = useState(false);
@@ -46,6 +48,8 @@ export default function FreelancerOnboarding() {
       formDataPayload.append('primary_skill', formData.primary_skill);
       formDataPayload.append('experience', formData.experience);
       formDataPayload.append('hourly_rate', formData.hourly_rate);
+      formDataPayload.append('kpi_achieved', formData.kpi_achieved);
+      formDataPayload.append('proud_situation', formData.proud_situation);
       if (resumeFile) {
         formDataPayload.append('resume', resumeFile);
       }
@@ -224,6 +228,50 @@ export default function FreelancerOnboarding() {
               step="250"
               value={formData.hourly_rate}
               onChange={handleChange}
+            />
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="kpi_achieved">1 Main Career KPI Achieved</label>
+            <textarea 
+              id="kpi_achieved" 
+              name="kpi_achieved" 
+              required 
+              rows={2}
+              placeholder="e.g. Reduced inference latency by 45% for a production LLM chatbot" 
+              value={formData.kpi_achieved}
+              onChange={handleChange}
+              style={{
+                padding: '12px',
+                border: '1px solid #e2e8f0',
+                borderRadius: '10px',
+                fontSize: '14px',
+                outline: 'none',
+                fontFamily: 'inherit',
+                resize: 'vertical'
+              }}
+            />
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="proud_situation">1 Challenge Turned Around (Proud Moment)</label>
+            <textarea 
+              id="proud_situation" 
+              name="proud_situation" 
+              required 
+              rows={2}
+              placeholder="e.g. Migrated a failing vector search database to pgvector in 48 hours to restore service" 
+              value={formData.proud_situation}
+              onChange={handleChange}
+              style={{
+                padding: '12px',
+                border: '1px solid #e2e8f0',
+                borderRadius: '10px',
+                fontSize: '14px',
+                outline: 'none',
+                fontFamily: 'inherit',
+                resize: 'vertical'
+              }}
             />
           </div>
 
