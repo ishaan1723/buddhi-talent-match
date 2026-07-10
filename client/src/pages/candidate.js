@@ -366,10 +366,9 @@ export default function CandidateLanding() {
         /* ---------- Hero ---------- */
         .hero {
           position: relative;
-          background: linear-gradient(180deg, #eef4ff 0%, var(--paper) 100%);
+          background: var(--ink) !important;
           padding: 110px 0 120px;
           overflow: hidden;
-          border-bottom: 1px solid var(--paper-line);
         }
         .hero-grid {
           display: grid;
@@ -388,29 +387,29 @@ export default function CandidateLanding() {
           display: inline-block;
           font-size: 11px;
           font-weight: 700;
-          color: var(--indigo);
+          color: #fbbf24 !important;
           letter-spacing: 0.14em;
           text-transform: uppercase;
           margin-bottom: 24px;
-          background: rgba(99, 102, 241, 0.08);
+          background: rgba(251, 191, 36, 0.12) !important;
           padding: 6px 14px;
           border-radius: 99px;
         }
         .hero-copy h1 {
           font-size: 48px;
           line-height: 1.1;
-          color: var(--text);
+          color: #ffffff !important;
           margin-bottom: 20px;
           font-weight: 650;
         }
         .hero-copy h1 em {
           font-style: italic;
-          color: var(--indigo);
+          color: #c7d2fe !important;
           font-weight: 400;
         }
         .hero-sub {
           font-size: 18px;
-          color: var(--text-muted);
+          color: #cbd5e1 !important;
           line-height: 1.5;
           margin-bottom: 36px;
         }
@@ -429,12 +428,12 @@ export default function CandidateLanding() {
           align-items: center;
           justify-content: center;
           gap: 12px;
-          color: var(--text-muted);
+          color: #94a3b8 !important;
           font-size: 13px;
           font-family: var(--font-mono);
         }
         .dot-sep {
-          color: var(--paper-line);
+          color: var(--ink-line) !important;
         }
 
         /* ---------- How it Works ---------- */
