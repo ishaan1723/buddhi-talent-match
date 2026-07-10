@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import Head from 'next/head';
 import { API_URL } from '../config';
+import { fetchWithTimeout } from '../utils/fetchHelper';
 
 const formatCurrency = (val) => {
   if (val === undefined || val === null) return '';
@@ -43,7 +44,7 @@ export default function Dashboard() {
   const fetchJobs = async () => {
     try {
       setLoadingJobs(true);
-      const res = await fetch(`${API_URL}/api/jobs/`);
+      const res = await fetchWithTimeout(`${API_URL}/api/jobs/`);
       if (res.ok) {
         const data = await res.json();
         const archivedIds = JSON.parse(localStorage.getItem('archived_job_ids') || '[]');
@@ -86,7 +87,7 @@ export default function Dashboard() {
   const fetchMatches = async (jobId) => {
     try {
       setLoadingMatches(true);
-      const res = await fetch(`${API_URL}/api/matches/${jobId}`);
+      const res = await fetchWithTimeout(`${API_URL}/api/matches/${jobId}`);
       if (res.ok) {
         const data = await res.json();
         setMatches(data);
@@ -171,7 +172,7 @@ export default function Dashboard() {
 
   const handleUpdateStatus = async (matchId, newStatus) => {
     try {
-      const res = await fetch(`${API_URL}/api/matches/${matchId}/status?status=${newStatus}`, {
+      const res = await fetchWithTimeout(`${API_URL}/api/matches/${matchId}/status?status=${newStatus}`, {
         method: 'PUT'
       });
       if (res.ok) {

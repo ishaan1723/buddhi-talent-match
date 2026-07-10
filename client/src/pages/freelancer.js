@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import Head from 'next/head';
 import { API_URL } from '../config';
+import { fetchWithTimeout } from '../utils/fetchHelper';
 
 export default function FreelancerOnboarding() {
   const [formData, setFormData] = useState({
@@ -49,7 +50,7 @@ export default function FreelancerOnboarding() {
         formDataPayload.append('resume', resumeFile);
       }
 
-      const res = await fetch(`${API_URL}/api/freelancers/`, {
+      const res = await fetchWithTimeout(`${API_URL}/api/freelancers/`, {
         method: 'POST',
         body: formDataPayload
       });

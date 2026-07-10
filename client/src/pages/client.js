@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import Head from 'next/head';
 import { API_URL } from '../config';
+import { fetchWithTimeout } from '../utils/fetchHelper';
 
 export default function ClientPosting() {
   const [formData, setFormData] = useState({
@@ -57,7 +58,7 @@ export default function ClientPosting() {
     setErrorMsg('');
 
     try {
-      const res = await fetch(`${API_URL}/api/jobs/`, {
+      const res = await fetchWithTimeout(`${API_URL}/api/jobs/`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
