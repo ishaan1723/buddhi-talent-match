@@ -383,7 +383,7 @@ export default function CandidateLanding() {
           margin: 0 auto;
           text-align: center;
         }
-        .hero-badge {
+        :global(.hero-badge) {
           display: inline-block;
           font-size: 11px;
           font-weight: 700;
@@ -395,19 +395,19 @@ export default function CandidateLanding() {
           padding: 6px 14px;
           border-radius: 99px;
         }
-        .hero-copy h1 {
+        .hero-copy :global(h1) {
           font-size: 48px;
           line-height: 1.1;
           color: #ffffff !important;
           margin-bottom: 20px;
           font-weight: 650;
         }
-        .hero-copy h1 em {
+        .hero-copy :global(h1 em) {
           font-style: italic;
           color: #c7d2fe !important;
           font-weight: 400;
         }
-        .hero-sub {
+        :global(.hero-sub) {
           font-size: 18px;
           color: #cbd5e1 !important;
           line-height: 1.5;
@@ -423,16 +423,19 @@ export default function CandidateLanding() {
           padding: 14px 28px;
           font-size: 15px;
         }
-        .hero-social {
+        :global(.hero-social) {
           display: flex;
           align-items: center;
           justify-content: center;
           gap: 12px;
-          color: #94a3b8 !important;
+          color: #cbd5e1 !important;
           font-size: 13px;
           font-family: var(--font-mono);
         }
-        .dot-sep {
+        :global(.hero-social span) {
+          color: #cbd5e1 !important;
+        }
+        :global(.hero-social .dot-sep) {
           color: var(--ink-line) !important;
         }
 
