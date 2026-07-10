@@ -366,9 +366,10 @@ export default function CandidateLanding() {
         /* ---------- Hero ---------- */
         .hero {
           position: relative;
-          background: var(--ink);
-          padding: 96px 0 120px;
+          background: linear-gradient(180deg, #eef4ff 0%, var(--paper) 100%);
+          padding: 110px 0 120px;
           overflow: hidden;
+          border-bottom: 1px solid var(--paper-line);
         }
         .hero-grid {
           display: grid;
@@ -387,29 +388,29 @@ export default function CandidateLanding() {
           display: inline-block;
           font-size: 11px;
           font-weight: 700;
-          color: var(--gold);
+          color: var(--indigo);
           letter-spacing: 0.14em;
           text-transform: uppercase;
           margin-bottom: 24px;
-          background: rgba(201, 162, 39, 0.12);
+          background: rgba(99, 102, 241, 0.08);
           padding: 6px 14px;
           border-radius: 99px;
         }
         .hero-copy h1 {
           font-size: 48px;
           line-height: 1.1;
-          color: var(--text-on-ink);
+          color: var(--text);
           margin-bottom: 20px;
-          font-weight: 500;
+          font-weight: 650;
         }
         .hero-copy h1 em {
           font-style: italic;
-          color: var(--indigo-soft);
+          color: var(--indigo);
           font-weight: 400;
         }
         .hero-sub {
           font-size: 18px;
-          color: var(--text-on-ink-muted);
+          color: var(--text-muted);
           line-height: 1.5;
           margin-bottom: 36px;
         }
@@ -428,12 +429,12 @@ export default function CandidateLanding() {
           align-items: center;
           justify-content: center;
           gap: 12px;
-          color: var(--text-on-ink-muted);
+          color: var(--text-muted);
           font-size: 13px;
           font-family: var(--font-mono);
         }
         .dot-sep {
-          color: var(--ink-line);
+          color: var(--paper-line);
         }
 
         /* ---------- How it Works ---------- */
