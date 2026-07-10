@@ -213,7 +213,7 @@ export default function Home() {
               </p>
               <div className="hero-ctas">
                 <a href="/client" className="btn btn-primary">I want to hire AI talent</a>
-                <a href="/freelancer" className="btn btn-ghost-dark">Apply as an AI freelancer</a>
+                <a href="/candidate" className="btn btn-ghost-dark">Apply as an AI freelancer</a>
               </div>
               <p className="hero-microtrust">No recruiter fees on your pilot · 3-day average time-to-match</p>
             </div>
@@ -468,7 +468,7 @@ export default function Home() {
             <p>Post a requirement and see scored matches within 3 days on average.</p>
             <div className="hero-ctas">
               <a href="/client" className="btn btn-primary">Post a requirement</a>
-              <a href="/freelancer" className="btn btn-ghost-dark">Apply as talent</a>
+              <a href="/candidate" className="btn btn-ghost-dark">Apply as talent</a>
             </div>
           </div>
         </section>
