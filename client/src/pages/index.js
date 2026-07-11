@@ -60,7 +60,13 @@ export default function Home() {
     if (!token || !user) {
       router.push('/login');
     } else {
-      setCurrentUser(user);
+      if (user.account_type === 'company') {
+        router.push('/company');
+      } else if (user.account_type === 'freelancer') {
+        router.push('/candidate');
+      } else {
+        setCurrentUser(user);
+      }
     }
 
     if (router.query.msg) {
