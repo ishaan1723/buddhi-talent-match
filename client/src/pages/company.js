@@ -160,7 +160,18 @@ export default function CompanyHome() {
           padding: 0 24px;
         }
 
-        /* Nav styling matching index.js */
+        /* ---------- Reveal Animation ---------- */
+        :global(.reveal) {
+          opacity: 0;
+          transform: translateY(16px);
+          transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        :global(.reveal-visible) {
+          opacity: 1;
+          transform: translateY(0);
+        }
+
+        /* Nav styling with dynamic scrolling states */
         .nav {
           position: fixed;
           top: 0;
@@ -172,7 +183,7 @@ export default function CompanyHome() {
           padding: 20px 0;
         }
         .nav-scrolled {
-          background-color: rgba(250, 249, 246, 0.95);
+          background-color: rgba(250, 249, 246, 0.95) !important;
           backdrop-filter: blur(10px);
           border-bottom: 1px solid var(--paper-line);
           padding: 14px 0;
@@ -186,14 +197,21 @@ export default function CompanyHome() {
           display: flex;
           align-items: center;
           gap: 10px;
-          font-family: var(--font-display);
-          font-weight: 600;
-          font-size: 17px;
-          color: var(--text);
         }
-        .brand em {
+        .brand-word {
+          font-family: var(--font-display);
+          font-size: 17px;
+          font-weight: 600;
+          letter-spacing: -0.01em;
+          color: #ffffff !important;
+          transition: color 0.3s ease;
+        }
+        .brand-word em {
           color: var(--gold);
           font-style: normal;
+        }
+        .nav-scrolled .brand-word {
+          color: var(--text) !important;
         }
         .logo-img {
           width: 28px;
@@ -204,6 +222,31 @@ export default function CompanyHome() {
           display: flex;
           align-items: center;
           gap: 16px;
+        }
+        .nav-actions :global(.nav-user-indicator) {
+          color: #b9b0ff !important;
+          transition: color 0.3s ease;
+        }
+        .nav-scrolled .nav-actions :global(.nav-user-indicator) {
+          color: var(--indigo) !important;
+        }
+        .nav-actions :global(.btn-secondary) {
+          color: #ffffff !important;
+          border-color: rgba(255, 255, 255, 0.3) !important;
+          background: transparent !important;
+          transition: all 0.3s ease;
+        }
+        .nav-actions :global(.btn-secondary:hover) {
+          background: rgba(255, 255, 255, 0.1) !important;
+          border-color: #ffffff !important;
+        }
+        .nav-scrolled .nav-actions :global(.btn-secondary) {
+          color: var(--text) !important;
+          border-color: var(--paper-line) !important;
+          background: #ffffff !important;
+        }
+        .nav-scrolled .nav-actions :global(.btn-secondary:hover) {
+          background: var(--paper-dim) !important;
         }
 
         /* Hero section style matching index.js but clean dark-navy background */
@@ -220,32 +263,33 @@ export default function CompanyHome() {
           gap: 80px;
           align-items: center;
         }
-        .hero-badge {
+        .hero-copy :global(.hero-badge) {
           display: inline-block;
           font-family: var(--font-mono);
           font-size: 11px;
-          color: var(--gold);
+          color: var(--gold) !important;
           letter-spacing: 0.12em;
-          border: 1px solid rgba(201, 162, 39, 0.3);
-          background: rgba(201, 162, 39, 0.08);
+          border: 1px solid rgba(201, 162, 39, 0.3) !important;
+          background: rgba(201, 162, 39, 0.08) !important;
           padding: 4px 10px;
           border-radius: 99px;
           margin-bottom: 24px;
         }
-        .hero-copy h1 {
+        .hero-copy :global(h1) {
           font-size: clamp(36px, 4.5vw, 52px);
           line-height: 1.1;
           margin-bottom: 20px;
-          color: #fff;
+          color: #ffffff !important;
+          font-weight: 700;
         }
-        .hero-copy h1 em {
-          color: var(--gold);
+        .hero-copy :global(h1 em) {
+          color: var(--gold) !important;
           font-style: normal;
         }
-        .hero-p {
+        .hero-copy :global(.hero-p) {
           font-size: 16px;
           line-height: 1.65;
-          color: var(--text-on-ink-muted);
+          color: var(--text-on-ink-muted) !important;
           margin-bottom: 36px;
           max-width: 480px;
         }
