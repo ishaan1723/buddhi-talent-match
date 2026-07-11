@@ -1,9 +1,23 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/router';
 import Head from 'next/head';
 import { API_URL } from '../config';
 import { fetchWithTimeout } from '../utils/fetchHelper';
+import { getStoredUser, getToken } from '../utils/auth';
 
 export default function FreelancerOnboarding() {
+  const router = useRouter();
+
+  useEffect(() => {
+    const user = getStoredUser();
+    const token = getToken();
+    if (!token || !user) {
+      router.push('/login?msg=Please log in to register as an AI freelancer.');
+    } else if (user.account_type !== 'freelancer') {
+      router.push('/?msg=Unauthorized. Candidate onboarding is restricted to candidates only.');
+    }
+  }, []);
+
   const [formData, setFormData] = useState({
     name: '',
     email: '',

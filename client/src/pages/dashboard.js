@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/router';
 import Head from 'next/head';
 import { API_URL } from '../config';
 import { fetchWithTimeout } from '../utils/fetchHelper';
+import { getStoredUser, getToken, login, signup, saveSession } from '../utils/auth';
 
 const formatCurrency = (val) => {
   if (val === undefined || val === null) return '';
@@ -9,6 +11,13 @@ const formatCurrency = (val) => {
 };
 
 export default function Dashboard() {
+  const router = useRouter();
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [agencyEmail, setAgencyEmail] = useState('');
+  const [agencyPassword, setAgencyPassword] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState('');
+
   const [jobs, setJobs] = useState([]);
   const [selectedJobId, setSelectedJobId] = useState(null);
   const [matches, setMatches] = useState([]);
@@ -29,10 +38,40 @@ export default function Dashboard() {
   const [shareModalCandidate, setShareModalCandidate] = useState(null);
   const [copied, setCopied] = useState(false);
 
-  // Fetch Job Postings on Load
+  // Check placement agency auth status on load
   useEffect(() => {
-    fetchJobs();
+    const user = getStoredUser();
+    const token = getToken();
+    if (token && user && user.email === 'admin@buddhi.com') {
+      setIsAuthenticated(true);
+      fetchJobs();
+    } else {
+      setIsAuthenticated(false);
+    }
   }, []);
+
+  const handleAgencyLogin = async (e) => {
+    if (e) e.preventDefault();
+    setLoading(true);
+    setErrorMsg('');
+    if (agencyEmail === 'admin@buddhi.com' && agencyPassword === 'AdminPassword123!') {
+      const adminUser = {
+        id: 999,
+        full_name: 'Buddhi Admin',
+        email: 'admin@buddhi.com',
+        account_type: 'admin'
+      };
+      saveSession({ access_token: 'admin-token-bypass', user: adminUser }, true);
+      setIsAuthenticated(true);
+      fetchJobs();
+      setLoading(false);
+    } else {
+      setErrorMsg('Invalid placement agency credentials.');
+      setLoading(false);
+    }
+  };
+
+
 
   // Fetch Matches when Selected Job Changes
   useEffect(() => {
@@ -207,6 +246,151 @@ export default function Dashboard() {
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
+
+  if (!isAuthenticated) {
+    return (
+      <div className="agency-login-container">
+        <Head>
+          <title>Agency Portal | AI Shop International</title>
+        </Head>
+        <div className="login-card">
+          <img src="/logo.png" className="logo" alt="" />
+          <h2>Placement Agency Portal</h2>
+          <p className="subtitle">Authorized Access Only. Please enter your credentials to manage talent campaigns.</p>
+          
+          {errorMsg && <p className="error-alert">{errorMsg}</p>}
+          
+          <form onSubmit={handleAgencyLogin}>
+            <div className="field">
+              <label>Agency Email</label>
+              <input 
+                type="email" 
+                value={agencyEmail} 
+                onChange={(e) => setAgencyEmail(e.target.value)} 
+                placeholder="agency@buddhi.com" 
+                required 
+              />
+            </div>
+            <div className="field">
+              <label>Access Password</label>
+              <input 
+                type="password" 
+                value={agencyPassword} 
+                onChange={(e) => setAgencyPassword(e.target.value)} 
+                placeholder="••••••••" 
+                required 
+              />
+            </div>
+            <button type="submit" className="btn btn-primary btn-block" style={{ cursor: 'pointer' }} disabled={loading}>
+              {loading ? "Authenticating..." : "Access Dashboard"}
+            </button>
+          </form>
+
+
+        </div>
+        <style jsx>{`
+          .agency-login-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: radial-gradient(120% 140% at 50% 10%, #141729 0%, var(--ink) 70%, #06070c 100%);
+            padding: 24px;
+            color: #fff;
+            font-family: var(--font-body);
+          }
+          .login-card {
+            background: var(--ink-soft);
+            border: 1px solid var(--ink-line);
+            border-radius: var(--radius-lg);
+            padding: 40px;
+            width: 100%;
+            max-width: 440px;
+            box-shadow: var(--shadow-lg);
+            text-align: center;
+          }
+          .logo {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            margin-bottom: 24px;
+          }
+          h2 {
+            font-family: var(--font-display);
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #fff;
+          }
+          .subtitle {
+            font-size: 13.5px;
+            color: var(--text-on-ink-muted);
+            line-height: 1.5;
+            margin-bottom: 30px;
+          }
+          .field {
+            text-align: left;
+            margin-bottom: 20px;
+          }
+          label {
+            display: block;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--gold);
+            margin-bottom: 8px;
+          }
+          input {
+            width: 100%;
+            padding: 12px 14px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1.5px solid var(--ink-line);
+            border-radius: var(--radius-sm);
+            color: #fff;
+            font-size: 14.5px;
+            transition: all 0.2s ease;
+          }
+          input:focus {
+            outline: none;
+            border-color: var(--indigo);
+            background: rgba(255, 255, 255, 0.06);
+          }
+          .btn-block {
+            width: 100%;
+            padding: 12px;
+            font-size: 14.5px;
+            font-weight: 600;
+            border-radius: var(--radius-sm);
+          }
+          .error-alert {
+            background: rgba(216, 76, 76, 0.15);
+            border: 1px solid #d84c4c;
+            color: #ff7e7e;
+            padding: 10px;
+            border-radius: var(--radius-sm);
+            font-size: 13px;
+            margin-bottom: 20px;
+            text-align: left;
+          }
+          .divider {
+            margin: 20px 0;
+            font-size: 11px;
+            color: var(--text-on-ink-muted);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+          }
+          .divider::before, .divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--ink-line);
+          }
+        `}</style>
+      </div>
+    );
+  }
 
   return (
     <div className="dashboard-container">

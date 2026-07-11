@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/router';
 import Head from 'next/head';
+import { getStoredUser, getToken, clearSession } from '../utils/auth';
 
 function Reveal({ children, className = '', delay = 0, as = 'div' }) {
   const [visible, setVisible] = useState(false);
@@ -20,8 +22,22 @@ function Reveal({ children, className = '', delay = 0, as = 'div' }) {
 }
 
 export default function CandidateLanding() {
+  const router = useRouter();
+  const [currentUser, setCurrentUser] = useState(null);
   const [scrolled, setScrolled] = useState(false);
   const [activeFaq, setActiveFaq] = useState(null);
+
+  useEffect(() => {
+    const user = getStoredUser();
+    const token = getToken();
+    if (!token || !user) {
+      router.push('/login');
+    } else if (user.account_type !== 'freelancer') {
+      router.push('/');
+    } else {
+      setCurrentUser(user);
+    }
+  }, []);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -80,7 +96,29 @@ export default function CandidateLanding() {
 
           <div className="nav-actions">
             <a href="/dashboard" className="nav-ghost">Recruiter Dashboard</a>
-            <a href="/freelancer" className="btn btn-primary nav-cta">Onboard Now</a>
+            {currentUser ? (
+              <>
+                <span className="nav-user-indicator" style={{ fontSize: '12.5px', fontWeight: '700', letterSpacing: '0.04em', color: 'var(--indigo)', textTransform: 'uppercase' }}>
+                  HI {currentUser.full_name.split(' ')[0]}
+                </span>
+                <button 
+                  onClick={() => {
+                    clearSession();
+                    setCurrentUser(null);
+                    window.location.reload();
+                  }} 
+                  className="btn btn-secondary nav-cta"
+                  style={{ padding: '8px 16px', fontSize: '13px', borderRadius: '8px', cursor: 'pointer' }}
+                >
+                  Log Out
+                </button>
+              </>
+            ) : (
+              <>
+                <a href="/login" className="nav-ghost">Log In</a>
+                <a href="/freelancer" className="btn btn-primary nav-cta">Onboard Now</a>
+              </>
+            )}
           </div>
         </div>
       </header>

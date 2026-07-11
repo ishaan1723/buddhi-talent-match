@@ -1,9 +1,23 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/router';
 import Head from 'next/head';
 import { API_URL } from '../config';
 import { fetchWithTimeout } from '../utils/fetchHelper';
+import { getStoredUser, getToken } from '../utils/auth';
 
 export default function ClientPosting() {
+  const router = useRouter();
+
+  useEffect(() => {
+    const user = getStoredUser();
+    const token = getToken();
+    if (!token || !user) {
+      router.push('/login?msg=Please log in to post an AI requirement.');
+    } else if (user.account_type !== 'company') {
+      router.push('/?msg=Unauthorized. Job posting is restricted to recruiters/companies only.');
+    }
+  }, []);
+
   const [formData, setFormData] = useState({
     title: '',
     description: '',

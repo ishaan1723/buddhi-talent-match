@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/router';
 import Head from 'next/head';
 import AuthLayout from '../components/AuthLayout';
-import SocialAuthRow from '../components/SocialAuthRow';
+
 import { signup, saveSession, passwordStrength } from '../utils/auth';
 
 export default function Signup() {
@@ -41,7 +41,7 @@ export default function Signup() {
     try {
       const data = await signup({ fullName, email, password, accountType });
       saveSession(data, true);
-      router.push(accountType === 'company' ? '/client' : '/candidate');
+      router.push('/');
     } catch (err) {
       setFormError(err.message || 'Could not create your account.');
     } finally {
@@ -67,14 +67,7 @@ export default function Signup() {
       <h1 className="af-title">Create your account</h1>
       <p className="af-subtitle">Already have an account? <a href="/login" className="af-link" style={{ display: 'inline' }}>Log in</a>.</p>
 
-      <SocialAuthRow onStubClick={() => setSocialNote(true)} />
-      {socialNote && (
-        <p className="af-error-text" style={{ color: 'var(--text-muted)', marginTop: '-12px', marginBottom: '18px' }}>
-          Social sign-up is coming soon — use email &amp; password for now.
-        </p>
-      )}
 
-      <div className="af-divider">OR SIGN UP WITH EMAIL</div>
 
       <form onSubmit={handleSubmit} noValidate>
         <div className="af-role-toggle" role="radiogroup" aria-label="Account type">

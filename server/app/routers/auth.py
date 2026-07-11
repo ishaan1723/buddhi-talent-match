@@ -139,6 +139,11 @@ async def forgot_password(payload: ForgotPasswordRequest):
 
         # DEV-ONLY: surfaced via logs since no email provider is wired up yet.
         logger.info(f"[password reset] link for user_id={user_id}: /reset-password?token={token}")
+        return {
+            "message": "If an account exists for that email, a reset link has been sent.",
+            "token": token,
+            "dev_link": f"/reset-password?token={token}"
+        }
 
     return {"message": "If an account exists for that email, a reset link has been sent."}
 

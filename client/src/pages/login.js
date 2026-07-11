@@ -2,8 +2,8 @@ import { useState } from 'react';
 import { useRouter } from 'next/router';
 import Head from 'next/head';
 import AuthLayout from '../components/AuthLayout';
-import SocialAuthRow from '../components/SocialAuthRow';
-import { login, saveSession } from '../utils/auth';
+
+import { login, signup, saveSession } from '../utils/auth';
 
 export default function Login() {
   const router = useRouter();
@@ -33,7 +33,7 @@ export default function Login() {
     try {
       const data = await login({ email, password, rememberMe });
       saveSession(data, rememberMe);
-      router.push('/dashboard');
+      router.push('/');
     } catch (err) {
       setFormError(err.message || 'Invalid email or password.');
     } finally {
@@ -59,14 +59,9 @@ export default function Login() {
       <h1 className="af-title">Log in to your account</h1>
       <p className="af-subtitle">New to AI Shop International? <a href="/signup" className="af-link" style={{ display: 'inline' }}>Create an account</a>.</p>
 
-      <SocialAuthRow onStubClick={() => setSocialNote(true)} />
-      {socialNote && (
-        <p className="af-error-text" style={{ color: 'var(--text-muted)', marginTop: '-12px', marginBottom: '18px' }}>
-          Social login is coming soon — use email &amp; password for now.
-        </p>
-      )}
 
-      <div className="af-divider">OR CONTINUE WITH EMAIL</div>
+
+
 
       <form onSubmit={handleSubmit} noValidate>
         <div className="af-field">

@@ -8,6 +8,7 @@ export default function ForgotPassword() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [devLink, setDevLink] = useState('');
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -18,7 +19,10 @@ export default function ForgotPassword() {
     setError('');
     setLoading(true);
     try {
-      await forgotPassword({ email });
+      const res = await forgotPassword({ email });
+      if (res.dev_link) {
+        setDevLink(res.dev_link);
+      }
       setSubmitted(true);
     } catch (err) {
       setError(err.message || 'Something went wrong. Please try again.');
@@ -53,6 +57,26 @@ export default function ForgotPassword() {
             If an account exists for <strong>{email}</strong>, we&apos;ve sent a link to reset your password.
             It&apos;ll expire in 30 minutes.
           </p>
+          
+          {devLink && (
+            <div style={{
+              background: 'rgba(201, 162, 39, 0.1)',
+              border: '1.5px dashed var(--gold)',
+              borderRadius: '12px',
+              padding: '16px',
+              margin: '20px 0',
+              textAlign: 'left'
+            }}>
+              <span style={{ fontSize: '11px', fontWeight: '700', color: 'var(--gold)', letterSpacing: '0.05em', display: 'block', marginBottom: '8px' }}>DEV MODE: RESET PASSWORD LINK</span>
+              <p style={{ fontSize: '13px', color: 'var(--text-muted)', marginBottom: '12px', lineHeight: '1.5' }}>
+                Since no live email server is configured in development, you can click the button below to test the reset flow:
+              </p>
+              <a href={devLink} className="btn btn-primary" style={{ width: '100%', justifyContent: 'center', background: 'var(--gold)', borderColor: 'var(--gold)', boxShadow: 'none' }}>
+                ⚡ Reset Password Now
+              </a>
+            </div>
+          )}
+
           <a href="/login" className="btn btn-secondary" style={{ width: '100%', justifyContent: 'center' }}>Back to login</a>
         </div>
       ) : (
