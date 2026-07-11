@@ -32,8 +32,6 @@ export default function CandidateLanding() {
     const token = getToken();
     if (!token || !user) {
       router.push('/login');
-    } else if (user.account_type !== 'freelancer') {
-      router.push('/');
     } else {
       setCurrentUser(user);
     }
