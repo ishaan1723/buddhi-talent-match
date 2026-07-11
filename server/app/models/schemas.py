@@ -1,5 +1,5 @@
 from pydantic import BaseModel, EmailStr, HttpUrl, Field
-from typing import List, Optional
+from typing import List, Optional, Literal
 from datetime import datetime
 
 class FreelancerBase(BaseModel):
@@ -52,3 +52,41 @@ class MatchResponse(BaseModel):
     created_at: datetime
     kpi_achieved: Optional[str] = None
     proud_situation: Optional[str] = None
+
+
+# ---------------------------------------------------------------------------
+# Auth schemas
+# ---------------------------------------------------------------------------
+
+class SignupRequest(BaseModel):
+    full_name: str = Field(..., min_length=2, max_length=150)
+    email: EmailStr
+    password: str = Field(..., min_length=8, max_length=128)
+    account_type: Literal["company", "freelancer"] = "company"
+
+class LoginRequest(BaseModel):
+    email: EmailStr
+    password: str
+    remember_me: bool = False
+
+class ForgotPasswordRequest(BaseModel):
+    email: EmailStr
+
+class ResetPasswordRequest(BaseModel):
+    token: str
+    new_password: str = Field(..., min_length=8, max_length=128)
+
+class UserResponse(BaseModel):
+    id: int
+    full_name: str
+    email: EmailStr
+    account_type: str
+    created_at: datetime
+
+    class Config:
+        from_attributes = True
+
+class AuthResponse(BaseModel):
+    access_token: str
+    token_type: str = "bearer"
+    user: UserResponse
