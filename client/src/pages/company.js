@@ -22,6 +22,7 @@ export default function CompanyHome() {
   const router = useRouter();
   const [currentUser, setCurrentUser] = useState(null);
   const [scrolled, setScrolled] = useState(false);
+  const [activeFaq, setActiveFaq] = useState(null);
 
   useEffect(() => {
     const user = getStoredUser();
@@ -59,6 +60,7 @@ export default function CompanyHome() {
           </a>
 
           <div className="nav-actions">
+            <a href="/dashboard" className="nav-ghost">Recruiter Dashboard</a>
             <span className="nav-user-indicator" style={{ fontSize: '12.5px', fontWeight: '700', letterSpacing: '0.04em', color: 'var(--indigo)', textTransform: 'uppercase' }}>
               HI {currentUser.full_name.split(' ')[0]}
             </span>
@@ -147,6 +149,92 @@ export default function CompanyHome() {
         </div>
       </section>
 
+      {/* ---------------- More Informative Sections (Similar to Freelancer) ---------------- */}
+      <section className="benefits-section">
+        <div className="container">
+          <Reveal className="text-center">
+            <h2>Why Companies Choose Us</h2>
+            <p className="subtitle">High-impact engineering teams deserve high-impact talent.</p>
+          </Reveal>
+          <div className="benefits-grid">
+            <div className="benefit-row">
+              <div className="benefit-image-placeholder">🤖</div>
+              <div className="benefit-copy">
+                <h3>Vetting Voted by Engineers</h3>
+                <p>
+                  Every freelancer on our platform passes through technical screening assessing practical implementation capability. We score their skills in LLM tuning, RAG pipeline construction, prompt engineering, and deep reinforcement learning.
+                </p>
+                <ul className="benefit-list">
+                  <li>Technical Coding Challenge verified</li>
+                  <li>Portfolio review of live projects</li>
+                  <li>Direct access to candidate skill metrics</li>
+                </ul>
+              </div>
+            </div>
+
+            <div className="benefit-row benefit-reverse">
+              <div className="benefit-image-placeholder">📈</div>
+              <div className="benefit-copy">
+                <h3>Streamlined Onboarding & Compliance</h3>
+                <p>
+                  We manage the complexities of global talent sourcing. Our platform handles standard contract terms, pre-negotiated pricing scales, and compliance paperwork so you can start coding within days.
+                </p>
+                <ul className="benefit-list">
+                  <li>Global timezone alignment</li>
+                  <li>Standardized contracts & invoices</li>
+                  <li>Zero-hassle payments</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ---------------- FAQ Accordion Section ---------------- */}
+      <section className="faq-section" id="faqs">
+        <div className="container">
+          <Reveal className="text-center">
+            <h2>Frequently Asked Questions</h2>
+            <p className="subtitle">Everything you need to know about our recruiter placement model.</p>
+          </Reveal>
+          
+          <div className="faq-list">
+            {[
+              {
+                q: "How do you vet the AI engineers?",
+                a: "We verify their real-world code samples, prompt engineering depth, and project KPI turnarounds. Every developer must pass a technical challenge before being indexed."
+              },
+              {
+                q: "What is the cost of placement?",
+                a: "There are no upfront platform listing fees. You only pay a flat connection fee once a contract begins, saving you thousands compared to typical recruiter fees."
+              },
+              {
+                q: "How long does matching take?",
+                a: "The semantic matching engine computes fit scores instantly. Once you post your requirement, our placement agency team typically introduces matching candidates within 48 to 72 hours."
+              },
+              {
+                q: "Do you support remote and global hiring?",
+                a: "Yes. All candidates are remote-ready and equipped with modern collaboration tools. We filter matches based on your preferred timezone offsets to ensure smooth teamwork."
+              }
+            ].map((faq, idx) => (
+              <div 
+                key={idx} 
+                className={`faq-item ${activeFaq === idx ? 'faq-active' : ''}`}
+                onClick={() => setActiveFaq(activeFaq === idx ? null : idx)}
+              >
+                <div className="faq-trigger">
+                  <span>{faq.q}</span>
+                  <span className="faq-icon">+</span>
+                </div>
+                <div className="faq-content">
+                  <p>{faq.a}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       <style jsx>{`
         .company-portal {
           background-color: var(--paper);
@@ -221,13 +309,28 @@ export default function CompanyHome() {
         .nav-actions {
           display: flex;
           align-items: center;
-          gap: 16px;
+          gap: 20px;
         }
         .nav-actions :global(.nav-user-indicator) {
           color: #b9b0ff !important;
           transition: color 0.3s ease;
         }
         .nav-scrolled .nav-actions :global(.nav-user-indicator) {
+          color: var(--indigo) !important;
+        }
+        .nav-actions :global(.nav-ghost) {
+          font-size: 13.5px;
+          font-weight: 500;
+          color: rgba(255, 255, 255, 0.7) !important;
+          transition: color 0.3s ease;
+        }
+        .nav-scrolled .nav-actions :global(.nav-ghost) {
+          color: var(--text-muted) !important;
+        }
+        .nav-actions :global(.nav-ghost:hover) {
+          color: #ffffff !important;
+        }
+        .nav-scrolled .nav-actions :global(.nav-ghost:hover) {
           color: var(--indigo) !important;
         }
         .nav-actions :global(.btn-secondary) {
@@ -396,6 +499,139 @@ export default function CompanyHome() {
           line-height: 1.55;
         }
 
+        /* Rich Informative Benefits Layout */
+        .benefits-section {
+          padding: 100px 0;
+          background: #ffffff;
+        }
+        .benefits-grid {
+          display: flex;
+          flex-direction: column;
+          gap: 80px;
+          margin-top: 60px;
+        }
+        .benefit-row {
+          display: grid;
+          grid-template-columns: 1fr 1.2fr;
+          gap: 60px;
+          align-items: center;
+        }
+        .benefit-reverse {
+          grid-template-columns: 1.2fr 1fr;
+        }
+        .benefit-reverse .benefit-image-placeholder {
+          grid-column: 2;
+        }
+        .benefit-reverse .benefit-copy {
+          grid-column: 1;
+          grid-row: 1;
+        }
+        .benefit-image-placeholder {
+          background: var(--paper-dim);
+          border: 1px solid var(--paper-line);
+          border-radius: var(--radius-lg);
+          height: 320px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 72px;
+        }
+        .benefit-copy h3 {
+          font-size: 24px;
+          margin-bottom: 16px;
+          font-weight: 650;
+        }
+        .benefit-copy p {
+          font-size: 15px;
+          color: var(--text-muted);
+          line-height: 1.6;
+          margin-bottom: 24px;
+        }
+        .benefit-list {
+          list-style: none;
+          display: flex;
+          flex-direction: column;
+          gap: 10px;
+        }
+        .benefit-list li {
+          font-size: 14px;
+          font-weight: 550;
+          display: flex;
+          align-items: center;
+          gap: 10px;
+        }
+        .benefit-list li::before {
+          content: "✓";
+          color: var(--indigo);
+          font-weight: 700;
+        }
+
+        /* FAQ accordion styles */
+        .faq-section {
+          padding: 100px 0;
+          background: var(--paper-dim);
+          border-top: 1px solid var(--paper-line);
+        }
+        .text-center h2 {
+          font-size: 32px;
+          margin-bottom: 12px;
+          font-weight: 650;
+        }
+        .subtitle {
+          color: var(--text-muted);
+          font-size: 15px;
+        }
+        .faq-list {
+          max-width: 720px;
+          margin: 40px auto 0;
+          display: flex;
+          flex-direction: column;
+          gap: 12px;
+        }
+        .faq-item {
+          background: #ffffff;
+          border: 1px solid var(--paper-line);
+          border-radius: var(--radius-md);
+          overflow: hidden;
+          cursor: pointer;
+          transition: all 0.2s ease;
+        }
+        .faq-item:hover {
+          border-color: var(--indigo);
+        }
+        .faq-trigger {
+          padding: 20px 24px;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          font-weight: 600;
+          font-size: 15px;
+        }
+        .faq-icon {
+          font-size: 18px;
+          color: var(--indigo);
+          transition: transform 0.2s ease;
+        }
+        .faq-active .faq-icon {
+          transform: rotate(45deg);
+        }
+        .faq-content {
+          max-height: 0;
+          overflow: hidden;
+          transition: max-height 0.2s cubic-bezier(0, 1, 0, 1);
+          padding: 0 24px;
+        }
+        .faq-active .faq-content {
+          max-height: 1000px;
+          padding: 0 24px 20px;
+          transition: max-height 0.4s ease-in-out;
+        }
+        .faq-content p {
+          font-size: 14px;
+          color: var(--text-muted);
+          line-height: 1.6;
+        }
+
         @media (max-width: 960px) {
           .hero-grid {
             grid-template-columns: 1fr;
@@ -404,8 +640,16 @@ export default function CompanyHome() {
           .hero-card-side {
             justify-content: center;
           }
-          .props-grid {
+          .props-grid, .benefit-row {
             grid-template-columns: 1fr;
+            gap: 32px;
+          }
+          .benefit-reverse .benefit-image-placeholder {
+            grid-column: auto;
+          }
+          .benefit-reverse .benefit-copy {
+            grid-column: auto;
+            grid-row: auto;
           }
         }
       `}</style>
