@@ -62,7 +62,7 @@ export async function signup({ fullName, email, password, accountType }) {
       password,
       account_type: accountType,
     }),
-    timeout: 8000,
+    timeout: 60000,
   });
   if (!res.ok) throw new Error(await parseError(res, 'Could not create your account.'));
   return res.json();
@@ -73,7 +73,7 @@ export async function login({ email, password, rememberMe }) {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ email, password, remember_me: rememberMe }),
-    timeout: 8000,
+    timeout: 60000,
   });
   if (!res.ok) throw new Error(await parseError(res, 'Invalid email or password.'));
   return res.json();
@@ -84,7 +84,7 @@ export async function forgotPassword({ email }) {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ email }),
-    timeout: 8000,
+    timeout: 60000,
   });
   if (!res.ok) throw new Error(await parseError(res, 'Something went wrong. Please try again.'));
   return res.json();
@@ -95,7 +95,7 @@ export async function resetPassword({ token, newPassword }) {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ token, new_password: newPassword }),
-    timeout: 8000,
+    timeout: 60000,
   });
   if (!res.ok) throw new Error(await parseError(res, 'This reset link is invalid or has expired.'));
   return res.json();
