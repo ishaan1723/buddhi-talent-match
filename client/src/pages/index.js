@@ -280,8 +280,8 @@ export default function Home() {
                 who’ve shipped in production  —  scored, ranked, and ready in days, not weeks.
               </p>
               <div className="hero-ctas">
-                <a href="/client" className="btn btn-primary">I want to hire AI talent</a>
-                <a href="/candidate" className="btn btn-ghost-dark">Apply as an AI freelancer</a>
+                <a href="/login" className="btn btn-primary">Client / Recruiter Login</a>
+                <a href="/login" className="btn btn-ghost-dark">Freelancer / Candidate Login</a>
               </div>
               <p className="hero-microtrust">No recruiter fees on your pilot · 3-day average time-to-match</p>
             </div>
@@ -535,8 +535,8 @@ export default function Home() {
             <h2>Ready to hire your first AI expert?</h2>
             <p>Post a requirement and see scored matches within 3 days on average.</p>
             <div className="hero-ctas">
-              <a href="/client" className="btn btn-primary">Post a requirement</a>
-              <a href="/candidate" className="btn btn-ghost-dark">Apply as talent</a>
+              <a href="/login" className="btn btn-primary">Recruiter Portal</a>
+              <a href="/login" className="btn btn-ghost-dark">Freelancer Portal</a>
             </div>
           </div>
         </section>
