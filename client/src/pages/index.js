@@ -57,9 +57,7 @@ export default function Home() {
   useEffect(() => {
     const user = getStoredUser();
     const token = getToken();
-    if (!token || !user) {
-      router.push('/login');
-    } else {
+    if (token && user) {
       if (user.account_type === 'company') {
         router.push('/company');
       } else if (user.account_type === 'freelancer') {
