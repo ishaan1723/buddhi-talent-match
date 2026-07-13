@@ -18,7 +18,7 @@ import jwt
 
 from app.config import settings
 
-PBKDF2_ITERATIONS = 260_000
+PBKDF2_ITERATIONS = 20_000
 PBKDF2_ALGO = "sha256"
 
 
