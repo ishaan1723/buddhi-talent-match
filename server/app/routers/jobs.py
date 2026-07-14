@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, status
+from fastapi import APIRouter, HTTPException, status, BackgroundTasks
 from typing import List
 from app.models.schemas import JobCreate, JobResponse
 from app.database.connection import get_db_cursor
@@ -10,7 +10,7 @@ router = APIRouter(
 )
 
 @router.post("/", response_model=JobResponse, status_code=status.HTTP_201_CREATED)
-def create_job(job: JobCreate):
+def create_job(job: JobCreate, background_tasks: BackgroundTasks):
     try:
         with get_db_cursor() as cursor:
             query = """
@@ -26,8 +26,8 @@ def create_job(job: JobCreate):
             result = cursor.fetchone()
             job_id, created_at = result[0], result[1]
         
-        # Trigger semantic matching engine outside the transaction boundary
-        run_match_for_job(job_id)
+        # Trigger semantic matching engine asynchronously in the background
+        background_tasks.add_task(run_match_for_job, job_id)
         
         return JobResponse(
             id=job_id,
