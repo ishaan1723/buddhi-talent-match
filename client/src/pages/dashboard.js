@@ -83,21 +83,22 @@ export default function Dashboard() {
   const fetchJobs = async () => {
     try {
       setLoadingJobs(true);
-      const res = await fetchWithTimeout(`${API_URL}/api/jobs/`);
-      if (res.ok) {
-        const data = await res.json();
-        const archivedIds = JSON.parse(localStorage.getItem('archived_job_ids') || '[]');
-        const jobsWithStatus = data.map(j => ({
-          ...j,
-          status: archivedIds.includes(j.id) ? 'archived' : 'active'
-        }));
-        setJobs(jobsWithStatus);
-        const activeJob = jobsWithStatus.find(j => j.status !== 'archived');
-        if (activeJob) {
-          setSelectedJobId(activeJob.id);
-        } else if (jobsWithStatus.length > 0) {
-          setSelectedJobId(jobsWithStatus[0].id);
-        }
+      const res = await fetchWithTimeout(`${API_URL}/api/jobs/`, { timeout: 10000 });
+      if (!res.ok) {
+        throw new Error(`API error code: ${res.status}`);
+      }
+      const data = await res.json();
+      const archivedIds = JSON.parse(localStorage.getItem('archived_job_ids') || '[]');
+      const jobsWithStatus = data.map(j => ({
+        ...j,
+        status: archivedIds.includes(j.id) ? 'archived' : 'active'
+      }));
+      setJobs(jobsWithStatus);
+      const activeJob = jobsWithStatus.find(j => j.status !== 'archived');
+      if (activeJob) {
+        setSelectedJobId(activeJob.id);
+      } else if (jobsWithStatus.length > 0) {
+        setSelectedJobId(jobsWithStatus[0].id);
       }
     } catch (err) {
       console.error("Failed to fetch jobs. Running local mock data.", err);
@@ -126,11 +127,12 @@ export default function Dashboard() {
   const fetchMatches = async (jobId) => {
     try {
       setLoadingMatches(true);
-      const res = await fetchWithTimeout(`${API_URL}/api/matches/${jobId}`);
-      if (res.ok) {
-        const data = await res.json();
-        setMatches(data);
+      const res = await fetchWithTimeout(`${API_URL}/api/matches/${jobId}`, { timeout: 10000 });
+      if (!res.ok) {
+        throw new Error(`API error code: ${res.status}`);
       }
+      const data = await res.json();
+      setMatches(data);
     } catch (err) {
       console.error("Failed to fetch matches. Running local mock data.", err);
       const mockMatches = [
