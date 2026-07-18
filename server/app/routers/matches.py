@@ -140,7 +140,7 @@ def get_company_approved_matches(email: str):
             query = """
             SELECT m.id, m.job_id, m.freelancer_id, m.match_score, m.status,
                    j.title, f.name, f.email, f.linkedin_url, f.primary_skill, f.experience, f.hourly_rate,
-                   f.kpi_achieved, f.proud_situation, f.headline, f.portfolio_url, f.rating, m.ai_reasoning, m.created_at
+                   m.created_at, f.kpi_achieved, f.proud_situation, f.headline, f.portfolio_url, f.rating, m.ai_reasoning
             FROM matches m
             JOIN freelancers f ON m.freelancer_id = f.id
             JOIN jobs j ON m.job_id = j.id
@@ -188,7 +188,7 @@ def get_job_approved_matches(job_id: int):
             query = """
             SELECT m.id, m.job_id, m.freelancer_id, m.match_score, m.status,
                    j.title, f.name, f.email, f.linkedin_url, f.primary_skill, f.experience, f.hourly_rate,
-                   f.kpi_achieved, f.proud_situation, f.headline, f.portfolio_url, f.rating, m.ai_reasoning, m.created_at
+                   m.created_at, f.kpi_achieved, f.proud_situation, f.headline, f.portfolio_url, f.rating, m.ai_reasoning
             FROM matches m
             JOIN freelancers f ON m.freelancer_id = f.id
             JOIN jobs j ON m.job_id = j.id
