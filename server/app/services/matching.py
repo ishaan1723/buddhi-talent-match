@@ -7,7 +7,6 @@ from app.database.connection import get_db_cursor
 
 logger = logging.getLogger(__name__)
 
-# Fallback TF-IDF Matcher when no API keys are provided
 def calculate_local_tfidf_similarity(text1: str, text2: str) -> float:
     """Calculates cosine similarity between two texts using a local TF-IDF model."""
     try:
@@ -49,26 +48,90 @@ def get_text_embedding(text: str) -> list:
     # If no keys or errors occur, return a dummy vector (will use TF-IDF for scores)
     return [0.0] * 10 
 
-def calculate_match_score(freelancer_text: str, job_text: str, freelancer_rate: float, job_budget: float) -> float:
-    """
-    Calculates the final match score (%) between a freelancer and a job.
-    Includes semantic similarity AND budget alignment.
-    """
-    # 1. Semantic/Text Similarity (80% weight)
-    # If embedding keys are available, we could do cosine similarity of embeddings.
-    # Otherwise, we use our local TF-IDF matcher (highly reliable offline).
-    text_sim = calculate_local_tfidf_similarity(freelancer_text, job_text)
+def get_similarity(text1: str, text2: str) -> float:
+    """Computes similarity using either vector embeddings (if configured) or local TF-IDF."""
+    if not text1 or not text2 or not text1.strip() or not text2.strip():
+        return 0.0
+        
+    emb1 = get_text_embedding(text1)
+    emb2 = get_text_embedding(text2)
     
-    # 2. Budget Alignment (20% weight)
-    # If freelancer is cheaper than or equal to budget, 100% budget score.
-    # If freelancer is more expensive, reduce budget score proportionally.
+    # If valid embeddings generated (i.e. length is greater than dummy length of 10)
+    if len(emb1) > 10 and len(emb2) > 10:
+        try:
+            v1 = np.array(emb1).reshape(1, -1)
+            v2 = np.array(emb2).reshape(1, -1)
+            return float(cosine_similarity(v1, v2)[0][0])
+        except Exception as e:
+            logger.error(f"Failed to calculate vector similarity: {e}")
+            
+    # Fallback to local TF-IDF (free, accurate, offline)
+    return calculate_local_tfidf_similarity(text1, text2)
+
+def calculate_match_score(
+    job_text: str,
+    job_budget: float,
+    freelancer_rate: float,
+    primary_skill: str,
+    resume_text: str,
+    kpi_achieved: str,
+    proud_situation: str
+) -> float:
+    """
+    Calculates the final composite match score (%) between a freelancer and a job post.
+    Prioritizes KPI achievements (40%) and proud accomplishments (40%) over general keywords (20%).
+    """
+    # 1. Evaluate field availability and calculate sub-similarities
+    kpi_sim = 0.0
+    has_kpi = False
+    if kpi_achieved and kpi_achieved.strip():
+        kpi_sim = get_similarity(kpi_achieved, job_text)
+        has_kpi = True
+        
+    proud_sim = 0.0
+    has_proud = False
+    if proud_situation and proud_situation.strip():
+        proud_sim = get_similarity(proud_situation, job_text)
+        has_proud = True
+        
+    general_text = f"{primary_skill or ''} {resume_text or ''}".strip()
+    general_sim = 0.0
+    has_general = False
+    if general_text:
+        general_sim = get_similarity(general_text, job_text)
+        has_general = True
+        
+    # 2. Apply weighted matrix with dynamic fallback allocation
+    if has_kpi and has_proud and has_general:
+        # Full profile: 40% KPI, 40% Accomplishment, 20% General keywords
+        semantic_score = (kpi_sim * 0.40) + (proud_sim * 0.40) + (general_sim * 0.20)
+    elif has_kpi and has_general:
+        # No proud situation: Split 70% KPI / 30% General
+        semantic_score = (kpi_sim * 0.70) + (general_sim * 0.30)
+    elif has_proud and has_general:
+        # No KPI: Split 70% Accomplishment / 30% General
+        semantic_score = (proud_sim * 0.70) + (general_sim * 0.30)
+    elif has_kpi and has_proud:
+        # No general keywords/resume: Split 50% KPI / 50% Accomplishment
+        semantic_score = (kpi_sim * 0.50) + (proud_sim * 0.50)
+    elif has_general:
+        # Only general resume text: 100% General keywords
+        semantic_score = general_sim
+    elif has_kpi:
+        semantic_score = kpi_sim
+    elif has_proud:
+        semantic_score = proud_sim
+    else:
+        semantic_score = 0.0
+
+    # 3. Budget Alignment (20% of final score)
     if freelancer_rate <= job_budget:
         budget_score = 1.0
     else:
-        # e.g., if budget is 50 and rate is 100, budget score is 50/100 = 50%
         budget_score = job_budget / freelancer_rate
-        
-    final_score = (text_sim * 0.8) + (budget_score * 0.2)
+
+    # Final Match: 80% Weighted Semantic Score + 20% Budget Score
+    final_score = (semantic_score * 0.8) + (budget_score * 0.2)
     return round(final_score * 100, 2)
 
 def run_match_for_job(job_id: int):
@@ -98,18 +161,19 @@ def run_match_for_job(job_id: int):
             
             for f in freelancers:
                 f_id, f_name, f_skill, f_rate, resume_text, kpi_achieved, proud_situation = f
-                f_text = f"{f_name} expert in {f_skill}. "
-                if kpi_achieved:
-                    f_text += f"KPI Achieved: {kpi_achieved}. "
-                if proud_situation:
-                    f_text += f"Turnaround proud situation: {proud_situation}. "
-                if resume_text:
-                    f_text += f"Resume Details: {resume_text}"
                 
-                score = calculate_match_score(f_text, job_text, float(f_rate), float(job_budget))
+                score = calculate_match_score(
+                    job_text=job_text,
+                    job_budget=float(job_budget),
+                    freelancer_rate=float(f_rate),
+                    primary_skill=f_skill,
+                    resume_text=resume_text,
+                    kpi_achieved=kpi_achieved,
+                    proud_situation=proud_situation
+                )
                 cursor.execute(match_query, (job_id, f_id, score))
                 
-        logger.info(f"Finished calculating matches for Job ID: {job_id}")
+        logger.info(f"Finished calculating KPI-weighted matches for Job ID: {job_id}")
     except Exception as e:
         logger.error(f"Error running match for job: {e}")
 
@@ -124,13 +188,6 @@ def run_match_for_freelancer(freelancer_id: int):
                 return
             
             f_id, f_name, f_skill, f_rate, resume_text, kpi_achieved, proud_situation = freelancer
-            f_text = f"{f_name} expert in {f_skill}. "
-            if kpi_achieved:
-                f_text += f"KPI Achieved: {kpi_achieved}. "
-            if proud_situation:
-                f_text += f"Turnaround proud situation: {proud_situation}. "
-            if resume_text:
-                f_text += f"Resume Details: {resume_text}"
             
             # 2. Fetch all Jobs
             cursor.execute("SELECT id, title, description, budget FROM jobs;")
@@ -148,9 +205,17 @@ def run_match_for_freelancer(freelancer_id: int):
                 job_id, job_title, job_desc, job_budget = job
                 job_text = f"{job_title} {job_desc}"
                 
-                score = calculate_match_score(f_text, job_text, float(f_rate), float(job_budget))
+                score = calculate_match_score(
+                    job_text=job_text,
+                    job_budget=float(job_budget),
+                    freelancer_rate=float(f_rate),
+                    primary_skill=f_skill,
+                    resume_text=resume_text,
+                    kpi_achieved=kpi_achieved,
+                    proud_situation=proud_situation
+                )
                 cursor.execute(match_query, (job_id, f_id, score))
                 
-        logger.info(f"Finished calculating matches for Freelancer ID: {freelancer_id}")
+        logger.info(f"Finished calculating KPI-weighted matches for Freelancer ID: {freelancer_id}")
     except Exception as e:
         logger.error(f"Error running match for freelancer: {e}")
