@@ -25,6 +25,7 @@ CREATE TABLE IF NOT EXISTS jobs (
     description TEXT NOT NULL,
     budget NUMERIC(10, 2) NOT NULL,
     kpi_expectations TEXT,
+    posted_by VARCHAR(150),
     embedding double precision[],
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
@@ -66,6 +67,7 @@ def initialize_tables():
             cursor.execute(CREATE_TABLES_SQL)
             # Ensure existing tables are migrated safely
             cursor.execute("ALTER TABLE jobs ADD COLUMN IF NOT EXISTS kpi_expectations TEXT;")
+            cursor.execute("ALTER TABLE jobs ADD COLUMN IF NOT EXISTS posted_by VARCHAR(150);")
             cursor.execute("ALTER TABLE freelancers ADD COLUMN IF NOT EXISTS resume_text TEXT;")
             cursor.execute("ALTER TABLE freelancers ADD COLUMN IF NOT EXISTS kpi_achieved TEXT;")
             cursor.execute("ALTER TABLE freelancers ADD COLUMN IF NOT EXISTS proud_situation TEXT;")

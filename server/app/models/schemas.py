@@ -27,6 +27,7 @@ class JobBase(BaseModel):
     description: str = Field(..., min_length=10)
     budget: float = Field(..., gt=0)
     kpi_expectations: Optional[str] = None
+    posted_by: Optional[str] = None
 
 class JobCreate(JobBase):
     pass
@@ -64,6 +65,23 @@ class FreelancerMatchResponse(BaseModel):
     job_budget: float
     job_kpi_expectations: Optional[str] = None
     created_at: datetime
+
+class CompanyApprovedMatchResponse(BaseModel):
+    id: int
+    job_id: int
+    freelancer_id: int
+    match_score: float
+    status: str
+    job_title: str
+    freelancer_name: str
+    freelancer_email: str
+    linkedin_url: str
+    primary_skill: str
+    experience: int
+    hourly_rate: float
+    created_at: datetime
+    kpi_achieved: Optional[str] = None
+    proud_situation: Optional[str] = None
 
 
 # ---------------------------------------------------------------------------

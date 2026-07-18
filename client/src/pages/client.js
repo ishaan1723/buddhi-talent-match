@@ -76,13 +76,19 @@ export default function ClientPosting() {
     setLoading(true);
     setErrorMsg('');
 
+    const user = getStoredUser();
+    const payload = {
+      ...formData,
+      posted_by: user ? user.email : 'recruiter@buddhi.com'
+    };
+
     try {
       const res = await fetchWithTimeout(`${API_URL}/api/jobs/`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify(formData)
+        body: JSON.stringify(payload)
       });
 
       if (res.ok) {
