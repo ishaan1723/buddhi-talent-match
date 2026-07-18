@@ -66,7 +66,7 @@ export default function CompanyHome() {
     setFetchError('');
     try {
       // 1. Fetch all jobs posted by this company
-      const jobsRes = await fetchWithTimeout(`${API_URL}/api/jobs/company?email=${encodeURIComponent(userEmail)}`, { timeout: 10000 });
+      const jobsRes = await fetchWithTimeout(`${API_URL}/api/jobs/company?email=${encodeURIComponent(userEmail)}`, { timeout: 3000 });
       if (!jobsRes.ok) throw new Error("Could not fetch company jobs.");
       
       const jobsData = await jobsRes.json();
@@ -75,7 +75,7 @@ export default function CompanyHome() {
       // 2. Fetch approved candidates count for each job to show counts in Level 1 list
       const counts = {};
       for (const job of jobsData) {
-        const matchesRes = await fetchWithTimeout(`${API_URL}/api/matches/company/job/${job.id}/approved`, { timeout: 5000 });
+        const matchesRes = await fetchWithTimeout(`${API_URL}/api/matches/company/job/${job.id}/approved`, { timeout: 1500 });
         if (matchesRes.ok) {
           const matchesData = await matchesRes.json();
           counts[job.id] = matchesData.length;
@@ -149,7 +149,7 @@ export default function CompanyHome() {
     setExpandedReasoning({});
     
     try {
-      const res = await fetchWithTimeout(`${API_URL}/api/matches/company/job/${job.id}/approved`, { timeout: 10000 });
+      const res = await fetchWithTimeout(`${API_URL}/api/matches/company/job/${job.id}/approved`, { timeout: 3000 });
       if (!res.ok) throw new Error("Could not load approved matches.");
       const data = await res.json();
       setApprovedCandidates(data);
