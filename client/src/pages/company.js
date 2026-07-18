@@ -552,6 +552,12 @@ export default function CompanyHome() {
                             <span>⭐ <strong>{cand.rating.toFixed(1)}/5.0</strong> rating</span>
                           </div>
 
+                          {/* Direct Contacts Info */}
+                          <div className="cand-contact-row" style={{ display: 'flex', gap: '20px', fontSize: '13px', margin: '-4px 0 14px', color: 'var(--text-muted)' }}>
+                            <span>📧 <a href={`mailto:${cand.freelancer_email}`} style={{ color: 'var(--indigo)', fontWeight: '600' }}>{cand.freelancer_email}</a></span>
+                            <span>🔗 <a href={cand.linkedin_url} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--indigo)', fontWeight: '600' }}>LinkedIn Profile</a></span>
+                          </div>
+
                           {/* Expertise / Skills list */}
                           <div className="skills-block">
                             <strong>Skills:</strong>
