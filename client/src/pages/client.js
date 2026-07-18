@@ -22,7 +22,9 @@ export default function ClientPosting() {
     title: '',
     description: '',
     budget: 2500,
-    kpi_expectations: ''
+    kpi_expectations: '',
+    duration: '',
+    deadline: ''
   });
 
   const [submitted, setSubmitted] = useState(false);
@@ -58,7 +60,9 @@ export default function ClientPosting() {
       title: tpl.title,
       description: tpl.description,
       budget: tpl.budget,
-      kpi_expectations: tpl.kpi_expectations || ''
+      kpi_expectations: tpl.kpi_expectations || '',
+      duration: '3 Months',
+      deadline: 'Ongoing'
     });
     setErrorMsg('');
   };
@@ -249,6 +253,32 @@ export default function ClientPosting() {
               value={formData.budget}
               onChange={handleChange}
             />
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', marginBottom: '20px' }}>
+            <div className="form-group">
+              <label htmlFor="duration">Project Duration</label>
+              <input 
+                type="text" 
+                id="duration" 
+                name="duration" 
+                placeholder="e.g. 3 Months, 6 Months, 2 Weeks" 
+                value={formData.duration}
+                onChange={handleChange}
+              />
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="deadline">Application Deadline</label>
+              <input 
+                type="text" 
+                id="deadline" 
+                name="deadline" 
+                placeholder="e.g. July 31, Immediate, Ongoing" 
+                value={formData.deadline}
+                onChange={handleChange}
+              />
+            </div>
           </div>
 
           <button type="submit" disabled={loading} className="btn btn-primary submit-btn">

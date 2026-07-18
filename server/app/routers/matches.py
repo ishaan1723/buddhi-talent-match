@@ -15,7 +15,8 @@ def get_job_matches(job_id: int):
         with get_db_cursor() as cursor:
             query = """
             SELECT m.id, m.job_id, m.freelancer_id, m.match_score, m.status,
-                   f.name, f.email, f.linkedin_url, f.primary_skill, f.experience, f.hourly_rate, m.created_at, f.kpi_achieved, f.proud_situation
+                   f.name, f.email, f.linkedin_url, f.primary_skill, f.experience, f.hourly_rate, m.created_at, 
+                   f.kpi_achieved, f.proud_situation, f.headline, f.portfolio_url, f.rating, m.ai_reasoning
             FROM matches m
             JOIN freelancers f ON m.freelancer_id = f.id
             WHERE m.job_id = %s
@@ -40,7 +41,11 @@ def get_job_matches(job_id: int):
                     hourly_rate=float(row[10]),
                     created_at=row[11],
                     kpi_achieved=row[12],
-                    proud_situation=row[13]
+                    proud_situation=row[13],
+                    headline=row[14],
+                    portfolio_url=row[15],
+                    rating=float(row[16]) if row[16] else 5.0,
+                    ai_reasoning=row[17]
                 ))
             return matches
             
@@ -95,7 +100,7 @@ def get_freelancer_matches(email: str):
         with get_db_cursor() as cursor:
             query = """
             SELECT m.id, m.job_id, m.freelancer_id, m.match_score, m.status,
-                   j.title, j.description, j.budget, j.kpi_expectations, m.created_at
+                   j.title, j.description, j.budget, j.kpi_expectations, m.created_at, m.ai_reasoning
             FROM matches m
             JOIN freelancers f ON m.freelancer_id = f.id
             JOIN jobs j ON m.job_id = j.id
@@ -117,7 +122,8 @@ def get_freelancer_matches(email: str):
                     job_description=row[6],
                     job_budget=float(row[7]),
                     job_kpi_expectations=row[8],
-                    created_at=row[9]
+                    created_at=row[9],
+                    ai_reasoning=row[10]
                 ))
             return matches
     except Exception as e:
@@ -134,7 +140,7 @@ def get_company_approved_matches(email: str):
             query = """
             SELECT m.id, m.job_id, m.freelancer_id, m.match_score, m.status,
                    j.title, f.name, f.email, f.linkedin_url, f.primary_skill, f.experience, f.hourly_rate,
-                   f.kpi_achieved, f.proud_situation
+                   f.kpi_achieved, f.proud_situation, f.headline, f.portfolio_url, f.rating, m.ai_reasoning, m.created_at
             FROM matches m
             JOIN freelancers f ON m.freelancer_id = f.id
             JOIN jobs j ON m.job_id = j.id
@@ -159,8 +165,61 @@ def get_company_approved_matches(email: str):
                     primary_skill=row[9],
                     experience=row[10],
                     hourly_rate=float(row[11]),
-                    kpi_achieved=row[12],
-                    proud_situation=row[13]
+                    created_at=row[12],
+                    kpi_achieved=row[13],
+                    proud_situation=row[14],
+                    headline=row[15],
+                    portfolio_url=row[16],
+                    rating=float(row[17]) if row[17] else 5.0,
+                    ai_reasoning=row[18]
+                ))
+            return matches
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Database error occurred: {str(e)}"
+        )
+
+@router.get("/company/job/{job_id}/approved", response_model=List[CompanyApprovedMatchResponse])
+def get_job_approved_matches(job_id: int):
+    """Retrieves all approved matched freelancers for a specific job_id."""
+    try:
+        with get_db_cursor() as cursor:
+            query = """
+            SELECT m.id, m.job_id, m.freelancer_id, m.match_score, m.status,
+                   j.title, f.name, f.email, f.linkedin_url, f.primary_skill, f.experience, f.hourly_rate,
+                   f.kpi_achieved, f.proud_situation, f.headline, f.portfolio_url, f.rating, m.ai_reasoning, m.created_at
+            FROM matches m
+            JOIN freelancers f ON m.freelancer_id = f.id
+            JOIN jobs j ON m.job_id = j.id
+            WHERE m.status = 'approved' AND m.job_id = %s
+            ORDER BY m.match_score DESC;
+            """
+            cursor.execute(query, (job_id,))
+            rows = cursor.fetchall()
+            
+            matches = []
+            for row in rows:
+                matches.append(CompanyApprovedMatchResponse(
+                    id=row[0],
+                    job_id=row[1],
+                    freelancer_id=row[2],
+                    match_score=float(row[3]),
+                    status=row[4],
+                    job_title=row[5],
+                    freelancer_name=row[6],
+                    freelancer_email=row[7],
+                    linkedin_url=row[8],
+                    primary_skill=row[9],
+                    experience=row[10],
+                    hourly_rate=float(row[11]),
+                    created_at=row[12],
+                    kpi_achieved=row[13],
+                    proud_situation=row[14],
+                    headline=row[15],
+                    portfolio_url=row[16],
+                    rating=float(row[17]) if row[17] else 5.0,
+                    ai_reasoning=row[18]
                 ))
             return matches
     except Exception as e:

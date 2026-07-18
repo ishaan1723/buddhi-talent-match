@@ -76,18 +76,18 @@ def calculate_match_score(
     resume_text: str,
     kpi_achieved: str,
     proud_situation: str,
+    experience: int = 1,
     kpi_expectations: str = None
-) -> float:
+) -> tuple:
     """
     Calculates the final composite match score (%) between a freelancer and a job post.
     Prioritizes KPI achievements (40%) and proud accomplishments (40%) over general keywords (20%).
-    Matches freelancer's KPI directly against job's expected KPIs if defined.
+    Returns a tuple of (float_score, ai_reasoning_string).
     """
     # 1. Evaluate field availability and calculate sub-similarities
     kpi_sim = 0.0
     has_kpi = False
     if kpi_achieved and kpi_achieved.strip():
-        # Compare achieved KPIs directly to job's KPI expectations if present, else fallback to full job details
         kpi_target = kpi_expectations if (kpi_expectations and kpi_expectations.strip()) else job_text
         kpi_sim = get_similarity(kpi_achieved, kpi_target)
         has_kpi = True
@@ -107,19 +107,14 @@ def calculate_match_score(
         
     # 2. Apply weighted matrix with dynamic fallback allocation
     if has_kpi and has_proud and has_general:
-        # Full profile: 40% KPI, 40% Accomplishment, 20% General keywords
         semantic_score = (kpi_sim * 0.40) + (proud_sim * 0.40) + (general_sim * 0.20)
     elif has_kpi and has_general:
-        # No proud situation: Split 70% KPI / 30% General
         semantic_score = (kpi_sim * 0.70) + (general_sim * 0.30)
     elif has_proud and has_general:
-        # No KPI: Split 70% Accomplishment / 30% General
         semantic_score = (proud_sim * 0.70) + (general_sim * 0.30)
     elif has_kpi and has_proud:
-        # No general keywords/resume: Split 50% KPI / 50% Accomplishment
         semantic_score = (kpi_sim * 0.50) + (proud_sim * 0.50)
     elif has_general:
-        # Only general resume text: 100% General keywords
         semantic_score = general_sim
     elif has_kpi:
         semantic_score = kpi_sim
@@ -136,7 +131,32 @@ def calculate_match_score(
 
     # Final Match: 80% Weighted Semantic Score + 20% Budget Score
     final_score = (semantic_score * 0.8) + (budget_score * 0.2)
-    return round(final_score * 100, 2)
+    score_pct = round(final_score * 100, 2)
+
+    # 4. Generate AI Match Explanation
+    reasons = []
+    if kpi_sim > 0.4:
+        reasons.append("Strong past KPI alignment with target requirements.")
+    elif kpi_sim > 0.15:
+        reasons.append("Moderate alignment in operational KPIs.")
+        
+    if proud_sim > 0.4:
+        reasons.append("Excellent situational problem-solving track record.")
+    elif proud_sim > 0.15:
+        reasons.append("Demonstrated capability to turn challenges around.")
+        
+    if freelancer_rate <= job_budget:
+        reasons.append("Requested hourly rate fits within job budget constraints.")
+    else:
+        over_pct = int(((freelancer_rate / job_budget) - 1.0) * 100)
+        reasons.append(f"Requested hourly rate exceeds job budget threshold by {over_pct}%.")
+        
+    if experience >= 3:
+        reasons.append(f"Provides solid industry experience ({experience} years).")
+        
+    ai_reasoning = " ".join(reasons) or "Matches core technical description keywords and general experience guidelines."
+    
+    return score_pct, ai_reasoning
 
 def run_match_for_job(job_id: int):
     """Matches a newly created job against all existing freelancers in the database."""
@@ -152,21 +172,21 @@ def run_match_for_job(job_id: int):
             job_text = f"{job_title} {job_desc}"
             
             # 2. Fetch all Freelancers
-            cursor.execute("SELECT id, name, primary_skill, hourly_rate, resume_text, kpi_achieved, proud_situation FROM freelancers;")
+            cursor.execute("SELECT id, name, primary_skill, hourly_rate, resume_text, kpi_achieved, proud_situation, experience FROM freelancers;")
             freelancers = cursor.fetchall()
             
             # 3. Calculate match score and insert/update matches table
             match_query = """
-            INSERT INTO matches (job_id, freelancer_id, match_score, status)
-            VALUES (%s, %s, %s, 'pending')
+            INSERT INTO matches (job_id, freelancer_id, match_score, ai_reasoning, status)
+            VALUES (%s, %s, %s, %s, 'pending')
             ON CONFLICT (job_id, freelancer_id) 
-            DO UPDATE SET match_score = EXCLUDED.match_score;
+            DO UPDATE SET match_score = EXCLUDED.match_score, ai_reasoning = EXCLUDED.ai_reasoning;
             """
             
             for f in freelancers:
-                f_id, f_name, f_skill, f_rate, resume_text, kpi_achieved, proud_situation = f
+                f_id, f_name, f_skill, f_rate, resume_text, kpi_achieved, proud_situation, exp = f
                 
-                score = calculate_match_score(
+                score, reasoning = calculate_match_score(
                     job_text=job_text,
                     job_budget=float(job_budget),
                     freelancer_rate=float(f_rate),
@@ -174,9 +194,10 @@ def run_match_for_job(job_id: int):
                     resume_text=resume_text,
                     kpi_achieved=kpi_achieved,
                     proud_situation=proud_situation,
+                    experience=exp,
                     kpi_expectations=kpi_expectations
                 )
-                cursor.execute(match_query, (job_id, f_id, score))
+                cursor.execute(match_query, (job_id, f_id, score, reasoning))
                 
         logger.info(f"Finished calculating KPI-weighted matches for Job ID: {job_id}")
     except Exception as e:
@@ -187,12 +208,12 @@ def run_match_for_freelancer(freelancer_id: int):
     try:
         with get_db_cursor() as cursor:
             # 1. Fetch Freelancer Details
-            cursor.execute("SELECT id, name, primary_skill, hourly_rate, resume_text, kpi_achieved, proud_situation FROM freelancers WHERE id = %s;", (freelancer_id,))
+            cursor.execute("SELECT id, name, primary_skill, hourly_rate, resume_text, kpi_achieved, proud_situation, experience FROM freelancers WHERE id = %s;", (freelancer_id,))
             freelancer = cursor.fetchone()
             if not freelancer:
                 return
             
-            f_id, f_name, f_skill, f_rate, resume_text, kpi_achieved, proud_situation = freelancer
+            f_id, f_name, f_skill, f_rate, resume_text, kpi_achieved, proud_situation, exp = freelancer
             
             # 2. Fetch all Jobs (including kpi_expectations)
             cursor.execute("SELECT id, title, description, budget, kpi_expectations FROM jobs;")
@@ -200,17 +221,17 @@ def run_match_for_freelancer(freelancer_id: int):
             
             # 3. Calculate match score and insert/update matches table
             match_query = """
-            INSERT INTO matches (job_id, freelancer_id, match_score, status)
-            VALUES (%s, %s, %s, 'pending')
+            INSERT INTO matches (job_id, freelancer_id, match_score, ai_reasoning, status)
+            VALUES (%s, %s, %s, %s, 'pending')
             ON CONFLICT (job_id, freelancer_id) 
-            DO UPDATE SET match_score = EXCLUDED.match_score;
+            DO UPDATE SET match_score = EXCLUDED.match_score, ai_reasoning = EXCLUDED.ai_reasoning;
             """
             
             for job in jobs:
                 job_id, job_title, job_desc, job_budget, kpi_expectations = job
                 job_text = f"{job_title} {job_desc}"
                 
-                score = calculate_match_score(
+                score, reasoning = calculate_match_score(
                     job_text=job_text,
                     job_budget=float(job_budget),
                     freelancer_rate=float(f_rate),
@@ -218,9 +239,10 @@ def run_match_for_freelancer(freelancer_id: int):
                     resume_text=resume_text,
                     kpi_achieved=kpi_achieved,
                     proud_situation=proud_situation,
+                    experience=exp,
                     kpi_expectations=kpi_expectations
                 )
-                cursor.execute(match_query, (job_id, f_id, score))
+                cursor.execute(match_query, (job_id, f_id, score, reasoning))
                 
         logger.info(f"Finished calculating KPI-weighted matches for Freelancer ID: {freelancer_id}")
     except Exception as e:

@@ -28,6 +28,9 @@ class JobBase(BaseModel):
     budget: float = Field(..., gt=0)
     kpi_expectations: Optional[str] = None
     posted_by: Optional[str] = None
+    duration: Optional[str] = None
+    deadline: Optional[str] = None
+    status: Optional[str] = 'open'
 
 class JobCreate(JobBase):
     pass
@@ -53,6 +56,10 @@ class MatchResponse(BaseModel):
     hourly_rate: float
     created_at: datetime
     proud_situation: Optional[str] = None
+    headline: Optional[str] = None
+    portfolio_url: Optional[str] = None
+    rating: Optional[float] = 5.0
+    ai_reasoning: Optional[str] = None
 
 class FreelancerMatchResponse(BaseModel):
     id: int
@@ -65,6 +72,7 @@ class FreelancerMatchResponse(BaseModel):
     job_budget: float
     job_kpi_expectations: Optional[str] = None
     created_at: datetime
+    ai_reasoning: Optional[str] = None
 
 class CompanyApprovedMatchResponse(BaseModel):
     id: int
@@ -82,6 +90,10 @@ class CompanyApprovedMatchResponse(BaseModel):
     created_at: datetime
     kpi_achieved: Optional[str] = None
     proud_situation: Optional[str] = None
+    headline: Optional[str] = None
+    portfolio_url: Optional[str] = None
+    rating: Optional[float] = 5.0
+    ai_reasoning: Optional[str] = None
 
 
 # ---------------------------------------------------------------------------

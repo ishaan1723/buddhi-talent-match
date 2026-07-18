@@ -15,6 +15,9 @@ CREATE TABLE IF NOT EXISTS freelancers (
     primary_skill VARCHAR(100) NOT NULL,
     experience INTEGER NOT NULL,
     hourly_rate NUMERIC(10, 2) NOT NULL,
+    headline VARCHAR(150),
+    portfolio_url VARCHAR(255),
+    rating NUMERIC(3, 2) DEFAULT 5.0,
     embedding double precision[],
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
@@ -26,6 +29,9 @@ CREATE TABLE IF NOT EXISTS jobs (
     budget NUMERIC(10, 2) NOT NULL,
     kpi_expectations TEXT,
     posted_by VARCHAR(150),
+    duration VARCHAR(100),
+    deadline VARCHAR(100),
+    status VARCHAR(20) DEFAULT 'open',
     embedding double precision[],
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
@@ -36,6 +42,7 @@ CREATE TABLE IF NOT EXISTS matches (
     freelancer_id INTEGER REFERENCES freelancers(id) ON DELETE CASCADE,
     match_score NUMERIC(5, 2) NOT NULL,
     status VARCHAR(20) DEFAULT 'pending',
+    ai_reasoning TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT unique_job_freelancer UNIQUE (job_id, freelancer_id)
 );
@@ -68,9 +75,16 @@ def initialize_tables():
             # Ensure existing tables are migrated safely
             cursor.execute("ALTER TABLE jobs ADD COLUMN IF NOT EXISTS kpi_expectations TEXT;")
             cursor.execute("ALTER TABLE jobs ADD COLUMN IF NOT EXISTS posted_by VARCHAR(150);")
+            cursor.execute("ALTER TABLE jobs ADD COLUMN IF NOT EXISTS duration VARCHAR(100);")
+            cursor.execute("ALTER TABLE jobs ADD COLUMN IF NOT EXISTS deadline VARCHAR(100);")
+            cursor.execute("ALTER TABLE jobs ADD COLUMN IF NOT EXISTS status VARCHAR(20) DEFAULT 'open';")
             cursor.execute("ALTER TABLE freelancers ADD COLUMN IF NOT EXISTS resume_text TEXT;")
             cursor.execute("ALTER TABLE freelancers ADD COLUMN IF NOT EXISTS kpi_achieved TEXT;")
             cursor.execute("ALTER TABLE freelancers ADD COLUMN IF NOT EXISTS proud_situation TEXT;")
+            cursor.execute("ALTER TABLE freelancers ADD COLUMN IF NOT EXISTS headline VARCHAR(150);")
+            cursor.execute("ALTER TABLE freelancers ADD COLUMN IF NOT EXISTS portfolio_url VARCHAR(255);")
+            cursor.execute("ALTER TABLE freelancers ADD COLUMN IF NOT EXISTS rating NUMERIC(3, 2) DEFAULT 5.0;")
+            cursor.execute("ALTER TABLE matches ADD COLUMN IF NOT EXISTS ai_reasoning TEXT;")
         logger.info("Database schemas and tables checked/initialized successfully.")
     except Exception as e:
         logger.critical(f"Failed to initialize database tables: {e}")

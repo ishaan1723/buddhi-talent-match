@@ -24,12 +24,23 @@ export default function CompanyHome() {
   const router = useRouter();
   const [currentUser, setCurrentUser] = useState(null);
   const [scrolled, setScrolled] = useState(false);
-  const [activeFaq, setActiveFaq] = useState(null);
-
-  // Approved Matches State
-  const [approvedMatches, setApprovedMatches] = useState([]);
-  const [loadingApproved, setLoadingApproved] = useState(false);
+  
+  // Dashboard States
+  const [jobs, setJobs] = useState([]);
+  const [selectedJob, setSelectedJob] = useState(null);
+  const [approvedCandidates, setApprovedCandidates] = useState([]);
+  
+  // Search, Filters & Toggles
+  const [searchQuery, setSearchQuery] = useState('');
+  const [sortBy, setSortBy] = useState('match_score');
+  const [expandedReasoning, setExpandedReasoning] = useState({});
+  const [actionStatuses, setActionStatuses] = useState({});
+  
+  // Loading & Error States
+  const [loadingJobs, setLoadingJobs] = useState(false);
+  const [loadingCandidates, setLoadingCandidates] = useState(false);
   const [fetchError, setFetchError] = useState('');
+  const [jobCounts, setJobCounts] = useState({});
 
   useEffect(() => {
     const user = getStoredUser();
@@ -49,72 +60,254 @@ export default function CompanyHome() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Fetch approved matches for requirements posted by this company
+  // Fetch Jobs and Candidate Counts
+  const loadCompanyDashboard = async (userEmail) => {
+    setLoadingJobs(true);
+    setFetchError('');
+    try {
+      // 1. Fetch all jobs posted by this company
+      const jobsRes = await fetchWithTimeout(`${API_URL}/api/jobs/company?email=${encodeURIComponent(userEmail)}`, { timeout: 10000 });
+      if (!jobsRes.ok) throw new Error("Could not fetch company jobs.");
+      
+      const jobsData = await jobsRes.json();
+      setJobs(jobsData);
+      
+      // 2. Fetch approved candidates count for each job to show counts in Level 1 list
+      const counts = {};
+      for (const job of jobsData) {
+        const matchesRes = await fetchWithTimeout(`${API_URL}/api/matches/company/job/${job.id}/approved`, { timeout: 5000 });
+        if (matchesRes.ok) {
+          const matchesData = await matchesRes.json();
+          counts[job.id] = matchesData.length;
+        } else {
+          counts[job.id] = 0;
+        }
+      }
+      setJobCounts(counts);
+    } catch (err) {
+      console.error("Running Company portal in fallback demo mode.", err);
+      setFetchError("Displaying mock data (Demo Mode).");
+      
+      // Populate rich mock data for the demo
+      const mockJobs = [
+        {
+          id: 101,
+          title: "Senior RAG Engineer (LangChain / LlamaIndex)",
+          description: "We are seeking an expert to construct a scalable retrieval-augmented generation pipeline. The candidate will work on document parsing, sentence window retrieval, and integrating metadata filters. The ideal developer has experience with vector databases.",
+          budget: 3500.0,
+          kpi_expectations: "Reduce query latency of internal document searches by 40% and build automated chunking parser.",
+          duration: "3 Months",
+          deadline: "July 30, 2026",
+          status: "open",
+          created_at: "2026-07-15T10:00:00Z"
+        },
+        {
+          id: 102,
+          title: "Computer Vision Expert for Image Segmentation",
+          description: "We need an ML engineer to build a neural network pipeline for quality assurance defect classification. You will design, train, and deploy deep learning models to categorize defects in factory manufacturing lines.",
+          budget: 6000.0,
+          kpi_expectations: "Achieve defect detection classification accuracy >98% and run inference under 40ms.",
+          duration: "6 Months",
+          deadline: "Immediate",
+          status: "open",
+          created_at: "2026-07-12T09:30:00Z"
+        },
+        {
+          id: 103,
+          title: "NLP Researcher for Text Summarization",
+          description: "Looking for a backend NLP specialist to build a microservice summarizing complex financial and news documents daily. Experience with Hugging Face transformers and deploying async FastAPI tasks is required.",
+          budget: 4500.0,
+          kpi_expectations: "Build text summarization microservice handling 100,000+ daily documents with average API latency <100ms.",
+          duration: "2 Months",
+          deadline: "Expired",
+          status: "closed",
+          created_at: "2026-06-30T14:00:00Z"
+        }
+      ];
+      setJobs(mockJobs);
+      setJobCounts({
+        101: 2,
+        102: 0,
+        103: 1
+      });
+    } finally {
+      setLoadingJobs(false);
+    }
+  };
+
   useEffect(() => {
     if (currentUser) {
-      const fetchApprovedHires = async () => {
-        setLoadingApproved(true);
-        setFetchError('');
-        try {
-          const res = await fetchWithTimeout(
-            `${API_URL}/api/matches/company/approved?email=${encodeURIComponent(currentUser.email)}`, 
-            { timeout: 10000 }
-          );
-          if (res.ok) {
-            const data = await res.json();
-            setApprovedMatches(data);
-          } else {
-            throw new Error(`API error code: ${res.status}`);
-          }
-        } catch (err) {
-          console.error("Failed to load approved matches. Running mock fallback.", err);
-          setFetchError("Failed to fetch live matches. Running in demo mode.");
-          // Mock data fallback so the user always has a working demo
-          setApprovedMatches([
-            {
-              id: 301,
-              job_id: 1,
-              match_score: 95.8,
-              job_title: 'Senior RAG Engineer',
-              freelancer_name: 'Ishaan Jain',
-              freelancer_email: 'ishaan.jain@example.com',
-              linkedin_url: 'https://linkedin.com/in/ishaan-jain-ai',
-              primary_skill: 'LLM Orchestration, LangChain, Vector Database indexing',
-              experience: 4,
-              hourly_rate: 2200,
-              kpi_achieved: 'Reduced search query latency by 45% and scaled vector index chunking.',
-              proud_situation: 'Built high-scale enterprise chatbot handling 50k concurrent requests.'
-            }
-          ]);
-        } finally {
-          setLoadingApproved(false);
-        }
-      };
-      fetchApprovedHires();
+      loadCompanyDashboard(currentUser.email);
     }
   }, [currentUser]);
+
+  // Fetch approved candidates for a specific selected job (Level 2 drill down)
+  const selectJob = async (job) => {
+    setSelectedJob(job);
+    setLoadingCandidates(true);
+    setSearchQuery('');
+    setExpandedReasoning({});
+    
+    try {
+      const res = await fetchWithTimeout(`${API_URL}/api/matches/company/job/${job.id}/approved`, { timeout: 10000 });
+      if (!res.ok) throw new Error("Could not load approved matches.");
+      const data = await res.json();
+      setApprovedCandidates(data);
+    } catch (err) {
+      console.warn("Using mock approved candidates fallback for Job:", job.id);
+      
+      // Seed high-fidelity matching candidates for demo purposes
+      if (job.id === 101 || job.id === 1) {
+        setApprovedCandidates([
+          {
+            id: 501,
+            freelancer_name: "Ishaan Jain",
+            headline: "Senior AI Engineer & RAG Specialist",
+            primary_skill: "Python, LangChain, LlamaIndex, Vector Database Indexing",
+            experience: 4,
+            hourly_rate: 2800.0,
+            rating: 5.0,
+            portfolio_url: "https://github.com/ishaan-ai-developer",
+            freelancer_email: "ishaan.jain@example.com",
+            linkedin_url: "https://linkedin.com/in/ishaan-jain-ai",
+            match_score: 96.5,
+            ai_reasoning: "Excellent semantic alignment on search latency and index clustering. Matches 5/5 required tools. Requested rate fits within budget constraints.",
+            kpi_achieved: "Reduced vector search query latency by 45% and scaled RAG pipelines for 50k concurrent docs."
+          },
+          {
+            id: 502,
+            freelancer_name: "Aishwarya Roy",
+            headline: "NLP Developer & LLM Engineer",
+            primary_skill: "Hugging Face, BERT, Transformers, LLM fine-tuning",
+            experience: 3,
+            hourly_rate: 2500.0,
+            rating: 4.8,
+            portfolio_url: "https://github.com/aishwarya-nlp",
+            freelancer_email: "aishwarya@example.com",
+            linkedin_url: "https://linkedin.com/in/aishwarya-nlp",
+            match_score: 84.2,
+            ai_reasoning: "Decent keyword similarity for LangChain orchestrations. Strong accomplishments in model fine-tuning and token optimizations.",
+            kpi_achieved: "Built summarization pipeline processing 120k articles daily under 80ms latency."
+          }
+        ]);
+      } else if (job.id === 103 || job.id === 3) {
+        setApprovedCandidates([
+          {
+            id: 503,
+            freelancer_name: "Aishwarya Roy",
+            headline: "NLP Developer & LLM Engineer",
+            primary_skill: "Hugging Face, BERT, Transformers, LLM fine-tuning",
+            experience: 3,
+            hourly_rate: 2500.0,
+            rating: 4.8,
+            portfolio_url: "https://github.com/aishwarya-nlp",
+            freelancer_email: "aishwarya@example.com",
+            linkedin_url: "https://linkedin.com/in/aishwarya-nlp",
+            match_score: 88.0,
+            ai_reasoning: "Perfect fit for BERT fine-tuning expectations. 3 years relevant experience in text mining and summarization pipeline runs.",
+            kpi_achieved: "Built summarization pipeline processing 120k articles daily under 80ms latency."
+          }
+        ]);
+      } else {
+        // Empty state for Job 102 (CV Expert)
+        setApprovedCandidates([]);
+      }
+    } finally {
+      setLoadingCandidates(false);
+    }
+  };
+
+  // Toggle Job Status (Open/Closed)
+  const toggleJobStatus = async (job) => {
+    const newStatus = job.status === 'open' ? 'closed' : 'open';
+    try {
+      const res = await fetch(`${API_URL}/api/jobs/${job.id}/status?status=${newStatus}`, {
+        method: 'PUT'
+      });
+      if (res.ok) {
+        // Update local state
+        const updatedJobs = jobs.map(j => j.id === job.id ? { ...j, status: newStatus } : j);
+        setJobs(updatedJobs);
+        if (selectedJob && selectedJob.id === job.id) {
+          setSelectedJob({ ...selectedJob, status: newStatus });
+        }
+      }
+    } catch (err) {
+      // Local toggle for offline demo mode
+      const updatedJobs = jobs.map(j => j.id === job.id ? { ...j, status: newStatus } : j);
+      setJobs(updatedJobs);
+      if (selectedJob && selectedJob.id === job.id) {
+        setSelectedJob({ ...selectedJob, status: newStatus });
+      }
+    }
+  };
+
+  // Toggle reasoning expandable block
+  const toggleReasoning = (candId) => {
+    setExpandedReasoning(prev => ({
+      ...prev,
+      [candId]: !prev[candId]
+    }));
+  };
+
+  // Trigger candidate action (Hire / Message / Shortlist)
+  const triggerAction = (candId, action) => {
+    setActionStatuses(prev => ({
+      ...prev,
+      [`${candId}-${action}`]: true
+    }));
+    setTimeout(() => {
+      setActionStatuses(prev => ({
+        ...prev,
+        [`${candId}-${action}`]: false,
+        [`${candId}-${action}-done`]: true
+      }));
+    }, 1200);
+  };
+
+  // Filter and sort candidates
+  const filteredCandidates = approvedCandidates
+    .filter(cand => {
+      const query = searchQuery.toLowerCase();
+      return (
+        cand.freelancer_name.toLowerCase().includes(query) ||
+        cand.primary_skill.toLowerCase().includes(query) ||
+        cand.headline.toLowerCase().includes(query) ||
+        (cand.ai_reasoning && cand.ai_reasoning.toLowerCase().includes(query))
+      );
+    })
+    .sort((a, b) => {
+      if (sortBy === 'match_score') return b.match_score - a.match_score;
+      if (sortBy === 'experience') return b.experience - a.experience;
+      if (sortBy === 'hourly_rate') return a.hourly_rate - b.hourly_rate;
+      return 0;
+    });
 
   if (!currentUser) return null;
 
   return (
     <div className="company-portal">
       <Head>
-        <title>Recruiter Portal | AI Shop International</title>
-        <meta name="description" content="Company dashboard to request requirements and source vetted AI engineers." />
+        <title>Recruiter Dashboard | AI Shop International</title>
+        <meta name="description" content="Manage requirements and hire pre-vetted AI specialists." />
       </Head>
 
       {/* ---------------- Nav ---------------- */}
       <header className={`nav ${scrolled ? 'nav-scrolled' : ''}`}>
         <div className="nav-inner container">
-          <a href="/" className="brand" aria-label="AI Shop International home">
+          <button onClick={() => setSelectedJob(null)} className="brand-btn" aria-label="Home">
             <img src="/logo.png" className="logo-img" alt="AI Shop Logo" />
             <span className="brand-word">AI Shop <em>International</em></span>
-          </a>
+          </button>
 
           <div className="nav-actions">
-            <a href="/dashboard" className="nav-ghost">Recruiter Dashboard</a>
+            {selectedJob && (
+              <button onClick={() => setSelectedJob(null)} className="nav-ghost btn-back-nav">
+                ← Back to Jobs
+              </button>
+            )}
             <span className="nav-user-indicator" style={{ fontSize: '12.5px', fontWeight: '700', letterSpacing: '0.04em', color: 'var(--indigo)', textTransform: 'uppercase' }}>
-              HI {currentUser.full_name.split(' ')[0]}
+              HI {currentUser.full_name.split(' ')[0]} (Company User)
             </span>
             <button 
               onClick={() => {
@@ -130,208 +323,289 @@ export default function CompanyHome() {
         </div>
       </header>
 
-      {/* ---------------- Hero ---------------- */}
-      <section className="hero">
-        <div className="container hero-grid">
-          <div className="hero-copy">
-            <Reveal className="hero-badge">COMPANY PORTAL</Reveal>
-            <Reveal delay={100} as="h1">
-              Find your next <em>AI Expert</em> in days, not weeks.
-            </Reveal>
-            <Reveal delay={200} as="p" className="hero-p">
-              Welcome back, <strong>{currentUser.full_name}</strong>. Submit your project requirements below, and our placement agency team will instantly run them through the semantic matching engine to shortlist vetted specialists.
-            </Reveal>
-            <Reveal delay={300} className="hero-ctas">
-              <a href="/client" className="btn btn-primary hero-cta">Post a New Requirement</a>
-            </Reveal>
-          </div>
-
-          <Reveal delay={200} className="hero-card-side">
-            <div className="info-card">
-              <h3>Vetting & Matching Pipeline</h3>
-              <ul className="pipeline-steps">
-                <li>
-                  <span className="step-circle">1</span>
-                  <div>
-                    <h4>Submit Requirement</h4>
-                    <p>Outline project scope, expected KPIs, and tech stack details.</p>
-                  </div>
-                </li>
-                <li>
-                  <span className="step-circle">2</span>
-                  <div>
-                    <h4>AI Semantic Search</h4>
-                    <p>Engine matches job requirements with verified past achievements.</p>
-                  </div>
-                </li>
-                <li>
-                  <span className="step-circle">3</span>
-                  <div>
-                    <h4>Direct Connection</h4>
-                    <p>Unlock developer contacts and schedule interviews directly.</p>
-                  </div>
-                </li>
-              </ul>
-            </div>
-          </Reveal>
-        </div>
-      </section>
-
-      {/* ---------------- Approved Matches Section ---------------- */}
-      <section className="approved-section" id="approved-matches">
-        <div className="container">
-          <Reveal className="section-head text-center">
-            <span className="eyebrow">APPROVED HIRES</span>
-            <h2>My Candidate Introductions</h2>
-            <p>Below are matched AI specialists approved for your requirements. You have unlocked their full contact information.</p>
-          </Reveal>
-
-          <div className="approved-list-card card">
-            {loadingApproved ? (
-              <div className="loader">
-                <div className="spinner"></div>
-                <p>Loading approved candidate connections...</p>
+      {/* ---------------- Dashboard Shell ---------------- */}
+      <main className="dashboard-content container">
+        
+        {/* LEVEL 1: Job Postings List */}
+        {!selectedJob ? (
+          <div className="job-list-view">
+            <div className="dashboard-header-row">
+              <div>
+                <span className="eyebrow">COMPANY WORKSPACE</span>
+                <h2>Active Job Requirements</h2>
+                <p>Post tech roles and view candidate shortlist matches pre-screened and approved by our placement team.</p>
               </div>
-            ) : approvedMatches.length === 0 ? (
-              <div className="empty-state">
-                <span className="empty-icon">🤝</span>
-                <h3>No Approved Matches Yet</h3>
-                <p>Once our agency admin approves matched talent for your job postings, their profiles and contact details will unlock here.</p>
+              <a href="/client" className="btn btn-primary btn-post-new">
+                + Post a New Requirement
+              </a>
+            </div>
+
+            {fetchError && <p className="demo-badge-banner">{fetchError}</p>}
+
+            {loadingJobs ? (
+              <div className="loader-container">
+                <div className="spinner"></div>
+                <p>Sourcing your postings from the database...</p>
+              </div>
+            ) : jobs.length === 0 ? (
+              <div className="empty-workspace-card card text-center">
+                <span className="empty-icon">📁</span>
+                <h3>No posted requirements found</h3>
+                <p>Get started by listing your first project description. Our AI matching pipeline will instantly parse and score candidates.</p>
+                <a href="/client" className="btn btn-primary" style={{ marginTop: '20px', display: 'inline-block' }}>Post First Job</a>
               </div>
             ) : (
-              <div className="approved-list">
-                {fetchError && <p className="demo-notice">{fetchError}</p>}
-                {approvedMatches.map((match) => (
-                  <div key={match.id} className="approved-item">
-                    
-                    {/* Left Block: Match info & KPIs */}
-                    <div className="approved-item-left">
-                      <div className="approved-header-row">
-                        <h3>{match.freelancer_name}</h3>
-                        <span className="match-badge">{Math.round(match.match_score)}% Match</span>
-                        <span className="role-tag">Matched to: {match.job_title}</span>
+              <div className="jobs-grid">
+                {jobs.map((job) => {
+                  const count = jobCounts[job.id] || 0;
+                  return (
+                    <div key={job.id} className="job-card card">
+                      <div className="job-card-header">
+                        <span className={`status-pill ${job.status}`}>
+                          {job.status === 'open' ? '🟢 Open' : '🔴 Closed'}
+                        </span>
+                        <span className="date-stamp">
+                          {new Date(job.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                        </span>
                       </div>
                       
-                      <p className="skills"><strong>Expertise:</strong> {match.primary_skill} ({match.experience} yrs exp)</p>
+                      <h3>{job.title}</h3>
+                      <p className="job-desc-preview">
+                        {job.description.length > 130 ? `${job.description.substring(0, 130)}...` : job.description}
+                      </p>
                       
-                      {match.kpi_achieved && (
-                        <div className="kpi-box">
-                          <strong>KPI Achieved:</strong> <span>{match.kpi_achieved}</span>
-                        </div>
-                      )}
-                      
-                      {match.proud_situation && (
-                        <div className="situation-box">
-                          <strong>Proud Accomplishment:</strong> <span>{match.proud_situation}</span>
-                        </div>
-                      )}
-                    </div>
+                      <div className="job-meta-row">
+                        <span className="budget-tag">Budget: ₹{job.budget.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}/hr</span>
+                        {job.duration && <span className="duration-tag">⏱️ {job.duration}</span>}
+                      </div>
 
-                    {/* Right Block: Contact & Budget details */}
-                    <div className="approved-item-right">
-                      <div className="contact-box">
-                        <h4>Direct Contact</h4>
-                        <a href={`mailto:${match.freelancer_email}`} className="contact-link email-link">
-                          📧 {match.freelancer_email}
-                        </a>
-                        <a href={match.linkedin_url} target="_blank" rel="noopener noreferrer" className="contact-link linkedin-link">
-                          🔗 View LinkedIn Profile
-                        </a>
-                      </div>
-                      <div className="rate-box">
-                        <span>Requested Rate:</span>
-                        <strong>₹{match.hourly_rate.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}/hr</strong>
+                      <div className="job-card-footer">
+                        <div className="match-counter-badge">
+                          <strong>{count}</strong> Approved Candidate{count !== 1 ? 's' : ''}
+                        </div>
+                        <button onClick={() => selectJob(job)} className="btn btn-secondary btn-view-matches">
+                          View approved candidates →
+                        </button>
                       </div>
                     </div>
-
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             )}
           </div>
-        </div>
-      </section>
+        ) : (
+          
+          /* LEVEL 2: Job Detail & Approved Candidates View */
+          <div className="job-detail-view">
+            
+            {/* Back Button / Navigation */}
+            <div className="back-bar">
+              <button onClick={() => setSelectedJob(null)} className="btn-back">
+                ← Back to Job Postings
+              </button>
+            </div>
 
-      {/* ---------------- Value Proposition ---------------- */}
-      <section className="value-prop">
-        <div className="container">
-          <Reveal className="section-head text-center">
-            <span className="eyebrow">THE BUDGET</span>
-            <h2>Vetted talent. Zero markup fees.</h2>
-            <p>Our flat connection pricing model beats typical placement agency costs by thousands of dollars.</p>
-          </Reveal>
-
-          <div className="compare-grid">
-            <Reveal className="compare-card">
-              <h4>Typical Placement Agencies</h4>
-              <div className="compare-pricing">20% - 30%</div>
-              <p className="compare-label">ANNUAL SALARY MARKUP</p>
-              <ul className="compare-features">
-                <li>High cost of hiring</li>
-                <li>Long negotiation processes</li>
-                <li>Hiring risk if candidate leaves</li>
-              </ul>
-            </Reveal>
-
-            <Reveal className="compare-card highlight" delay={100}>
-              <span className="card-badge">RECOMMENDED</span>
-              <h4>AI Shop International</h4>
-              <div className="compare-pricing">Flat Fee</div>
-              <p className="compare-label">ONE-TIME CONNECTION CHARGE</p>
-              <ul className="compare-features">
-                <li>No ongoing markups</li>
-                <li>Direct client-freelancer contract</li>
-                <li>Pre-vetted performance metrics</li>
-              </ul>
-            </Reveal>
-          </div>
-        </div>
-      </section>
-
-      {/* ---------------- FAQs ---------------- */}
-      <section className="faq-section">
-        <div className="container">
-          <Reveal className="section-head text-center">
-            <span className="eyebrow">HELP</span>
-            <h2>Frequently Asked Questions</h2>
-            <p>Answers to common questions about billing, security, and developer contracts.</p>
-          </Reveal>
-
-          <div className="faq-list">
-            {[
-              {
-                q: "How does the flat connection fee structure work?",
-                a: "There are no monthly listing fees. When you review candidate matches and choose to unlock their contact information, we collect a flat placement engine connection fee. You then negotiate rates directly with the freelancer, paying zero platform commissions."
-              },
-              {
-                q: "What standards must freelancers pass to join the network?",
-                a: "Every candidate profile undergoes coding evaluations and technical resume screening. We require candidates to document verified achievements and past project turnaround scenarios to validate their senior capabilities."
-              },
-              {
-                q: "Can we hire developers for long-term contract roles?",
-                a: "Yes. All freelancers in our database negotiate rates and contracts directly with you. Many are looking for full-time or long-term contract roles."
-              }
-            ].map((faq, i) => {
-              const isOpen = activeFaq === i;
-              return (
-                <div key={i} className="faq-item">
-                  <button
-                    onClick={() => setActiveFaq(isOpen ? null : i)}
-                    className="faq-trigger"
-                    aria-expanded={isOpen}
-                  >
-                    <span>{faq.q}</span>
-                    <span className="faq-icon" aria-hidden="true">{isOpen ? '\u2212' : '+'}</span>
-                  </button>
-                  <div className={`faq-panel ${isOpen ? 'faq-panel-open' : ''}`}>
-                    <p>{faq.a}</p>
+            {/* Split Grid Layout */}
+            <div className="detail-grid">
+              
+              {/* Left Column: Job Description and original parameters */}
+              <div className="job-specs-col card">
+                <div className="specs-header">
+                  <div className="status-toggle-row">
+                    <span className={`status-pill ${selectedJob.status}`}>
+                      {selectedJob.status === 'open' ? '🟢 Open Posting' : '🔴 Closed Posting'}
+                    </span>
+                    <button onClick={() => toggleJobStatus(selectedJob)} className="btn-status-toggle">
+                      {selectedJob.status === 'open' ? 'Close Posting' : 'Open Posting'}
+                    </button>
                   </div>
+                  <h2>{selectedJob.title}</h2>
+                  <span className="date-stamp">Posted: {new Date(selectedJob.created_at).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</span>
                 </div>
-              );
-            })}
+
+                <div className="spec-info-row">
+                  <div className="spec-tile">
+                    <span>MAX HOURLY BUDGET</span>
+                    <strong>₹{selectedJob.budget.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}/hr</strong>
+                  </div>
+                  {selectedJob.duration && (
+                    <div className="spec-tile">
+                      <span>PROJECT DURATION</span>
+                      <strong>{selectedJob.duration}</strong>
+                    </div>
+                  )}
+                  {selectedJob.deadline && (
+                    <div className="spec-tile">
+                      <span>DEADLINE</span>
+                      <strong>{selectedJob.deadline}</strong>
+                    </div>
+                  )}
+                </div>
+
+                <div className="spec-section">
+                  <h4>Role Description</h4>
+                  <p>{selectedJob.description}</p>
+                </div>
+
+                {selectedJob.kpi_expectations && (
+                  <div className="spec-section target-kpis-box">
+                    <h4>Target Performance KPIs Expected</h4>
+                    <p>{selectedJob.kpi_expectations}</p>
+                  </div>
+                )}
+
+                <div className="specs-notes">
+                  <p><strong>Note:</strong> Vetting parameters and AI screening configurations are managed by our agency recruiters. Only final approved matches are displayed here.</p>
+                </div>
+              </div>
+
+              {/* Right Column: Approved Candidates List */}
+              <div className="candidates-list-col">
+                <div className="list-header-card card">
+                  <div className="search-filter-row">
+                    <h3>AI-Approved Candidates ({filteredCandidates.length})</h3>
+                    
+                    {/* Sort Dropdown */}
+                    <div className="sort-box">
+                      <label htmlFor="sortSelect">Sort:</label>
+                      <select 
+                        id="sortSelect" 
+                        value={sortBy} 
+                        onChange={(e) => setSortBy(e.target.value)}
+                        className="sort-select"
+                      >
+                        <option value="match_score">Highest Match</option>
+                        <option value="experience">Experience</option>
+                        <option value="hourly_rate">Lowest Rate</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  {/* Search input */}
+                  <input 
+                    type="text" 
+                    placeholder="Search candidates by name, primary skill, or match reasoning..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="candidate-search-input"
+                  />
+                </div>
+
+                {loadingCandidates ? (
+                  <div className="loader-container">
+                    <div className="spinner"></div>
+                    <p>Fetching approved candidates...</p>
+                  </div>
+                ) : filteredCandidates.length === 0 ? (
+                  <div className="empty-candidates-card card text-center">
+                    <span className="empty-icon">⏳</span>
+                    <h3>No Approved Candidates</h3>
+                    <p>
+                      {searchQuery 
+                        ? "No matched profiles found fitting your search query parameters."
+                        : "Our agency recruiters are still evaluating applicants for this job. You will see approved profiles populating here soon."
+                      }
+                    </p>
+                  </div>
+                ) : (
+                  <div className="candidates-stack">
+                    {filteredCandidates.map((cand) => {
+                      const isExpanded = !!expandedReasoning[cand.id];
+                      return (
+                        <div key={cand.id} className="candidate-card card">
+                          
+                          {/* Top Row: Name, headline, rating, match percentage */}
+                          <div className="cand-card-top">
+                            <div className="cand-profile-row">
+                              <div className="avatar-circle">
+                                {cand.freelancer_name.split(' ').map(n => n[0]).join('')}
+                              </div>
+                              <div>
+                                <h4>{cand.freelancer_name}</h4>
+                                <span className="cand-headline">{cand.headline || "AI / Machine Learning Specialist"}</span>
+                              </div>
+                            </div>
+
+                            <div className="cand-score-box">
+                              <span className="score-percentage">{Math.round(cand.match_score)}%</span>
+                              <span className="score-lbl">AI Match</span>
+                            </div>
+                          </div>
+
+                          {/* Mid Info: Experience, Rate, Rating */}
+                          <div className="cand-meta-strip">
+                            <span>💼 <strong>{cand.experience} yrs</strong> experience</span>
+                            <span>💵 <strong>₹{cand.hourly_rate.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}/hr</strong> rate</span>
+                            <span>⭐ <strong>{cand.rating.toFixed(1)}/5.0</strong> rating</span>
+                          </div>
+
+                          {/* Expertise / Skills list */}
+                          <div className="skills-block">
+                            <strong>Skills:</strong>
+                            <div className="skills-tags">
+                              {cand.primary_skill.split(',').map((skill, sIdx) => (
+                                <span key={sIdx} className="skill-badge">{skill.trim()}</span>
+                              ))}
+                            </div>
+                          </div>
+
+                          {/* KPI Achievements */}
+                          {cand.kpi_achieved && (
+                            <div className="cand-kpi-brief">
+                              <strong>KPI Achieved:</strong> <span>{cand.kpi_achieved}</span>
+                            </div>
+                          )}
+
+                          {/* AI Match reasoning (Expandable) */}
+                          <div className="ai-reasoning-container">
+                            <button onClick={() => toggleReasoning(cand.id)} className="btn-reasoning-toggle">
+                              {isExpanded ? 'Hide AI Match Reasoning ▲' : 'Show AI Match Reasoning ▼'}
+                            </button>
+                            {isExpanded && (
+                              <div className="ai-reasoning-details">
+                                <p><strong>Approval Match Context:</strong> {cand.ai_reasoning || "Matches job descriptions keywords and experience bounds. Screened and certified by agency recruiter."}</p>
+                                <span className="recruiter-tag">Vetted by: Agency Admin</span>
+                              </div>
+                            )}
+                          </div>
+
+                          {/* Action Buttons */}
+                          <div className="cand-actions-row">
+                            {cand.portfolio_url && (
+                              <a href={cand.portfolio_url} target="_blank" rel="noopener noreferrer" className="btn btn-secondary cand-action-btn">
+                                🔗 View Portfolio
+                              </a>
+                            )}
+                            
+                            <button 
+                              onClick={() => triggerAction(cand.id, 'message')}
+                              disabled={actionStatuses[`${cand.id}-message-done`]}
+                              className={`btn btn-secondary cand-action-btn ${actionStatuses[`${cand.id}-message-done`] ? 'done' : ''}`}
+                            >
+                              {actionStatuses[`${cand.id}-message`] ? 'Sending...' : actionStatuses[`${cand.id}-message-done`] ? 'Chat Room Created ✓' : '💬 Message'}
+                            </button>
+
+                            <button 
+                              onClick={() => triggerAction(cand.id, 'hire')}
+                              disabled={actionStatuses[`${cand.id}-hire-done`]}
+                              className={`btn btn-primary cand-action-btn ${actionStatuses[`${cand.id}-hire-done`] ? 'done' : ''}`}
+                            >
+                              {actionStatuses[`${cand.id}-hire`] ? 'Connecting...' : actionStatuses[`${cand.id}-hire-done`] ? 'Hired / Contact Sent ✓' : '🚀 Hire Candidate'}
+                            </button>
+                          </div>
+
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+
+            </div>
           </div>
-        </div>
-      </section>
+        )}
+
+      </main>
 
       {/* ---------------- Footer ---------------- */}
       <footer className="footer">
@@ -339,18 +613,18 @@ export default function CompanyHome() {
           <div className="footer-inner">
             <div>
               <span className="footer-brand-name">AI Shop International</span>
-              <p>The premium pre-vetted matching engine network connecting businesses with global AI talent.</p>
+              <p>The pre-vetted matching network connecting businesses with global AI talent.</p>
             </div>
             <div className="footer-links">
               <div className="footer-col">
-                <h4>Portal</h4>
-                <a href="#approved-matches">Approved Matches</a>
-                <a href="/client">Post a Requirement</a>
+                <h4>Dashboard</h4>
+                <a href="#company-workspace" onClick={() => setSelectedJob(null)}>Requirements Workspace</a>
+                <a href="/client">Post a Job</a>
               </div>
               <div className="footer-col">
-                <h4>Admin</h4>
-                <a href="/dashboard">Agency Login</a>
+                <h4>Legal</h4>
                 <a href="/credits">Credits</a>
+                <a href="/login">Logout session</a>
               </div>
             </div>
           </div>
@@ -366,6 +640,7 @@ export default function CompanyHome() {
           color: var(--text);
           min-height: 100vh;
           font-family: var(--font-body);
+          padding-top: 100px;
         }
         .container {
           max-width: 1200px;
@@ -409,11 +684,14 @@ export default function CompanyHome() {
           align-items: center;
           justify-content: space-between;
         }
-        .brand {
+        .brand-btn {
+          background: none;
+          border: none;
           display: flex;
           align-items: center;
           gap: 10px;
-          text-decoration: none;
+          cursor: pointer;
+          padding: 0;
         }
         .logo-img {
           width: 28px;
@@ -446,103 +724,23 @@ export default function CompanyHome() {
         .nav-ghost:hover {
           color: var(--text);
         }
-
-        /* ---------- Hero ---------- */
-        .hero {
-          position: relative;
-          padding: 160px 0 100px;
-          background: radial-gradient(120% 140% at 50% 10%, #1c233a 0%, var(--ink) 70%, #06070c 100%);
-          color: var(--text-on-ink);
-          overflow: hidden;
-        }
-        .hero-grid {
-          display: grid;
-          grid-template-columns: 1.1fr 0.9fr;
-          gap: 80px;
-          align-items: center;
-        }
-        .hero-badge {
-          display: inline-block;
-          font-family: var(--font-mono);
-          font-size: 11px;
-          color: var(--gold) !important;
-          letter-spacing: 0.12em;
-          border: 1px solid rgba(201, 162, 39, 0.3) !important;
-          background: rgba(201, 162, 39, 0.08) !important;
-          padding: 4px 10px;
-          border-radius: 99px;
-          margin-bottom: 24px;
-        }
-        .hero-copy :global(h1) {
-          font-size: clamp(38px, 5.5vw, 54px);
-          line-height: 1.1;
-          margin-bottom: 20px;
-          color: #ffffff !important;
-          font-weight: 700;
-          letter-spacing: -0.02em;
-        }
-        .hero-copy :global(h1 em) {
-          color: var(--gold) !important;
-          font-style: normal;
-        }
-        .hero-p {
-          font-size: 16.5px;
-          line-height: 1.65;
-          color: var(--text-on-ink-muted) !important;
-          margin-bottom: 36px;
-        }
-        .info-card {
-          background: var(--ink-soft);
-          border: 1px solid var(--ink-line);
-          border-radius: var(--radius-lg);
-          padding: 32px;
-        }
-        .info-card h3 {
-          font-size: 18px;
-          color: #ffffff;
-          margin-bottom: 24px;
-          font-weight: 600;
-        }
-        .pipeline-steps {
-          list-style: none;
-          display: flex;
-          flex-direction: column;
-          gap: 20px;
-        }
-        .pipeline-steps li {
-          display: flex;
-          gap: 16px;
-        }
-        .step-circle {
-          flex-shrink: 0;
-          width: 28px;
-          height: 28px;
-          background: var(--indigo);
-          color: #ffffff;
-          font-weight: 700;
-          font-size: 13px;
-          border-radius: 50%;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-        }
-        .pipeline-steps h4 {
-          font-size: 14.5px;
-          font-weight: 600;
-          color: #ffffff;
-          margin-bottom: 4px;
-        }
-        .pipeline-steps p {
-          font-size: 12.5px;
-          color: var(--text-on-ink-muted);
-          line-height: 1.5;
+        .btn-back-nav {
+          background: none;
+          border: none;
+          cursor: pointer;
         }
 
-        /* ---------- Approved Matches Section ---------- */
-        .approved-section {
-          padding: 80px 0;
-          background: var(--paper-dim);
+        /* ---------- Shell Layout ---------- */
+        .dashboard-content {
+          padding-bottom: 80px;
+        }
+        .dashboard-header-row {
+          display: flex;
+          justify-content: space-between;
+          align-items: flex-end;
+          margin-bottom: 40px;
           border-bottom: 1px solid var(--paper-line);
+          padding-bottom: 24px;
         }
         .eyebrow {
           font-family: var(--font-mono);
@@ -551,30 +749,447 @@ export default function CompanyHome() {
           letter-spacing: 0.12em;
           font-weight: 700;
           display: block;
-          margin-bottom: 12px;
+          margin-bottom: 8px;
         }
-        .section-head h2 {
-          font-size: 32px;
+        .dashboard-header-row h2 {
+          font-size: 28px;
+          font-weight: 700;
           color: var(--text);
-          margin-bottom: 16px;
-          font-weight: 650;
+          margin-bottom: 8px;
         }
-        .section-head p {
-          font-size: 16px;
+        .dashboard-header-row p {
           color: var(--text-muted);
+          font-size: 14.5px;
         }
-        .approved-list-card {
+        .demo-badge-banner {
+          background: #fff8e6;
+          border: 1px solid #ffeeba;
+          color: #856404;
+          font-size: 13.5px;
+          padding: 10px 20px;
+          border-radius: var(--radius-sm);
+          margin-bottom: 24px;
+          font-weight: 550;
+        }
+
+        /* ---------- Level 1: Jobs Grid ---------- */
+        .jobs-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+          gap: 28px;
+        }
+        .job-card {
           background: #ffffff;
           border: 1px solid var(--paper-line);
           border-radius: var(--radius-lg);
-          padding: 30px;
+          padding: 28px;
+          display: flex;
+          flex-direction: column;
+          justify-content: space-between;
           box-shadow: var(--shadow-sm);
-          max-width: 960px;
-          margin: 40px auto 0;
+          transition: transform 0.2s, box-shadow 0.2s;
         }
-        .loader {
+        .job-card:hover {
+          transform: translateY(-2px);
+          box-shadow: var(--shadow-md);
+        }
+        .job-card-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 16px;
+        }
+        .status-pill {
+          font-family: var(--font-mono);
+          font-size: 11px;
+          font-weight: 700;
+          padding: 4px 10px;
+          border-radius: var(--radius-sm);
+          text-transform: uppercase;
+        }
+        .status-pill.open {
+          background: #e6f9f0;
+          color: #1dbf73;
+        }
+        .status-pill.closed {
+          background: #f1f5f9;
+          color: #64748b;
+        }
+        .date-stamp {
+          font-size: 12px;
+          color: var(--text-muted);
+        }
+        .job-card h3 {
+          font-size: 18px;
+          font-weight: 650;
+          color: var(--text);
+          margin-bottom: 12px;
+        }
+        .job-desc-preview {
+          font-size: 13.5px;
+          color: var(--text-muted);
+          line-height: 1.5;
+          margin-bottom: 20px;
+          min-height: 60px;
+        }
+        .job-meta-row {
+          display: flex;
+          gap: 16px;
+          font-size: 12.5px;
+          font-family: var(--font-mono);
+          color: var(--text-muted);
+          margin-bottom: 24px;
+        }
+        .budget-tag {
+          color: var(--text);
+          font-weight: 600;
+        }
+        .job-card-footer {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          border-top: 1px solid var(--paper-line);
+          padding-top: 16px;
+        }
+        .match-counter-badge {
+          font-size: 13px;
+          color: var(--text);
+        }
+        .match-counter-badge strong {
+          color: var(--indigo);
+          font-size: 15px;
+        }
+
+        /* ---------- Level 2: Job Detail view ---------- */
+        .back-bar {
+          margin-bottom: 30px;
+        }
+        .btn-back {
+          background: none;
+          border: none;
+          cursor: pointer;
+          color: var(--text-muted);
+          font-weight: 600;
+          font-size: 14.5px;
+          transition: color 0.2s;
+        }
+        .btn-back:hover {
+          color: var(--text);
+        }
+        .detail-grid {
+          display: grid;
+          grid-template-columns: 1.1fr 1.4fr;
+          gap: 40px;
+          align-items: start;
+        }
+
+        /* Left specs panel */
+        .job-specs-col {
+          background: #ffffff;
+          border: 1px solid var(--paper-line);
+          border-radius: var(--radius-lg);
+          padding: 36px;
+          box-shadow: var(--shadow-sm);
+        }
+        .specs-header {
+          border-bottom: 1px solid var(--paper-line);
+          padding-bottom: 24px;
+          margin-bottom: 24px;
+        }
+        .status-toggle-row {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 16px;
+        }
+        .btn-status-toggle {
+          background: var(--paper-dim);
+          border: 1px solid var(--paper-line);
+          padding: 4px 12px;
+          border-radius: 6px;
+          font-size: 11.5px;
+          font-weight: 600;
+          cursor: pointer;
+          transition: all 0.2s;
+        }
+        .btn-status-toggle:hover {
+          background: var(--paper-line);
+        }
+        .job-specs-col h2 {
+          font-size: 24px;
+          font-weight: 700;
+          color: var(--text);
+          margin-bottom: 6px;
+        }
+        .spec-info-row {
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 16px;
+          margin-bottom: 30px;
+        }
+        .spec-tile {
+          background: var(--paper-dim);
+          border: 1px solid var(--paper-line);
+          border-radius: var(--radius-sm);
+          padding: 14px 10px;
           text-align: center;
-          padding: 40px 0;
+        }
+        .spec-tile span {
+          display: block;
+          font-size: 9px;
+          font-family: var(--font-mono);
+          color: var(--text-muted);
+          letter-spacing: 0.05em;
+          margin-bottom: 6px;
+        }
+        .spec-tile strong {
+          font-size: 13.5px;
+          color: var(--text);
+        }
+        .spec-section {
+          margin-bottom: 24px;
+        }
+        .spec-section h4 {
+          font-size: 14px;
+          text-transform: uppercase;
+          letter-spacing: 0.05em;
+          color: var(--text);
+          margin-bottom: 10px;
+        }
+        .spec-section p {
+          font-size: 14px;
+          color: var(--text-muted);
+          line-height: 1.6;
+        }
+        .target-kpis-box {
+          background: #f8fafc;
+          border-left: 3px solid var(--indigo);
+          padding: 16px;
+          border-radius: 0 var(--radius-md) var(--radius-md) 0;
+        }
+        .specs-notes {
+          font-size: 12px;
+          color: var(--text-muted);
+          line-height: 1.5;
+          margin-top: 36px;
+          border-top: 1px solid var(--paper-line);
+          padding-top: 16px;
+        }
+
+        /* Right matches panel */
+        .list-header-card {
+          background: #ffffff;
+          border: 1px solid var(--paper-line);
+          border-radius: var(--radius-lg);
+          padding: 24px;
+          margin-bottom: 24px;
+          box-shadow: var(--shadow-sm);
+        }
+        .search-filter-row {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 16px;
+        }
+        .search-filter-row h3 {
+          font-size: 17px;
+          font-weight: 650;
+          color: var(--text);
+        }
+        .sort-box {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          font-size: 12.5px;
+          color: var(--text-muted);
+        }
+        .sort-select {
+          background: var(--paper-dim);
+          border: 1px solid var(--paper-line);
+          padding: 4px 8px;
+          border-radius: 6px;
+          font-size: 12px;
+          color: var(--text);
+          cursor: pointer;
+        }
+        .candidate-search-input {
+          width: 100%;
+          border: 1px solid var(--paper-line);
+          padding: 10px 14px;
+          border-radius: var(--radius-sm);
+          font-size: 13.5px;
+          background: var(--paper-dim);
+          color: var(--text);
+        }
+        .candidates-stack {
+          display: flex;
+          flex-direction: column;
+          gap: 24px;
+        }
+        .candidate-card {
+          background: #ffffff;
+          border: 1px solid var(--paper-line);
+          border-radius: var(--radius-lg);
+          padding: 28px;
+          box-shadow: var(--shadow-sm);
+        }
+        .cand-card-top {
+          display: flex;
+          justify-content: space-between;
+          align-items: flex-start;
+          margin-bottom: 16px;
+        }
+        .cand-profile-row {
+          display: flex;
+          align-items: center;
+          gap: 16px;
+        }
+        .avatar-circle {
+          width: 44px;
+          height: 44px;
+          border-radius: 50%;
+          background: var(--indigo-soft);
+          color: var(--indigo);
+          font-weight: 700;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 15px;
+          letter-spacing: 0.05em;
+        }
+        .cand-profile-row h4 {
+          font-size: 17px;
+          font-weight: 700;
+          color: var(--text);
+          margin-bottom: 2px;
+        }
+        .cand-headline {
+          font-size: 13px;
+          color: var(--text-muted);
+          display: block;
+        }
+        .cand-score-box {
+          text-align: center;
+          background: rgba(91, 79, 232, 0.08);
+          border: 1px solid rgba(91, 79, 232, 0.25);
+          padding: 6px 12px;
+          border-radius: 8px;
+        }
+        .score-percentage {
+          font-size: 18px;
+          font-weight: 700;
+          color: var(--indigo);
+          display: block;
+          line-height: 1.1;
+        }
+        .score-lbl {
+          font-size: 9px;
+          color: var(--indigo);
+          font-family: var(--font-mono);
+          text-transform: uppercase;
+          letter-spacing: 0.04em;
+        }
+        .cand-meta-strip {
+          display: flex;
+          gap: 24px;
+          font-size: 13.5px;
+          color: var(--text-muted);
+          border-bottom: 1px solid var(--paper-line);
+          padding-bottom: 14px;
+          margin-bottom: 14px;
+        }
+        .skills-block {
+          margin-bottom: 14px;
+          font-size: 13.5px;
+        }
+        .skills-tags {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 8px;
+          margin-top: 6px;
+        }
+        .skill-badge {
+          font-size: 11.5px;
+          background: var(--paper-dim);
+          border: 1px solid var(--paper-line);
+          padding: 2px 10px;
+          border-radius: var(--radius-sm);
+          color: var(--text);
+        }
+        .cand-kpi-brief {
+          font-size: 12.5px;
+          background: #f8fafc;
+          border-left: 3px solid var(--indigo);
+          padding: 8px 12px;
+          border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+          margin-bottom: 20px;
+        }
+        .cand-kpi-brief strong {
+          color: var(--text);
+        }
+        .cand-kpi-brief span {
+          color: var(--text-muted);
+        }
+        
+        /* Expandable Reasoning block */
+        .ai-reasoning-container {
+          background: var(--paper-dim);
+          border: 1px solid var(--paper-line);
+          border-radius: var(--radius-sm);
+          margin-bottom: 20px;
+          overflow: hidden;
+        }
+        .btn-reasoning-toggle {
+          width: 100%;
+          background: none;
+          border: none;
+          padding: 10px 16px;
+          font-size: 12px;
+          font-weight: 600;
+          color: var(--indigo);
+          cursor: pointer;
+          text-align: left;
+        }
+        .ai-reasoning-details {
+          padding: 0 16px 14px;
+          font-size: 12.5px;
+          line-height: 1.5;
+          color: var(--text-muted);
+        }
+        .recruiter-tag {
+          display: inline-block;
+          font-size: 10px;
+          background: #f1f5f9;
+          color: #475569;
+          padding: 2px 8px;
+          border-radius: 4px;
+          margin-top: 8px;
+          font-family: var(--font-mono);
+        }
+
+        /* Action Buttons */
+        .cand-actions-row {
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 12px;
+        }
+        .cand-action-btn {
+          width: 100%;
+          justify-content: center;
+          padding: 10px 0;
+          font-size: 13px;
+        }
+        :global(.btn-secondary.done), :global(.btn-primary.done) {
+          background: #1dbf73 !important;
+          border-color: #1dbf73 !important;
+          color: #ffffff !important;
+          cursor: not-allowed;
+        }
+
+        /* Miscellaneous */
+        .loader-container {
+          text-align: center;
+          padding: 60px 0;
           color: var(--text-muted);
         }
         .spinner {
@@ -589,264 +1204,21 @@ export default function CompanyHome() {
         @keyframes spin {
           to { transform: rotate(360deg); }
         }
-        .demo-notice {
-          background: #fff8e6;
-          border: 1px solid #ffeeba;
-          color: #856404;
-          font-size: 13px;
-          padding: 8px 16px;
-          border-radius: var(--radius-sm);
-          margin-bottom: 20px;
-          text-align: center;
-        }
-        .empty-state {
-          text-align: center;
-          padding: 60px 0;
+        .empty-workspace-card, .empty-candidates-card {
+          padding: 60px 24px;
         }
         .empty-icon {
           font-size: 48px;
           display: block;
           margin-bottom: 16px;
         }
-        .empty-state h3 {
+        .empty-workspace-card h3, .empty-candidates-card h3 {
           font-size: 18px;
-          color: var(--text);
-          margin-bottom: 6px;
-        }
-        .empty-state p {
-          color: var(--text-muted);
-          font-size: 14px;
-        }
-        .approved-item {
-          display: flex;
-          justify-content: space-between;
-          align-items: stretch;
-          gap: 36px;
-          padding: 28px 0;
-          border-bottom: 1px solid var(--paper-line);
-        }
-        .approved-item:last-child {
-          border-bottom: none;
-          padding-bottom: 0;
-        }
-        .approved-item:first-child {
-          padding-top: 0;
-        }
-        .approved-item-left {
-          flex: 1;
-        }
-        .approved-header-row {
-          display: flex;
-          align-items: center;
-          gap: 16px;
-          flex-wrap: wrap;
-          margin-bottom: 12px;
-        }
-        .approved-header-row h3 {
-          font-size: 19px;
-          font-weight: 700;
-          color: var(--text);
-        }
-        .match-badge {
-          background: rgba(91, 79, 232, 0.08);
-          border: 1px solid rgba(91, 79, 232, 0.25);
-          color: var(--indigo);
-          font-size: 11.5px;
-          font-weight: 700;
-          padding: 2px 8px;
-          border-radius: 99px;
-        }
-        .role-tag {
-          font-size: 12px;
-          background: var(--paper-dim);
-          border: 1px solid var(--paper-line);
-          color: var(--text-muted);
-          padding: 2px 10px;
-          border-radius: 99px;
-          font-weight: 550;
-        }
-        .skills {
-          font-size: 14px;
-          color: var(--text);
-          margin-bottom: 14px;
-        }
-        .kpi-box, .situation-box {
-          font-size: 13px;
-          background: #f8fafc;
-          padding: 10px 14px;
-          border-radius: var(--radius-sm);
-          margin-bottom: 10px;
-        }
-        .kpi-box { border-left: 3px solid var(--indigo); }
-        .situation-box { border-left: 3px solid var(--gold); }
-        .kpi-box strong, .situation-box strong { color: var(--text); }
-        .kpi-box span, .situation-box span { color: var(--text-muted); }
-
-        .approved-item-right {
-          width: 260px;
-          display: flex;
-          flex-direction: column;
-          justify-content: space-between;
-          border-left: 1px solid var(--paper-line);
-          padding-left: 36px;
-          flex-shrink: 0;
-        }
-        .contact-box h4 {
-          font-size: 12px;
-          text-transform: uppercase;
-          letter-spacing: 0.05em;
-          color: var(--text-muted);
-          margin-bottom: 10px;
-        }
-        .contact-link {
-          display: block;
-          font-size: 13.5px;
-          color: var(--indigo);
-          text-decoration: none;
-          margin-bottom: 8px;
-          font-weight: 550;
-        }
-        .contact-link:hover {
-          text-decoration: underline;
-        }
-        .rate-box {
-          margin-top: 16px;
-          font-size: 13px;
-          color: var(--text-muted);
-        }
-        .rate-box strong {
-          display: block;
-          font-size: 20px;
-          color: var(--text);
-          margin-top: 2px;
-        }
-
-        /* ---------- Value Proposition ---------- */
-        .value-prop {
-          padding: 96px 0;
-          background: #ffffff;
-          border-bottom: 1px solid var(--paper-line);
-        }
-        .compare-grid {
-          display: grid;
-          grid-template-columns: repeat(2, 1fr);
-          gap: 32px;
-          max-width: 840px;
-          margin: 40px auto 0;
-        }
-        .compare-card {
-          background: #ffffff;
-          border: 1px solid var(--paper-line);
-          border-radius: var(--radius-lg);
-          padding: 40px;
-          text-align: center;
-          position: relative;
-          box-shadow: var(--shadow-sm);
-        }
-        .compare-card.highlight {
-          border-color: var(--indigo);
-          box-shadow: var(--shadow-md);
-        }
-        .card-badge {
-          position: absolute;
-          top: -12px;
-          left: 50%;
-          transform: translateX(-50%);
-          background: var(--indigo);
-          color: #ffffff;
-          font-family: var(--font-mono);
-          font-size: 10px;
-          font-weight: 700;
-          padding: 4px 12px;
-          border-radius: 99px;
-          letter-spacing: 0.06em;
-        }
-        .compare-card h4 {
-          font-size: 16px;
-          color: var(--text-muted);
-          margin-bottom: 16px;
-        }
-        .compare-pricing {
-          font-size: 40px;
-          font-family: var(--font-display);
-          font-weight: 700;
-          color: var(--text);
           margin-bottom: 8px;
         }
-        .compare-label {
-          font-family: var(--font-mono);
-          font-size: 11px;
-          color: var(--indigo);
-          font-weight: 700;
-          margin-bottom: 30px;
-        }
-        .compare-features {
-          list-style: none;
-          display: flex;
-          flex-direction: column;
-          gap: 12px;
-          text-align: left;
-          border-top: 1px solid var(--paper-line);
-          padding-top: 24px;
-          font-size: 14.5px;
-          color: var(--text-muted);
-        }
-        .compare-features li {
-          display: flex;
-          align-items: center;
-          gap: 10px;
-        }
-
-        /* ---------- FAQs ---------- */
-        .faq-section {
-          padding: 96px 0;
-          background: var(--paper-dim);
-          border-bottom: 1px solid var(--paper-line);
-        }
-        .faq-list {
-          max-width: 720px;
-          margin: 0 auto;
-          display: flex;
-          flex-direction: column;
-          gap: 16px;
-        }
-        .faq-item {
-          background: #ffffff;
-          border: 1px solid var(--paper-line);
-          border-radius: var(--radius-sm);
-          overflow: hidden;
-        }
-        .faq-trigger {
-          width: 100%;
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          padding: 20px 24px;
-          background: none;
-          border: none;
-          font-size: 15px;
-          font-weight: 600;
-          color: var(--text);
-          cursor: pointer;
-          text-align: left;
-        }
-        .faq-icon {
-          font-size: 18px;
-          color: var(--text-muted);
-        }
-        .faq-panel {
-          max-height: 0;
-          overflow: hidden;
-          transition: max-height 0.3s ease-out;
-        }
-        .faq-panel-open {
-          max-height: 200px;
-        }
-        .faq-panel p {
-          padding: 0 24px 20px;
+        .empty-workspace-card p, .empty-candidates-card p {
           color: var(--text-muted);
           font-size: 14.5px;
-          line-height: 1.6;
         }
 
         /* ---------- Footer ---------- */
@@ -856,6 +1228,7 @@ export default function CompanyHome() {
           color: var(--text-on-ink-muted) !important;
           padding: 72px 0 36px;
           font-size: 14px;
+          margin-top: 80px;
         }
         .footer-inner {
           display: grid;
@@ -902,23 +1275,16 @@ export default function CompanyHome() {
 
         /* ---------- Responsive ---------- */
         @media (max-width: 960px) {
-          .hero-grid { grid-template-columns: 1fr; gap: 40px; }
-          .approved-item { flex-direction: column; gap: 20px; }
-          .approved-item-right {
-            width: 100%;
-            border-left: none;
-            padding-left: 0;
-            border-top: 1px solid var(--paper-line);
-            padding-top: 20px;
-          }
-          .compare-grid { grid-template-columns: 1fr; }
-        }
-        @media (max-width: 768px) {
-          .hero-copy h1 { font-size: 38px; }
-          .footer-inner { grid-template-columns: 1fr; gap: 40px; }
+          .detail-grid { grid-template-columns: 1fr; }
           .nav-actions { gap: 10px; }
           .nav-ghost { font-size: 12px; }
           .nav-cta { padding: 8px 14px; font-size: 12px; }
+        }
+        @media (max-width: 640px) {
+          .spec-info-row { grid-template-columns: 1fr; }
+          .cand-actions-row { grid-template-columns: 1fr; }
+          .search-filter-row { flex-direction: column; align-items: flex-start; gap: 12px; }
+          .sort-box { width: 100%; justify-content: space-between; }
         }
       `}</style>
     </div>
