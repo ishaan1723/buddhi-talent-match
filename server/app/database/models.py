@@ -24,6 +24,7 @@ CREATE TABLE IF NOT EXISTS jobs (
     title VARCHAR(100) NOT NULL,
     description TEXT NOT NULL,
     budget NUMERIC(10, 2) NOT NULL,
+    kpi_expectations TEXT,
     embedding double precision[],
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
@@ -63,6 +64,11 @@ def initialize_tables():
     try:
         with get_db_cursor() as cursor:
             cursor.execute(CREATE_TABLES_SQL)
+            # Ensure existing tables are migrated safely
+            cursor.execute("ALTER TABLE jobs ADD COLUMN IF NOT EXISTS kpi_expectations TEXT;")
+            cursor.execute("ALTER TABLE freelancers ADD COLUMN IF NOT EXISTS resume_text TEXT;")
+            cursor.execute("ALTER TABLE freelancers ADD COLUMN IF NOT EXISTS kpi_achieved TEXT;")
+            cursor.execute("ALTER TABLE freelancers ADD COLUMN IF NOT EXISTS proud_situation TEXT;")
         logger.info("Database schemas and tables checked/initialized successfully.")
     except Exception as e:
         logger.critical(f"Failed to initialize database tables: {e}")

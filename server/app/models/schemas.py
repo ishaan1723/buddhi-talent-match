@@ -26,6 +26,7 @@ class JobBase(BaseModel):
     title: str = Field(..., min_length=5, max_length=100)
     description: str = Field(..., min_length=10)
     budget: float = Field(..., gt=0)
+    kpi_expectations: Optional[str] = None
 
 class JobCreate(JobBase):
     pass

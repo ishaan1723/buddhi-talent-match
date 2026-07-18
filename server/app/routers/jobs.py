@@ -14,14 +14,15 @@ def create_job(job: JobCreate, background_tasks: BackgroundTasks):
     try:
         with get_db_cursor() as cursor:
             query = """
-            INSERT INTO jobs (title, description, budget)
-            VALUES (%s, %s, %s)
+            INSERT INTO jobs (title, description, budget, kpi_expectations)
+            VALUES (%s, %s, %s, %s)
             RETURNING id, created_at;
             """
             cursor.execute(query, (
                 job.title,
                 job.description,
-                job.budget
+                job.budget,
+                job.kpi_expectations
             ))
             result = cursor.fetchone()
             job_id, created_at = result[0], result[1]
@@ -34,6 +35,7 @@ def create_job(job: JobCreate, background_tasks: BackgroundTasks):
             title=job.title,
             description=job.description,
             budget=job.budget,
+            kpi_expectations=job.kpi_expectations,
             created_at=created_at
         )
     except Exception as e:
@@ -47,7 +49,7 @@ def list_jobs():
     try:
         with get_db_cursor() as cursor:
             query = """
-            SELECT id, title, description, budget, created_at
+            SELECT id, title, description, budget, created_at, kpi_expectations
             FROM jobs
             ORDER BY created_at DESC;
             """
@@ -61,7 +63,8 @@ def list_jobs():
                     title=row[1],
                     description=row[2],
                     budget=float(row[3]),
-                    created_at=row[4]
+                    created_at=row[4],
+                    kpi_expectations=row[5]
                 ))
             return jobs
             

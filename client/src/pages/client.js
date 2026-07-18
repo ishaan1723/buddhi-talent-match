@@ -21,7 +21,8 @@ export default function ClientPosting() {
   const [formData, setFormData] = useState({
     title: '',
     description: '',
-    budget: 2500
+    budget: 2500,
+    kpi_expectations: ''
   });
 
   const [submitted, setSubmitted] = useState(false);
@@ -33,19 +34,22 @@ export default function ClientPosting() {
       label: "AI Chatbot Dev",
       title: "Need Python Dev to build an AI chatbot",
       description: "We are looking for a developer to build a smart customer support chatbot. The chatbot needs to read our internal PDF files and answer user queries. Experience with LangChain, Python, and OpenAI API is highly preferred.",
-      budget: 2500
+      budget: 2500,
+      kpi_expectations: "Reduce support team response load by 40% and achieve >90% automated answer accuracy."
     },
     {
       label: "Computer Vision Specialist",
       title: "Computer Vision Expert for Image Segmentation",
       description: "Looking for an ML engineer to build an image classification and object detection pipeline for manufacturing defect detection. Must be highly skilled in PyTorch, OpenCV, and convolutional neural networks.",
-      budget: 5000
+      budget: 5000,
+      kpi_expectations: "Achieve image classification accuracy threshold >98% and processing time <40ms per frame."
     },
     {
       label: "NLP Researcher",
       title: "NLP Engineer for Text Summarization",
       description: "We need a backend developer to build a text processing service. The goal is to summarize financial news articles daily. Experience with Hugging Face transformers, BERT models, and FastAPI is required.",
-      budget: 3500
+      budget: 3500,
+      kpi_expectations: "Wrote high-scale summarizer handling 100,000+ daily articles with average API latency <100ms."
     }
   ];
 
@@ -53,7 +57,8 @@ export default function ClientPosting() {
     setFormData({
       title: tpl.title,
       description: tpl.description,
-      budget: tpl.budget
+      budget: tpl.budget,
+      kpi_expectations: tpl.kpi_expectations || ''
     });
     setErrorMsg('');
   };
@@ -210,6 +215,18 @@ export default function ClientPosting() {
               rows="6"
               placeholder="Describe the problems you want the freelancer to solve, tools to use, and required expertise..." 
               value={formData.description}
+              onChange={handleChange}
+            />
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="kpi_expectations">Key Target KPI Metrics Expected</label>
+            <textarea 
+              id="kpi_expectations" 
+              name="kpi_expectations" 
+              rows="3"
+              placeholder="e.g. Reduce page load times by 30%, achieve 95% automated test coverage, or deliver backend in 2 weeks..." 
+              value={formData.kpi_expectations}
               onChange={handleChange}
             />
           </div>

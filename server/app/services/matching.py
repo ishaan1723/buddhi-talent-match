@@ -75,17 +75,21 @@ def calculate_match_score(
     primary_skill: str,
     resume_text: str,
     kpi_achieved: str,
-    proud_situation: str
+    proud_situation: str,
+    kpi_expectations: str = None
 ) -> float:
     """
     Calculates the final composite match score (%) between a freelancer and a job post.
     Prioritizes KPI achievements (40%) and proud accomplishments (40%) over general keywords (20%).
+    Matches freelancer's KPI directly against job's expected KPIs if defined.
     """
     # 1. Evaluate field availability and calculate sub-similarities
     kpi_sim = 0.0
     has_kpi = False
     if kpi_achieved and kpi_achieved.strip():
-        kpi_sim = get_similarity(kpi_achieved, job_text)
+        # Compare achieved KPIs directly to job's KPI expectations if present, else fallback to full job details
+        kpi_target = kpi_expectations if (kpi_expectations and kpi_expectations.strip()) else job_text
+        kpi_sim = get_similarity(kpi_achieved, kpi_target)
         has_kpi = True
         
     proud_sim = 0.0
@@ -138,13 +142,13 @@ def run_match_for_job(job_id: int):
     """Matches a newly created job against all existing freelancers in the database."""
     try:
         with get_db_cursor() as cursor:
-            # 1. Fetch Job Details
-            cursor.execute("SELECT id, title, description, budget FROM jobs WHERE id = %s;", (job_id,))
+            # 1. Fetch Job Details (including kpi_expectations)
+            cursor.execute("SELECT id, title, description, budget, kpi_expectations FROM jobs WHERE id = %s;", (job_id,))
             job = cursor.fetchone()
             if not job:
                 return
             
-            job_id, job_title, job_desc, job_budget = job
+            job_id, job_title, job_desc, job_budget, kpi_expectations = job
             job_text = f"{job_title} {job_desc}"
             
             # 2. Fetch all Freelancers
@@ -169,7 +173,8 @@ def run_match_for_job(job_id: int):
                     primary_skill=f_skill,
                     resume_text=resume_text,
                     kpi_achieved=kpi_achieved,
-                    proud_situation=proud_situation
+                    proud_situation=proud_situation,
+                    kpi_expectations=kpi_expectations
                 )
                 cursor.execute(match_query, (job_id, f_id, score))
                 
@@ -189,8 +194,8 @@ def run_match_for_freelancer(freelancer_id: int):
             
             f_id, f_name, f_skill, f_rate, resume_text, kpi_achieved, proud_situation = freelancer
             
-            # 2. Fetch all Jobs
-            cursor.execute("SELECT id, title, description, budget FROM jobs;")
+            # 2. Fetch all Jobs (including kpi_expectations)
+            cursor.execute("SELECT id, title, description, budget, kpi_expectations FROM jobs;")
             jobs = cursor.fetchall()
             
             # 3. Calculate match score and insert/update matches table
@@ -202,7 +207,7 @@ def run_match_for_freelancer(freelancer_id: int):
             """
             
             for job in jobs:
-                job_id, job_title, job_desc, job_budget = job
+                job_id, job_title, job_desc, job_budget, kpi_expectations = job
                 job_text = f"{job_title} {job_desc}"
                 
                 score = calculate_match_score(
@@ -212,7 +217,8 @@ def run_match_for_freelancer(freelancer_id: int):
                     primary_skill=f_skill,
                     resume_text=resume_text,
                     kpi_achieved=kpi_achieved,
-                    proud_situation=proud_situation
+                    proud_situation=proud_situation,
+                    kpi_expectations=kpi_expectations
                 )
                 cursor.execute(match_query, (job_id, f_id, score))
                 
