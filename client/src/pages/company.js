@@ -250,18 +250,31 @@ export default function CompanyHome() {
     }));
   };
 
-  // Trigger candidate action (Hire / Message / Shortlist)
-  const triggerAction = (candId, action) => {
+  // Trigger candidate action (Hire / Message)
+  const triggerAction = (cand, action) => {
+    const candId = cand.id;
     setActionStatuses(prev => ({
       ...prev,
       [`${candId}-${action}`]: true
     }));
+    
     setTimeout(() => {
       setActionStatuses(prev => ({
         ...prev,
         [`${candId}-${action}`]: false,
         [`${candId}-${action}-done`]: true
       }));
+
+      // Direct email integration via Mailto
+      const subject = action === 'hire'
+        ? `Job Offer: ${selectedJob.title} - AI Shop International`
+        : `Inquiry regarding your AI profile - AI Shop International`;
+
+      const body = action === 'hire'
+        ? `Hi ${cand.freelancer_name},\n\nWe reviewed your pre-vetted AI profile on AI Shop International and were highly impressed by your achievements (specifically: "${cand.kpi_achieved}").\n\nWe have approved you for our project: "${selectedJob.title}" (Hourly Budget: ₹${selectedJob.budget}/hr) and would love to schedule a direct introductory call.\n\nPlease let us know your availability.\n\nBest regards,\n${currentUser.full_name}`
+        : `Hi ${cand.freelancer_name},\n\nWe are currently looking for specialists for our "${selectedJob.title}" project and would like to ask a few questions regarding your experience in: ${cand.primary_skill}.\n\nLet us know if you have time for a quick message thread.\n\nBest regards,\n${currentUser.full_name}`;
+
+      window.location.href = `mailto:${cand.freelancer_email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
     }, 1200);
   };
 
@@ -578,19 +591,19 @@ export default function CompanyHome() {
                             )}
                             
                             <button 
-                              onClick={() => triggerAction(cand.id, 'message')}
+                              onClick={() => triggerAction(cand, 'message')}
                               disabled={actionStatuses[`${cand.id}-message-done`]}
                               className={`btn btn-secondary cand-action-btn ${actionStatuses[`${cand.id}-message-done`] ? 'done' : ''}`}
                             >
-                              {actionStatuses[`${cand.id}-message`] ? 'Sending...' : actionStatuses[`${cand.id}-message-done`] ? 'Chat Room Created ✓' : '💬 Message'}
+                              {actionStatuses[`${cand.id}-message`] ? 'Sending...' : actionStatuses[`${cand.id}-message-done`] ? 'Email Client Opened ✓' : '💬 Message'}
                             </button>
 
                             <button 
-                              onClick={() => triggerAction(cand.id, 'hire')}
+                              onClick={() => triggerAction(cand, 'hire')}
                               disabled={actionStatuses[`${cand.id}-hire-done`]}
                               className={`btn btn-primary cand-action-btn ${actionStatuses[`${cand.id}-hire-done`] ? 'done' : ''}`}
                             >
-                              {actionStatuses[`${cand.id}-hire`] ? 'Connecting...' : actionStatuses[`${cand.id}-hire-done`] ? 'Hired / Contact Sent ✓' : '🚀 Hire Candidate'}
+                              {actionStatuses[`${cand.id}-hire`] ? 'Connecting...' : actionStatuses[`${cand.id}-hire-done`] ? 'Email Offer Sent ✓' : '🚀 Hire Candidate'}
                             </button>
                           </div>
 
