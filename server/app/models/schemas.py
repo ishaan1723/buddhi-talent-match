@@ -51,8 +51,19 @@ class MatchResponse(BaseModel):
     experience: int
     hourly_rate: float
     created_at: datetime
-    kpi_achieved: Optional[str] = None
     proud_situation: Optional[str] = None
+
+class FreelancerMatchResponse(BaseModel):
+    id: int
+    job_id: int
+    freelancer_id: int
+    match_score: float
+    status: str
+    job_title: str
+    job_description: str
+    job_budget: float
+    job_kpi_expectations: Optional[str] = None
+    created_at: datetime
 
 
 # ---------------------------------------------------------------------------

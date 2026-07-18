@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException, status
 from typing import List
-from app.models.schemas import MatchResponse
+from app.models.schemas import MatchResponse, FreelancerMatchResponse
 from app.database.connection import get_db_cursor
 
 router = APIRouter(
@@ -82,6 +82,44 @@ def update_match_status(match_id: int, status: str):
                 "message": f"Match status successfully updated to {status}."
             }
             
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Database error occurred: {str(e)}"
+        )
+
+@router.get("/freelancer/all", response_model=List[FreelancerMatchResponse])
+def get_freelancer_matches(email: str):
+    """Retrieves all job matches for a specific freelancer, sorted by match percentage."""
+    try:
+        with get_db_cursor() as cursor:
+            query = """
+            SELECT m.id, m.job_id, m.freelancer_id, m.match_score, m.status,
+                   j.title, j.description, j.budget, j.kpi_expectations, m.created_at
+            FROM matches m
+            JOIN freelancers f ON m.freelancer_id = f.id
+            JOIN jobs j ON m.job_id = j.id
+            WHERE f.email = %s
+            ORDER BY m.match_score DESC;
+            """
+            cursor.execute(query, (email,))
+            rows = cursor.fetchall()
+            
+            matches = []
+            for row in rows:
+                matches.append(FreelancerMatchResponse(
+                    id=row[0],
+                    job_id=row[1],
+                    freelancer_id=row[2],
+                    match_score=float(row[3]),
+                    status=row[4],
+                    job_title=row[5],
+                    job_description=row[6],
+                    job_budget=float(row[7]),
+                    job_kpi_expectations=row[8],
+                    created_at=row[9]
+                ))
+            return matches
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
