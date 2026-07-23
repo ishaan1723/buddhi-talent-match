@@ -77,16 +77,16 @@ export default function FreelancerOnboarding() {
       }
     } catch (err) {
       console.warn("Autofill parser failed. Simulating local parse extraction.", err);
-      // Hardcoded fallback data extraction matching SIDDHARTH for demo presentation stability
+      // Hardcoded fallback data extraction matching Aarav Sharma for demo presentation stability
       setFormData({
-        name: "Siddharth Mehta",
-        email: "sid@example.com",
-        linkedin_url: "https://linkedin.com/in/sid-mehta-cv",
-        primary_skill: "Computer Vision, PyTorch, OpenCV, TensorRT",
+        name: "Aarav Sharma",
+        email: "aarav.sharma@example.com",
+        linkedin_url: "https://linkedin.com/in/aarav-sharma-ml",
+        primary_skill: "Python, PyTorch, TensorFlow, OpenCV, NumPy, Scikit-Learn",
         experience: 5,
         hourly_rate: 3200,
-        kpi_achieved: "Achieved defect detection classification accuracy >98.4% with inference times <32ms.",
-        proud_situation: "Redesigned CV model inference pipeline using TensorRT, saving $12,000/month in cloud GPU costs."
+        kpi_achieved: "Integrated OpenCV filters and PyTorch models to reduce processing latency by 35% on edge platforms.",
+        proud_situation: "Designed and trained convolutional neural networks (CNNs) for real-time defect detection and high-fidelity image segmentation."
       });
       setResumeFile(file);
       setParsingStage("Auto-Fill complete!");

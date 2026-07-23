@@ -349,17 +349,17 @@ export default function Dashboard() {
       const mockNewMatch = {
         id: newCandId,
         job_id: selectedJobId,
-        freelancer_name: bulkFile ? "Siddharth Mehta" : "Ishaan Jain",
-        freelancer_email: bulkFile ? "sid@example.com" : "17ishaanjain@gmail.com",
-        linkedin_url: bulkFile ? "https://linkedin.com/in/sid-mehta-cv" : "https://linkedin.com/in/ishaan-jain-ai",
-        primary_skill: bulkFile ? "Computer Vision, PyTorch, OpenCV" : "Python, LangChain, Vector Indexes",
+        freelancer_name: bulkFile ? "Aarav Sharma" : "Ishaan Jain",
+        freelancer_email: bulkFile ? "aarav.sharma@example.com" : "17ishaanjain@gmail.com",
+        linkedin_url: bulkFile ? "https://linkedin.com/in/aarav-sharma-ml" : "https://linkedin.com/in/ishaan-jain-ai",
+        primary_skill: bulkFile ? "Python, PyTorch, TensorFlow, OpenCV, NumPy, Scikit-Learn" : "Python, LangChain, Vector Indexes",
         experience: 5,
         hourly_rate: 3200.0,
         match_score: 96.5,
         status: "pending",
-        tags: bulkFile ? "CV, PyTorch, DeepLearning" : "RAG, LangChain, Senior",
+        tags: bulkFile ? "CV, PyTorch, OpenCV, DeepLearning, Lead" : "RAG, LangChain, Senior",
         created_at: new Date().toISOString(),
-        ai_reasoning: "Excellent alignment with target requirements. Hourly rate fits within job budget constraints."
+        ai_reasoning: "Excellent alignment with target requirements. Experience bounds match. Hourly rate fits within job budget constraints."
       };
       setMatches(prev => [mockNewMatch, ...prev]);
       
