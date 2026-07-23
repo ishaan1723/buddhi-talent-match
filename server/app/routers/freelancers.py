@@ -25,11 +25,14 @@ async def create_freelancer(
     hourly_rate: float = Form(...),
     kpi_achieved: Optional[str] = Form(None),
     proud_situation: Optional[str] = Form(None),
+    tags: Optional[str] = Form(""),
     resume: Optional[UploadFile] = File(None)
 ):
     resume_text = ""
+    resume_file_url = ""
     if resume:
         try:
+            # For local/demo simulation, we parse the text from the PDF file
             pdf_bytes = await resume.read()
             pdf_file = io.BytesIO(pdf_bytes)
             reader = pypdf.PdfReader(pdf_file)
@@ -39,15 +42,17 @@ async def create_freelancer(
                 if text:
                     extracted_pages.append(text)
             resume_text = "\n".join(extracted_pages)
+            # Store mock local path representing document storage
+            resume_file_url = f"/uploads/resumes/{resume.filename}"
         except Exception as e:
             logger.error(f"Error parsing resume PDF: {e}")
 
     try:
         with get_db_cursor() as cursor:
-            # Insert freelancer details into database including resume text
+            # Insert freelancer details into database including resume text, tags, and file url
             query = """
-            INSERT INTO freelancers (name, email, linkedin_url, primary_skill, experience, hourly_rate, resume_text, kpi_achieved, proud_situation)
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+            INSERT INTO freelancers (name, email, linkedin_url, primary_skill, experience, hourly_rate, resume_text, kpi_achieved, proud_situation, tags, resume_file_url)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
             RETURNING id, created_at;
             """
             cursor.execute(query, (
@@ -59,7 +64,9 @@ async def create_freelancer(
                 hourly_rate,
                 resume_text,
                 kpi_achieved,
-                proud_situation
+                proud_situation,
+                tags or "",
+                resume_file_url
             ))
             result = cursor.fetchone()
             f_id, created_at = result[0], result[1]
@@ -77,6 +84,8 @@ async def create_freelancer(
             hourly_rate=hourly_rate,
             kpi_achieved=kpi_achieved,
             proud_situation=proud_situation,
+            tags=tags or "",
+            resume_file_url=resume_file_url,
             created_at=created_at
         )
             
@@ -96,7 +105,7 @@ def list_freelancers():
     try:
         with get_db_cursor() as cursor:
             query = """
-            SELECT id, name, email, linkedin_url, primary_skill, experience, hourly_rate, created_at, kpi_achieved, proud_situation
+            SELECT id, name, email, linkedin_url, primary_skill, experience, hourly_rate, created_at, kpi_achieved, proud_situation, tags, resume_file_url
             FROM freelancers
             ORDER BY created_at DESC;
             """
@@ -115,7 +124,9 @@ def list_freelancers():
                     hourly_rate=float(row[6]),
                     created_at=row[7],
                     kpi_achieved=row[8],
-                    proud_situation=row[9]
+                    proud_situation=row[9],
+                    tags=row[10] or "",
+                    resume_file_url=row[11] or ""
                 ))
             return freelancers
             

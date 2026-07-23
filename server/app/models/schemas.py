@@ -11,6 +11,8 @@ class FreelancerBase(BaseModel):
     hourly_rate: float = Field(..., gt=0)
     kpi_achieved: Optional[str] = None
     proud_situation: Optional[str] = None
+    tags: Optional[str] = ""
+    resume_file_url: Optional[str] = ""
 
 class FreelancerCreate(FreelancerBase):
     pass
@@ -59,6 +61,8 @@ class MatchResponse(BaseModel):
     headline: Optional[str] = None
     portfolio_url: Optional[str] = None
     rating: Optional[float] = 5.0
+    tags: Optional[str] = ""
+    resume_file_url: Optional[str] = ""
     ai_reasoning: Optional[str] = None
 
 class FreelancerMatchResponse(BaseModel):
@@ -93,6 +97,8 @@ class CompanyApprovedMatchResponse(BaseModel):
     headline: Optional[str] = None
     portfolio_url: Optional[str] = None
     rating: Optional[float] = 5.0
+    tags: Optional[str] = ""
+    resume_file_url: Optional[str] = ""
     ai_reasoning: Optional[str] = None
 
 

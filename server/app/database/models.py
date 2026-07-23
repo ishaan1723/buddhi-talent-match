@@ -15,9 +15,14 @@ CREATE TABLE IF NOT EXISTS freelancers (
     primary_skill VARCHAR(100) NOT NULL,
     experience INTEGER NOT NULL,
     hourly_rate NUMERIC(10, 2) NOT NULL,
+    resume_text TEXT,
+    kpi_achieved TEXT,
+    proud_situation TEXT,
     headline VARCHAR(150),
     portfolio_url VARCHAR(255),
     rating NUMERIC(3, 2) DEFAULT 5.0,
+    tags TEXT DEFAULT '',
+    resume_file_url VARCHAR(255) DEFAULT '',
     embedding double precision[],
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
@@ -84,6 +89,8 @@ def initialize_tables():
             cursor.execute("ALTER TABLE freelancers ADD COLUMN IF NOT EXISTS headline VARCHAR(150);")
             cursor.execute("ALTER TABLE freelancers ADD COLUMN IF NOT EXISTS portfolio_url VARCHAR(255);")
             cursor.execute("ALTER TABLE freelancers ADD COLUMN IF NOT EXISTS rating NUMERIC(3, 2) DEFAULT 5.0;")
+            cursor.execute("ALTER TABLE freelancers ADD COLUMN IF NOT EXISTS tags TEXT DEFAULT '';")
+            cursor.execute("ALTER TABLE freelancers ADD COLUMN IF NOT EXISTS resume_file_url VARCHAR(255) DEFAULT '';")
             cursor.execute("ALTER TABLE matches ADD COLUMN IF NOT EXISTS ai_reasoning TEXT;")
         logger.info("Database schemas and tables checked/initialized successfully.")
     except Exception as e:

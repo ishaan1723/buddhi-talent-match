@@ -3,7 +3,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.database.connection import init_db_pool, close_db_pool
 from app.database.models import initialize_tables
-from app.routers import freelancers, jobs, matches, auth
+from app.routers import freelancers, jobs, matches, auth, parser
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -26,6 +26,7 @@ app.include_router(auth.router)
 app.include_router(freelancers.router)
 app.include_router(jobs.router)
 app.include_router(matches.router)
+app.include_router(parser.router)
 
 # Configure CORS for Next.js frontend
 app.add_middleware(

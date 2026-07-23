@@ -286,6 +286,7 @@ export default function CompanyHome() {
         cand.freelancer_name.toLowerCase().includes(query) ||
         cand.primary_skill.toLowerCase().includes(query) ||
         cand.headline.toLowerCase().includes(query) ||
+        (cand.tags && cand.tags.toLowerCase().includes(query)) ||
         (cand.ai_reasoning && cand.ai_reasoning.toLowerCase().includes(query))
       );
     })
@@ -536,6 +537,45 @@ export default function CompanyHome() {
                               <div>
                                 <h4>{cand.freelancer_name}</h4>
                                 <span className="cand-headline">{cand.headline || "AI / Machine Learning Specialist"}</span>
+                                
+                                {/* Dynamic Tags Row */}
+                                {cand.tags && (
+                                  <div className="cand-tags-row" style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', marginTop: '6px' }}>
+                                    {cand.tags.split(',').map((tag, tIdx) => {
+                                      const trimmed = tag.trim();
+                                      if (!trimmed) return null;
+                                      return (
+                                        <span 
+                                          key={tIdx} 
+                                          className="cand-tag-pill" 
+                                          style={{
+                                            fontSize: '11px',
+                                            padding: '2px 8px',
+                                            borderRadius: '99px',
+                                            fontWeight: '600',
+                                            background: trimmed.toLowerCase().includes('senior') || trimmed.toLowerCase().includes('lead') 
+                                              ? 'rgba(201, 162, 39, 0.1)' 
+                                              : trimmed.toLowerCase().includes('rag') || trimmed.toLowerCase().includes('cv') || trimmed.toLowerCase().includes('nlp')
+                                                ? 'rgba(91, 79, 232, 0.1)'
+                                                : 'rgba(74, 85, 104, 0.08)',
+                                            color: trimmed.toLowerCase().includes('senior') || trimmed.toLowerCase().includes('lead')
+                                              ? '#b58e12'
+                                              : trimmed.toLowerCase().includes('rag') || trimmed.toLowerCase().includes('cv') || trimmed.toLowerCase().includes('nlp')
+                                                ? 'var(--indigo)'
+                                                : '#4a5568',
+                                            border: trimmed.toLowerCase().includes('senior') || trimmed.toLowerCase().includes('lead')
+                                              ? '1px solid rgba(201, 162, 39, 0.2)'
+                                              : trimmed.toLowerCase().includes('rag') || trimmed.toLowerCase().includes('cv') || trimmed.toLowerCase().includes('nlp')
+                                                ? '1px solid rgba(91, 79, 232, 0.2)'
+                                                : '1px solid rgba(74, 85, 104, 0.15)'
+                                          }}
+                                        >
+                                          #{trimmed}
+                                        </span>
+                                      );
+                                    })}
+                                  </div>
+                                )}
                               </div>
                             </div>
 
