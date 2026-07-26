@@ -627,7 +627,14 @@ export default function CompanyHome() {
                                {[
                                  { label: 'KPI Fit', val: Math.min(100, Math.round(cand.match_score) + 2) },
                                  { label: 'Skills Fit', val: Math.max(0, Math.round(cand.match_score) - 1) },
-                                 { label: 'Budget Fit', val: Math.min(100, Math.round(cand.match_score) + 1) }
+                                 { 
+                                   label: 'Budget Fit', 
+                                   val: selectedJob?.budget 
+                                     ? (cand.hourly_rate <= selectedJob.budget 
+                                         ? 100 
+                                         : Math.max(10, Math.round(100 - ((cand.hourly_rate - selectedJob.budget) / selectedJob.budget) * 100)))
+                                     : 100 
+                                 }
                                ].map((fit, idx) => (
                                  <div key={fit.label} style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                                    <span style={{ width: '65px', fontSize: '11px', fontWeight: '600', color: '#475569' }}>{fit.label}</span>

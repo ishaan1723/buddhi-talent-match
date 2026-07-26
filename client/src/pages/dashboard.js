@@ -851,7 +851,14 @@ export default function Dashboard() {
                       {[
                         { label: 'KPI Fit', val: Math.min(100, Math.round(candidate.match_score) + 2) },
                         { label: 'Skills Fit', val: Math.max(0, Math.round(candidate.match_score) - 1) },
-                        { label: 'Budget Fit', val: Math.min(100, Math.round(candidate.match_score) + 1) }
+                        { 
+                          label: 'Budget Fit', 
+                          val: getSelectedJob().budget 
+                            ? (candidate.hourly_rate <= getSelectedJob().budget 
+                                ? 100 
+                                : Math.max(10, Math.round(100 - ((candidate.hourly_rate - getSelectedJob().budget) / getSelectedJob().budget) * 100)))
+                            : 100 
+                        }
                       ].map((fit, idx) => (
                         <div key={fit.label} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                           <span style={{ width: '55px', fontSize: '10px', fontWeight: '600', color: '#334155' }}>{fit.label}</span>
