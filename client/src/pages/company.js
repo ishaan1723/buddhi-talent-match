@@ -35,6 +35,11 @@ export default function CompanyHome() {
   const [sortBy, setSortBy] = useState('match_score');
   const [expandedReasoning, setExpandedReasoning] = useState({});
   const [actionStatuses, setActionStatuses] = useState({});
+
+  // B2B Comparison & Animation states
+  const [compareList, setCompareList] = useState([]);
+  const [showCompareModal, setShowCompareModal] = useState(false);
+  const [animateBars, setAnimateBars] = useState(false);
   
   // Loading & Error States
   const [loadingJobs, setLoadingJobs] = useState(false);
@@ -147,6 +152,8 @@ export default function CompanyHome() {
     setLoadingCandidates(true);
     setSearchQuery('');
     setExpandedReasoning({});
+    setCompareList([]); // Reset comparison selections
+    setAnimateBars(false); // Reset animation state
     
     try {
       const res = await fetchWithTimeout(`${API_URL}/api/matches/company/job/${job.id}/approved`, { timeout: 3000 });
@@ -214,6 +221,7 @@ export default function CompanyHome() {
       }
     } finally {
       setLoadingCandidates(false);
+      setTimeout(() => setAnimateBars(true), 150);
     }
   };
 
@@ -530,60 +538,113 @@ export default function CompanyHome() {
                           
                           {/* Top Row: Name, headline, rating, match percentage */}
                           <div className="cand-card-top">
-                            <div className="cand-profile-row">
-                              <div className="avatar-circle">
-                                {cand.freelancer_name.split(' ').map(n => n[0]).join('')}
-                              </div>
-                              <div>
-                                <h4>{cand.freelancer_name}</h4>
-                                <span className="cand-headline">{cand.headline || "AI / Machine Learning Specialist"}</span>
-                                
-                                {/* Dynamic Tags Row */}
-                                {cand.tags && (
-                                  <div className="cand-tags-row" style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', marginTop: '6px' }}>
-                                    {cand.tags.split(',').map((tag, tIdx) => {
-                                      const trimmed = tag.trim();
-                                      if (!trimmed) return null;
-                                      return (
-                                        <span 
-                                          key={tIdx} 
-                                          className="cand-tag-pill" 
-                                          style={{
-                                            fontSize: '11px',
-                                            padding: '2px 8px',
-                                            borderRadius: '99px',
-                                            fontWeight: '600',
-                                            background: trimmed.toLowerCase().includes('senior') || trimmed.toLowerCase().includes('lead') 
-                                              ? 'rgba(201, 162, 39, 0.1)' 
-                                              : trimmed.toLowerCase().includes('rag') || trimmed.toLowerCase().includes('cv') || trimmed.toLowerCase().includes('nlp')
-                                                ? 'rgba(91, 79, 232, 0.1)'
-                                                : 'rgba(74, 85, 104, 0.08)',
-                                            color: trimmed.toLowerCase().includes('senior') || trimmed.toLowerCase().includes('lead')
-                                              ? '#b58e12'
-                                              : trimmed.toLowerCase().includes('rag') || trimmed.toLowerCase().includes('cv') || trimmed.toLowerCase().includes('nlp')
-                                                ? 'var(--indigo)'
-                                                : '#4a5568',
-                                            border: trimmed.toLowerCase().includes('senior') || trimmed.toLowerCase().includes('lead')
-                                              ? '1px solid rgba(201, 162, 39, 0.2)'
-                                              : trimmed.toLowerCase().includes('rag') || trimmed.toLowerCase().includes('cv') || trimmed.toLowerCase().includes('nlp')
-                                                ? '1px solid rgba(91, 79, 232, 0.2)'
-                                                : '1px solid rgba(74, 85, 104, 0.15)'
-                                          }}
-                                        >
-                                          #{trimmed}
-                                        </span>
-                                      );
-                                    })}
-                                  </div>
-                                )}
-                              </div>
-                            </div>
+                            <div className="cand-profile-row" style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                               
+                               {/* B2B Compare Checkbox */}
+                               <div className="compare-checkbox-wrap" style={{ marginRight: '4px' }}>
+                                 <input 
+                                   type="checkbox"
+                                   id={`compare-${cand.id}`}
+                                   checked={compareList.some(item => item.id === cand.id)}
+                                   onChange={(e) => {
+                                     if (e.target.checked) {
+                                       if (compareList.length >= 4) {
+                                         alert("You can compare a maximum of 4 candidates at once.");
+                                         return;
+                                       }
+                                       setCompareList(prev => [...prev, cand]);
+                                     } else {
+                                       setCompareList(prev => prev.filter(item => item.id !== cand.id));
+                                     }
+                                   }}
+                                   style={{
+                                     width: '18px',
+                                     height: '18px',
+                                     cursor: 'pointer',
+                                     accentColor: 'var(--indigo)'
+                                   }}
+                                 />
+                               </div>
 
-                            <div className="cand-score-box">
-                              <span className="score-percentage">{Math.round(cand.match_score)}%</span>
-                              <span className="score-lbl">AI Match</span>
-                            </div>
-                          </div>
+                               <div className="avatar-circle">
+                                 {cand.freelancer_name.split(' ').map(n => n[0]).join('')}
+                               </div>
+                               <div>
+                                 <h4>{cand.freelancer_name}</h4>
+                                 <span className="cand-headline">{cand.headline || "AI / Machine Learning Specialist"}</span>
+                                 
+                                 {/* Dynamic Tags Row */}
+                                 {cand.tags && (
+                                   <div className="cand-tags-row" style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', marginTop: '6px' }}>
+                                     {cand.tags.split(',').map((tag, tIdx) => {
+                                       const trimmed = tag.trim();
+                                       if (!trimmed) return null;
+                                       return (
+                                         <span 
+                                           key={tIdx} 
+                                           className="cand-tag-pill" 
+                                           style={{
+                                             fontSize: '11px',
+                                             padding: '2px 8px',
+                                             borderRadius: '99px',
+                                             fontWeight: '600',
+                                             background: trimmed.toLowerCase().includes('senior') || trimmed.toLowerCase().includes('lead') 
+                                               ? 'rgba(201, 162, 39, 0.1)' 
+                                               : trimmed.toLowerCase().includes('rag') || trimmed.toLowerCase().includes('cv') || trimmed.toLowerCase().includes('nlp')
+                                                 ? 'rgba(91, 79, 232, 0.1)'
+                                                 : 'rgba(74, 85, 104, 0.08)',
+                                             color: trimmed.toLowerCase().includes('senior') || trimmed.toLowerCase().includes('lead')
+                                               ? '#b58e12'
+                                               : trimmed.toLowerCase().includes('rag') || trimmed.toLowerCase().includes('cv') || trimmed.toLowerCase().includes('nlp')
+                                                 ? 'var(--indigo)'
+                                                 : '#4a5568',
+                                             border: trimmed.toLowerCase().includes('senior') || trimmed.toLowerCase().includes('lead')
+                                               ? '1px solid rgba(201, 162, 39, 0.2)'
+                                               : trimmed.toLowerCase().includes('rag') || trimmed.toLowerCase().includes('cv') || trimmed.toLowerCase().includes('nlp')
+                                                 ? '1px solid rgba(91, 79, 232, 0.2)'
+                                                 : '1px solid rgba(74, 85, 104, 0.15)'
+                                           }}
+                                         >
+                                           #{trimmed}
+                                         </span>
+                                       );
+                                     })}
+                                   </div>
+                                 )}
+                               </div>
+                             </div>
+
+                             <div className="cand-score-box">
+                               <span className="score-percentage">{Math.round(cand.match_score)}%</span>
+                               <span className="score-lbl">AI Match</span>
+                             </div>
+                           </div>
+
+                           {/* Match Breakdown animated bars */}
+                           <div className="match-breakdown-section" style={{ margin: '14px 0', padding: '12px 16px', background: '#f8fafc', borderRadius: '10px', border: '1px solid #e2e8f0' }}>
+                             <h5 style={{ fontSize: '11px', fontWeight: '700', color: '#64748b', textTransform: 'uppercase', marginBottom: '8px', letterSpacing: '0.5px' }}>Match Score Breakdown</h5>
+                             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                               {[
+                                 { label: 'KPI Fit', val: Math.min(100, Math.round(cand.match_score) + 2) },
+                                 { label: 'Skills Fit', val: Math.max(0, Math.round(cand.match_score) - 1) },
+                                 { label: 'Budget Fit', val: Math.min(100, Math.round(cand.match_score) + 1) }
+                               ].map((fit, idx) => (
+                                 <div key={fit.label} style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                                   <span style={{ width: '65px', fontSize: '11px', fontWeight: '600', color: '#475569' }}>{fit.label}</span>
+                                   <div style={{ flex: 1, height: '5px', background: '#e2e8f0', borderRadius: '99px', overflow: 'hidden' }}>
+                                     <div style={{ 
+                                       width: animateBars ? `${fit.val}%` : '0%', 
+                                       height: '100%', 
+                                       background: 'var(--indigo)', 
+                                       borderRadius: '99px', 
+                                       transition: `width 1.2s cubic-bezier(0.16, 1, 0.3, 1) ${idx * 150}ms` 
+                                     }}></div>
+                                   </div>
+                                   <span style={{ fontSize: '11px', fontWeight: '700', color: '#475569', width: '32px', textAlign: 'right' }}>{animateBars ? `${fit.val}%` : '0%'}</span>
+                                 </div>
+                               ))}
+                             </div>
+                           </div>
 
                           {/* Availability Badge */}
                           <div style={{ marginBottom: '12px' }}>
@@ -700,6 +761,221 @@ export default function CompanyHome() {
         )}
 
       </main>
+
+      {/* Persistent Bottom B2B Comparison Tray */}
+      {compareList.length > 0 && (
+        <div className="compare-bar-tray" style={{
+          position: 'fixed',
+          bottom: 0,
+          left: 0,
+          right: 0,
+          backgroundColor: 'rgba(11, 14, 23, 0.95)',
+          backdropFilter: 'blur(10px)',
+          borderTop: '1px solid var(--ink-line)',
+          color: '#ffffff',
+          padding: '16px 40px',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          zIndex: 1000,
+          animation: 'fadeIn 0.2s ease-out'
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+            <span style={{ fontSize: '13px', fontWeight: '700', color: 'var(--gold)' }}>⚖️ COMPARE POOL:</span>
+            <div style={{ display: 'flex', gap: '10px' }}>
+              {compareList.map(cand => (
+                <div key={cand.id} style={{
+                  fontSize: '12px',
+                  background: 'rgba(255,255,255,0.08)',
+                  padding: '4px 12px',
+                  borderRadius: '99px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  border: '1px solid rgba(255,255,255,0.15)'
+                }}>
+                  <span>{cand.freelancer_name}</span>
+                  <button 
+                    onClick={() => setCompareList(prev => prev.filter(item => item.id !== cand.id))}
+                    style={{ background: 'none', border: 'none', color: '#ffcdd2', cursor: 'pointer', fontWeight: 'bold' }}
+                  >
+                    ×
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+          <div style={{ display: 'flex', gap: '12px' }}>
+            <button 
+              onClick={() => setCompareList([])}
+              className="btn" 
+              style={{ fontSize: '13px', padding: '8px 16px', background: 'transparent', color: '#cbd5e1', border: '1px solid rgba(255,255,255,0.2)', borderRadius: '8px' }}
+            >
+              Clear
+            </button>
+            <button 
+              onClick={() => setShowCompareModal(true)}
+              className="btn" 
+              disabled={compareList.length < 2}
+              style={{
+                fontSize: '13px',
+                padding: '8px 24px',
+                background: compareList.length < 2 ? '#475569' : 'var(--indigo)',
+                color: '#ffffff',
+                border: 'none',
+                borderRadius: '8px',
+                fontWeight: '600',
+                cursor: compareList.length < 2 ? 'not-allowed' : 'pointer',
+                boxShadow: compareList.length < 2 ? 'none' : '0 4px 14px rgba(91,79,232,0.4)'
+              }}
+            >
+              Compare Selected ({compareList.length})
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* B2B Side-by-Side Comparison Matrix Modal */}
+      {showCompareModal && (
+        <div className="modal-overlay" onClick={() => setShowCompareModal(false)} style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: 'rgba(11, 14, 23, 0.6)',
+          backdropFilter: 'blur(10px)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 10000,
+          padding: '24px'
+        }}>
+          <div className="compare-modal-content" onClick={(e) => e.stopPropagation()} style={{
+            backgroundColor: '#ffffff',
+            borderRadius: '16px',
+            width: '100%',
+            maxWidth: '1100px',
+            maxHeight: '90vh',
+            overflowY: 'auto',
+            boxShadow: '0 20px 50px rgba(0,0,0,0.15)',
+            border: '1px solid var(--paper-line)',
+            animation: 'fadeIn 0.2s ease-out',
+            display: 'flex',
+            flexDirection: 'column'
+          }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '24px', borderBottom: '1px solid var(--paper-line)' }}>
+              <h3 style={{ fontSize: '20px', color: 'var(--text)', margin: 0 }}>⚖️ Candidate Comparison Matrix</h3>
+              <button 
+                onClick={() => setShowCompareModal(false)} 
+                style={{ background: 'none', border: 'none', fontSize: '28px', cursor: 'pointer', color: 'var(--text-muted)' }}
+              >
+                ×
+              </button>
+            </div>
+            
+            <div style={{ padding: '24px', overflowX: 'auto' }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13.5px', textAlign: 'left' }}>
+                <thead>
+                  <tr style={{ borderBottom: '2px solid var(--paper-line)' }}>
+                    <th style={{ padding: '16px 12px', color: 'var(--text-muted)', fontWeight: '700', width: '180px' }}>Criteria</th>
+                    {compareList.map(cand => (
+                      <th key={cand.id} style={{ padding: '16px 12px', minWidth: '220px' }}>
+                        <div style={{ fontWeight: '800', fontSize: '15px', color: 'var(--text)' }}>{cand.freelancer_name}</div>
+                        <div style={{ fontSize: '11px', color: 'var(--indigo)', fontWeight: '600', marginTop: '2px' }}>{cand.headline || "AI Developer"}</div>
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr style={{ borderBottom: '1px solid var(--paper-line)' }}>
+                    <td style={{ padding: '14px 12px', fontWeight: '700', color: 'var(--text-muted)' }}>AI Match Score</td>
+                    {compareList.map(cand => (
+                      <td key={cand.id} style={{ padding: '14px 12px' }}>
+                        <span style={{ fontSize: '16px', fontWeight: '800', color: 'var(--indigo)' }}>{Math.round(cand.match_score)}%</span>
+                        <div style={{ fontSize: '10px', color: 'var(--text-muted)', marginTop: '2px' }}>Vetted Match</div>
+                      </td>
+                    ))}
+                  </tr>
+                  <tr style={{ borderBottom: '1px solid var(--paper-line)' }}>
+                    <td style={{ padding: '14px 12px', fontWeight: '700', color: 'var(--text-muted)' }}>Target Hourly Rate</td>
+                    {compareList.map(cand => (
+                      <td key={cand.id} style={{ padding: '14px 12px', fontWeight: '700', color: 'var(--text)' }}>
+                        ₹{cand.hourly_rate.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}/hr
+                      </td>
+                    ))}
+                  </tr>
+                  <tr style={{ borderBottom: '1px solid var(--paper-line)' }}>
+                    <td style={{ padding: '14px 12px', fontWeight: '700', color: 'var(--text-muted)' }}>AI Experience</td>
+                    {compareList.map(cand => (
+                      <td key={cand.id} style={{ padding: '14px 12px', color: 'var(--text)' }}>
+                        <strong>{cand.experience} Years</strong>
+                      </td>
+                    ))}
+                  </tr>
+                  <tr style={{ borderBottom: '1px solid var(--paper-line)' }}>
+                    <td style={{ padding: '14px 12px', fontWeight: '700', color: 'var(--text-muted)' }}>Availability</td>
+                    {compareList.map(cand => (
+                      <td key={cand.id} style={{ padding: '14px 12px' }}>
+                        <span style={{
+                          padding: '2px 8px',
+                          borderRadius: '12px',
+                          fontSize: '11px',
+                          fontWeight: '600',
+                          backgroundColor: cand.availability_status === 'Not Available' ? '#ffebee' : cand.availability_status === 'Available in 2 Weeks' ? '#fff8e1' : '#e8f5e9',
+                          color: cand.availability_status === 'Not Available' ? '#c62828' : cand.availability_status === 'Available in 2 Weeks' ? '#f57f17' : '#2e7d32'
+                        }}>
+                          {cand.availability_status || "Ready to Start"}
+                        </span>
+                      </td>
+                    ))}
+                  </tr>
+                  <tr style={{ borderBottom: '1px solid var(--paper-line)' }}>
+                    <td style={{ padding: '14px 12px', fontWeight: '700', color: 'var(--text-muted)' }}>Primary Focus & Skills</td>
+                    {compareList.map(cand => (
+                      <td key={cand.id} style={{ padding: '14px 12px' }}>
+                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
+                          {cand.primary_skill.split(',').map((skill, sIdx) => (
+                            <span key={sIdx} style={{ fontSize: '10px', background: 'var(--indigo-soft)', color: 'var(--indigo)', padding: '2px 6px', borderRadius: '4px', fontWeight: '600' }}>
+                              {skill.trim()}
+                            </span>
+                          ))}
+                        </div>
+                      </td>
+                    ))}
+                  </tr>
+                  <tr style={{ borderBottom: '1px solid var(--paper-line)' }}>
+                    <td style={{ padding: '14px 12px', fontWeight: '700', color: 'var(--text-muted)' }}>Key Target KPI Achieved</td>
+                    {compareList.map(cand => (
+                      <td key={cand.id} style={{ padding: '14px 12px', color: 'var(--text)', lineHeight: '1.4' }}>
+                        "{cand.kpi_achieved || "Not provided"}"
+                      </td>
+                    ))}
+                  </tr>
+                  <tr style={{ borderBottom: '1px solid var(--paper-line)' }}>
+                    <td style={{ padding: '14px 12px', fontWeight: '700', color: 'var(--text-muted)' }}>Challenge Turned Around</td>
+                    {compareList.map(cand => (
+                      <td key={cand.id} style={{ padding: '14px 12px', color: 'var(--text-muted)', fontSize: '13px', fontStyle: 'italic', lineHeight: '1.4' }}>
+                        "{cand.proud_situation || "Not provided"}"
+                      </td>
+                    ))}
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div style={{ padding: '20px 24px', borderTop: '1px solid var(--paper-line)', display: 'flex', justifyContent: 'flex-end', gap: '12px' }}>
+              <button 
+                onClick={() => setShowCompareModal(false)} 
+                className="btn btn-secondary" 
+                style={{ padding: '10px 20px', borderRadius: '8px', fontSize: '13.5px' }}
+              >
+                Close Matrix
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* ---------------- Footer ---------------- */}
       <footer className="footer">

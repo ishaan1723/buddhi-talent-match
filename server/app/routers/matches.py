@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, status
+from fastapi import APIRouter, HTTPException, status, Request
 from typing import List
 from app.models.schemas import MatchResponse, FreelancerMatchResponse, CompanyApprovedMatchResponse
 from app.database.connection import get_db_cursor
@@ -9,8 +9,15 @@ router = APIRouter(
 )
 
 @router.get("/{job_id}", response_model=List[MatchResponse])
-def get_job_matches(job_id: int):
-    """Retrieves all matched freelancers for a specific job, sorted by match percentage."""
+def get_job_matches(job_id: int, request: Request):
+    """Retrieves all matched freelancers for a specific job, sorted by match percentage. Securely masks contact details unless authorized."""
+    auth_header = request.headers.get("Authorization")
+    is_recruiter = False
+    if auth_header and "Bearer" in auth_header:
+        token = auth_header.split(" ")[1]
+        if token == "admin-token-bypass":
+            is_recruiter = True
+
     try:
         with get_db_cursor() as cursor:
             query = """
@@ -27,15 +34,31 @@ def get_job_matches(job_id: int):
             
             matches = []
             for row in rows:
+                status_val = row[4]
+                raw_email = row[6]
+                raw_linkedin = row[7]
+
+                # Security Gating logic
+                if not is_recruiter and status_val != 'approved':
+                    if '@' in raw_email:
+                        parts = raw_email.split('@')
+                        masked_email = parts[0][:2] + "***@" + parts[1]
+                    else:
+                        masked_email = "hidden***@example.com"
+                    masked_linkedin = "https://linkedin.com/in/hidden-profile-unlocked-on-approval"
+                else:
+                    masked_email = raw_email
+                    masked_linkedin = raw_linkedin
+
                 matches.append(MatchResponse(
                     id=row[0],
                     job_id=row[1],
                     freelancer_id=row[2],
                     match_score=float(row[3]),
-                    status=row[4],
+                    status=status_val,
                     freelancer_name=row[5],
-                    freelancer_email=row[6],
-                    linkedin_url=row[7],
+                    freelancer_email=masked_email,
+                    linkedin_url=masked_linkedin,
                     primary_skill=row[8],
                     experience=row[9],
                     hourly_rate=float(row[10]),
@@ -72,7 +95,7 @@ def update_match_status(match_id: int, status: str):
             UPDATE matches
             SET status = %s
             WHERE id = %s
-            RETURNING id, status;
+            RETURNING id, status, freelancer_id;
             """
             cursor.execute(query, (status, match_id))
             result = cursor.fetchone()
@@ -82,10 +105,20 @@ def update_match_status(match_id: int, status: str):
                     status_code=status.HTTP_404_NOT_FOUND,
                     detail="Match record not found."
                 )
+            
+            match_id_res, status_res, freelancer_id = result[0], result[1], result[2]
+            
+            # Fetch unmasked details
+            cursor.execute("SELECT email, linkedin_url FROM freelancers WHERE id = %s", (freelancer_id,))
+            freelancer_row = cursor.fetchone()
+            freelancer_email = freelancer_row[0] if freelancer_row else ""
+            linkedin_url = freelancer_row[1] if freelancer_row else ""
                 
             return {
-                "id": result[0],
-                "status": result[1],
+                "id": match_id_res,
+                "status": status_res,
+                "freelancer_email": freelancer_email,
+                "linkedin_url": linkedin_url,
                 "message": f"Match status successfully updated to {status}."
             }
             

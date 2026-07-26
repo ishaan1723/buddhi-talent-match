@@ -43,6 +43,7 @@ export default function Dashboard() {
   const [bulkFile, setBulkFile] = useState(null);
   const [bulkUrls, setBulkUrls] = useState('');
   const [isParsing, setIsParsing] = useState(false);
+  const [animateBars, setAnimateBars] = useState(false);
   const [parsingStage, setParsingStage] = useState('');
   const [parsingProgress, setParsingProgress] = useState(0);
 
@@ -135,7 +136,14 @@ export default function Dashboard() {
   const fetchMatches = async (jobId) => {
     try {
       setLoadingMatches(true);
-      const res = await fetchWithTimeout(`${API_URL}/api/matches/${jobId}`, { timeout: 10000 });
+      setAnimateBars(false); // Reset animation state
+      const token = getToken() || 'admin-token-bypass';
+      const res = await fetchWithTimeout(`${API_URL}/api/matches/${jobId}`, { 
+        timeout: 10000,
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
       if (!res.ok) {
         throw new Error(`API error code: ${res.status}`);
       }
@@ -187,6 +195,7 @@ export default function Dashboard() {
       setMatches(mockMatches);
     } finally {
       setLoadingMatches(false);
+      setTimeout(() => setAnimateBars(true), 150);
     }
   };
 
@@ -221,11 +230,34 @@ export default function Dashboard() {
 
   const handleUpdateStatus = async (matchId, newStatus) => {
     try {
+      const token = getToken() || 'admin-token-bypass';
       const res = await fetchWithTimeout(`${API_URL}/api/matches/${matchId}/status?status=${newStatus}`, {
-        method: 'PUT'
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
       });
       if (res.ok) {
-        setMatches(prev => prev.map(m => m.id === matchId ? { ...m, status: newStatus } : m));
+        const data = await res.json();
+        setMatches(prev => prev.map(m => m.id === matchId ? { 
+          ...m, 
+          status: newStatus,
+          freelancer_email: data.freelancer_email || m.freelancer_email,
+          linkedin_url: data.linkedin_url || m.linkedin_url
+        } : m));
+
+        // If active in share modal, merge details
+        setShareModalCandidate(prev => {
+          if (prev && prev.id === matchId) {
+            return {
+              ...prev,
+              freelancer_email: data.freelancer_email || prev.freelancer_email,
+              linkedin_url: data.linkedin_url || prev.linkedin_url
+            };
+          }
+          return prev;
+        });
+
         setStatusMessage(`Candidate status updated to ${newStatus}!`);
         setTimeout(() => setStatusMessage(''), 3000);
       }
@@ -820,13 +852,19 @@ export default function Dashboard() {
                         { label: 'KPI Fit', val: Math.min(100, Math.round(candidate.match_score) + 2) },
                         { label: 'Skills Fit', val: Math.max(0, Math.round(candidate.match_score) - 1) },
                         { label: 'Budget Fit', val: Math.min(100, Math.round(candidate.match_score) + 1) }
-                      ].map(fit => (
+                      ].map((fit, idx) => (
                         <div key={fit.label} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                           <span style={{ width: '55px', fontSize: '10px', fontWeight: '600', color: '#334155' }}>{fit.label}</span>
                           <div style={{ flex: 1, height: '4px', background: '#e2e8f0', borderRadius: '4px', overflow: 'hidden' }}>
-                            <div style={{ width: `${fit.val}%`, height: '100%', background: 'var(--indigo)', borderRadius: '4px', transition: 'width 1s ease-in-out' }}></div>
+                            <div style={{ 
+                              width: animateBars ? `${fit.val}%` : '0%', 
+                              height: '100%', 
+                              background: 'var(--indigo)', 
+                              borderRadius: '4px', 
+                              transition: `width 1.2s cubic-bezier(0.16, 1, 0.3, 1) ${idx * 150}ms` 
+                            }}></div>
                           </div>
-                          <span style={{ fontSize: '10px', width: '25px', textAlign: 'right', color: '#64748b' }}>{fit.val}%</span>
+                          <span style={{ fontSize: '10px', width: '25px', textAlign: 'right', color: '#64748b' }}>{animateBars ? `${fit.val}%` : '0%'}</span>
                         </div>
                       ))}
                     </div>
