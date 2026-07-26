@@ -13,6 +13,7 @@ class FreelancerBase(BaseModel):
     proud_situation: Optional[str] = None
     tags: Optional[str] = ""
     resume_file_url: Optional[str] = ""
+    availability_status: Optional[str] = "ready"
 
 class FreelancerCreate(FreelancerBase):
     pass
@@ -63,6 +64,7 @@ class MatchResponse(BaseModel):
     rating: Optional[float] = 5.0
     tags: Optional[str] = ""
     resume_file_url: Optional[str] = ""
+    availability_status: Optional[str] = "ready"
     ai_reasoning: Optional[str] = None
 
 class FreelancerMatchResponse(BaseModel):
@@ -99,6 +101,7 @@ class CompanyApprovedMatchResponse(BaseModel):
     rating: Optional[float] = 5.0
     tags: Optional[str] = ""
     resume_file_url: Optional[str] = ""
+    availability_status: Optional[str] = "ready"
     ai_reasoning: Optional[str] = None
 
 

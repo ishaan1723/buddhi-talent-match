@@ -1,6 +1,7 @@
 from fastapi import APIRouter, HTTPException, status, UploadFile, File, Form
 from typing import List, Optional
 from app.models.schemas import FreelancerResponse
+from pydantic import BaseModel
 from app.database.connection import get_db_cursor
 from app.services.matching import run_match_for_freelancer
 import psycopg2
@@ -51,8 +52,8 @@ async def create_freelancer(
         with get_db_cursor() as cursor:
             # Insert freelancer details into database including resume text, tags, and file url
             query = """
-            INSERT INTO freelancers (name, email, linkedin_url, primary_skill, experience, hourly_rate, resume_text, kpi_achieved, proud_situation, tags, resume_file_url)
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+            INSERT INTO freelancers (name, email, linkedin_url, primary_skill, experience, hourly_rate, resume_text, kpi_achieved, proud_situation, tags, resume_file_url, availability_status)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, 'ready')
             RETURNING id, created_at;
             """
             cursor.execute(query, (
@@ -86,6 +87,7 @@ async def create_freelancer(
             proud_situation=proud_situation,
             tags=tags or "",
             resume_file_url=resume_file_url,
+            availability_status='ready',
             created_at=created_at
         )
             
@@ -105,7 +107,7 @@ def list_freelancers():
     try:
         with get_db_cursor() as cursor:
             query = """
-            SELECT id, name, email, linkedin_url, primary_skill, experience, hourly_rate, created_at, kpi_achieved, proud_situation, tags, resume_file_url
+            SELECT id, name, email, linkedin_url, primary_skill, experience, hourly_rate, created_at, kpi_achieved, proud_situation, tags, resume_file_url, availability_status
             FROM freelancers
             ORDER BY created_at DESC;
             """
@@ -126,11 +128,39 @@ def list_freelancers():
                     kpi_achieved=row[8],
                     proud_situation=row[9],
                     tags=row[10] or "",
-                    resume_file_url=row[11] or ""
+                    resume_file_url=row[11] or "",
+                    availability_status=row[12] or "ready"
                 ))
             return freelancers
             
     except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Database error occurred: {str(e)}"
+        )
+
+class AvailabilityUpdate(BaseModel):
+    email: str
+    availability_status: str
+
+@router.put("/availability")
+def update_availability(update_data: AvailabilityUpdate):
+    try:
+        with get_db_cursor() as cursor:
+            query = """
+            UPDATE freelancers
+            SET availability_status = %s
+            WHERE email = %s
+            RETURNING id;
+            """
+            cursor.execute(query, (update_data.availability_status, update_data.email))
+            result = cursor.fetchone()
+            if not result:
+                raise HTTPException(status_code=404, detail="Freelancer not found")
+            return {"message": "Availability updated successfully", "status": update_data.availability_status}
+    except Exception as e:
+        if isinstance(e, HTTPException):
+            raise e
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Database error occurred: {str(e)}"

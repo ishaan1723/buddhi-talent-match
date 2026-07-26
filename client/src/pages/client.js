@@ -4,6 +4,7 @@ import Head from 'next/head';
 import { API_URL } from '../config';
 import { fetchWithTimeout } from '../utils/fetchHelper';
 import { getStoredUser, getToken } from '../utils/auth';
+import DarkModeToggle from '../components/DarkModeToggle';
 
 export default function ClientPosting() {
   const router = useRouter();
@@ -30,6 +31,21 @@ export default function ClientPosting() {
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
+  const [showKpiSuggestions, setShowKpiSuggestions] = useState(false);
+
+  const getKpiSuggestions = () => {
+    const titleLower = formData.title.toLowerCase();
+    if (titleLower.includes('rag') || titleLower.includes('llm')) {
+      return ["Reduce query latency by 40%", "Achieve >90% precision in retrieval answers", "Index 1M+ documents successfully"];
+    }
+    if (titleLower.includes('vision') || titleLower.includes('image') || titleLower.includes('cv')) {
+      return ["Achieve >98% classification accuracy", "Run inference under 40ms", "Deploy model to edge devices smoothly"];
+    }
+    if (titleLower.includes('nlp') || titleLower.includes('text') || titleLower.includes('language')) {
+      return ["Process 100k+ documents daily", "Average API latency < 100ms", "Improve sentiment accuracy by 15%"];
+    }
+    return ["Deliver MVP within 4 weeks", "Pass all security and load tests", "Ensure 99.9% uptime for the service"];
+  };
 
   const templates = [
     {
@@ -175,6 +191,7 @@ export default function ClientPosting() {
           <img src="/logo.png" alt="AI Shop Logo" className="logo-img" />
           <span className="brand-name">AI Shop International</span>
         </a>
+        <DarkModeToggle />
       </header>
 
       <main className="form-container">
@@ -213,6 +230,8 @@ export default function ClientPosting() {
               placeholder="e.g. Need LLM Developer to build a RAG Pipeline" 
               value={formData.title}
               onChange={handleChange}
+              onFocus={() => setShowKpiSuggestions(true)}
+              onBlur={() => setTimeout(() => setShowKpiSuggestions(false), 200)}
             />
           </div>
 
@@ -239,6 +258,32 @@ export default function ClientPosting() {
               value={formData.kpi_expectations}
               onChange={handleChange}
             />
+            {showKpiSuggestions && (
+              <div style={{ marginTop: '10px', display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                <span style={{ fontSize: '12px', fontWeight: '600', color: 'var(--text-muted)', display: 'flex', alignItems: 'center' }}>✨ AI Suggestions:</span>
+                {getKpiSuggestions().map((suggestion, idx) => (
+                  <button
+                    key={idx}
+                    type="button"
+                    onClick={() => setFormData(prev => ({ ...prev, kpi_expectations: suggestion }))}
+                    style={{
+                      background: 'var(--indigo-soft)',
+                      color: 'var(--indigo)',
+                      border: 'none',
+                      padding: '6px 12px',
+                      borderRadius: '16px',
+                      fontSize: '12px',
+                      fontWeight: '500',
+                      cursor: 'pointer',
+                      transition: 'background 0.2s'
+                    }}
+                    onMouseDown={(e) => e.preventDefault()} // prevent blur
+                  >
+                    {suggestion}
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
 
           <div className="form-group">

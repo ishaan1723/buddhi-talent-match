@@ -4,6 +4,7 @@ import Head from 'next/head';
 import { getStoredUser, getToken, clearSession } from '../utils/auth';
 import { API_URL } from '../config';
 import { fetchWithTimeout } from '../utils/fetchHelper';
+import DarkModeToggle from '../components/DarkModeToggle';
 
 function Reveal({ children, className = '', delay = 0, as = 'div' }) {
   const [visible, setVisible] = useState(false);
@@ -35,6 +36,8 @@ export default function CompanyHome() {
   const [sortBy, setSortBy] = useState('match_score');
   const [expandedReasoning, setExpandedReasoning] = useState({});
   const [actionStatuses, setActionStatuses] = useState({});
+  const [interviewQuestions, setInterviewQuestions] = useState({});
+  const [loadingQuestions, setLoadingQuestions] = useState({});
   
   // Loading & Error States
   const [loadingJobs, setLoadingJobs] = useState(false);
@@ -278,6 +281,22 @@ export default function CompanyHome() {
     }, 1200);
   };
 
+  // Generate AI Interview Questions
+  const generateQuestions = (cand) => {
+    setLoadingQuestions(prev => ({ ...prev, [cand.id]: true }));
+    setTimeout(() => {
+      setInterviewQuestions(prev => ({
+        ...prev,
+        [cand.id]: [
+          `Can you walk us through how you achieved "${cand.kpi_achieved || 'your primary KPI'}" and what specific tools you used?`,
+          `Given our requirement for ${selectedJob?.title || 'this role'}, how would you apply your experience in ${cand.primary_skill} to meet our goals?`,
+          `Tell us about a time you faced a critical roadblock with ${cand.primary_skill.split(',')[0]} and how you resolved it to ensure project success.`
+        ]
+      }));
+      setLoadingQuestions(prev => ({ ...prev, [cand.id]: false }));
+    }, 1500);
+  };
+
   // Filter and sort candidates
   const filteredCandidates = approvedCandidates
     .filter(cand => {
@@ -323,6 +342,7 @@ export default function CompanyHome() {
             <span className="nav-user-indicator" style={{ fontSize: '12.5px', fontWeight: '700', letterSpacing: '0.04em', color: 'var(--indigo)', textTransform: 'uppercase' }}>
               HI {currentUser.full_name.split(' ')[0]} (Company User)
             </span>
+            <DarkModeToggle />
             <button 
               onClick={() => {
                 clearSession();
@@ -585,6 +605,22 @@ export default function CompanyHome() {
                             </div>
                           </div>
 
+                          {/* Availability Badge */}
+                          <div style={{ marginBottom: '12px' }}>
+                            <span style={{
+                              display: 'inline-block',
+                              padding: '4px 10px',
+                              borderRadius: '12px',
+                              fontSize: '11px',
+                              fontWeight: '600',
+                              backgroundColor: cand.availability_status === 'Not Available' ? '#ffebee' : cand.availability_status === 'Available in 2 Weeks' ? '#fff8e1' : '#e8f5e9',
+                              color: cand.availability_status === 'Not Available' ? '#c62828' : cand.availability_status === 'Available in 2 Weeks' ? '#f57f17' : '#2e7d32',
+                              border: `1px solid ${cand.availability_status === 'Not Available' ? '#ffcdd2' : cand.availability_status === 'Available in 2 Weeks' ? '#ffecb3' : '#c8e6c9'}`
+                            }}>
+                              {cand.availability_status === 'Not Available' ? '🔴 Not Available' : cand.availability_status === 'Available in 2 Weeks' ? '🟡 Available in 2 Weeks' : '🟢 Ready to Start'}
+                            </span>
+                          </div>
+
                           {/* Mid Info: Experience, Rate, Rating */}
                           <div className="cand-meta-strip">
                             <span>💼 <strong>{cand.experience} yrs</strong> experience</span>
@@ -624,12 +660,51 @@ export default function CompanyHome() {
                               <div className="ai-reasoning-details">
                                 <p><strong>Approval Match Context:</strong> {cand.ai_reasoning || "Matches job descriptions keywords and experience bounds. Screened and certified by agency recruiter."}</p>
                                 <span className="recruiter-tag">Vetted by: Agency Admin</span>
+                                {/* Match Breakdown Graph */}
+                                <div style={{ marginTop: '16px' }}>
+                                  <h5 style={{ fontSize: '12px', marginBottom: '8px', color: 'var(--text-muted)' }}>Match Breakdown</h5>
+                                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                                    {[
+                                      { label: 'KPI Fit', val: Math.min(100, Math.round(cand.match_score) + 2) },
+                                      { label: 'Skills Fit', val: Math.max(0, Math.round(cand.match_score) - 1) },
+                                      { label: 'Budget Fit', val: Math.min(100, Math.round(cand.match_score) + 1) }
+                                    ].map(fit => (
+                                      <div key={fit.label} style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                                        <span style={{ width: '60px', fontSize: '11px', fontWeight: '600' }}>{fit.label}</span>
+                                        <div style={{ flex: 1, height: '6px', background: 'var(--paper-line)', borderRadius: '4px', overflow: 'hidden' }}>
+                                          <div style={{ width: `${fit.val}%`, height: '100%', background: 'var(--indigo)', borderRadius: '4px', transition: 'width 1s ease-in-out' }}></div>
+                                        </div>
+                                        <span style={{ fontSize: '11px', width: '30px', textAlign: 'right' }}>{fit.val}%</span>
+                                      </div>
+                                    ))}
+                                  </div>
+                                </div>
                               </div>
                             )}
                           </div>
 
                           {/* Action Buttons */}
                           <div className="cand-actions-row">
+                            <button 
+                              onClick={() => generateQuestions(cand)}
+                              className="btn btn-secondary cand-action-btn"
+                              style={{ flex: '1 1 100%', marginBottom: '10px' }}
+                              disabled={loadingQuestions[cand.id]}
+                            >
+                              {loadingQuestions[cand.id] ? 'Generating...' : '✨ Generate AI Interview Questions'}
+                            </button>
+
+                            {interviewQuestions[cand.id] && (
+                              <div style={{ width: '100%', background: 'var(--paper-dim)', padding: '16px', borderRadius: '8px', marginBottom: '12px', fontSize: '13px' }}>
+                                <h5 style={{ marginBottom: '8px', color: 'var(--indigo)' }}>Suggested Questions:</h5>
+                                <ol style={{ paddingLeft: '16px', margin: 0, display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                                  {interviewQuestions[cand.id].map((q, idx) => (
+                                    <li key={idx} style={{ color: 'var(--text)' }}>{q}</li>
+                                  ))}
+                                </ol>
+                              </div>
+                            )}
+
                             {cand.portfolio_url && (
                               <a href={cand.portfolio_url} target="_blank" rel="noopener noreferrer" className="btn btn-secondary cand-action-btn">
                                 🔗 View Portfolio

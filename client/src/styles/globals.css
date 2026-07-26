@@ -565,3 +565,38 @@ textarea:focus-visible,
 @media (max-width: 980px) {
   .af-mobile-brand { display: inline-flex; }
 }
+
+/* Dark Mode Overrides */
+body.dark {
+  --paper: #0b0e17;
+  --paper-dim: #141928;
+  --paper-line: #242b3d;
+  --text: #f5f4f0;
+  --text-muted: #9498a6;
+  background-color: var(--paper);
+  color: var(--text);
+}
+
+body.dark .card {
+  background-color: var(--paper-dim);
+  border-color: var(--paper-line);
+}
+
+body.dark .navbar {
+  background-color: var(--paper) !important;
+  border-bottom-color: var(--paper-line) !important;
+}
+
+body.dark .navbar a, 
+body.dark .navbar span, 
+body.dark .navbar .brand-name {
+  color: var(--text) !important;
+}
+
+body.dark .af-input, 
+body.dark .af-social-btn, 
+body.dark .af-role-option {
+  background-color: var(--paper-dim);
+  color: var(--text);
+  border-color: var(--paper-line);
+}

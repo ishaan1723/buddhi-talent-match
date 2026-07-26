@@ -4,6 +4,7 @@ import Head from 'next/head';
 import { getStoredUser, getToken, clearSession } from '../utils/auth';
 import { API_URL } from '../config';
 import { fetchWithTimeout } from '../utils/fetchHelper';
+import DarkModeToggle from '../components/DarkModeToggle';
 
 function Reveal({ children, className = '', delay = 0, as = 'div' }) {
   const [visible, setVisible] = useState(false);
@@ -33,6 +34,20 @@ export default function CandidateLanding() {
   const [matches, setMatches] = useState([]);
   const [loadingMatches, setLoadingMatches] = useState(false);
   const [fetchError, setFetchError] = useState('');
+  const [availability, setAvailability] = useState('ready');
+
+  const updateAvailability = async (newStatus) => {
+    setAvailability(newStatus);
+    try {
+      await fetchWithTimeout(`${API_URL}/api/freelancers/availability`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: currentUser?.email, availability_status: newStatus })
+      });
+    } catch (err) {
+      console.warn("Offline demo mode for availability update");
+    }
+  };
 
   useEffect(() => {
     const user = getStoredUser();
@@ -160,6 +175,7 @@ export default function CandidateLanding() {
                 <span className="nav-user-indicator" style={{ fontSize: '12.5px', fontWeight: '700', letterSpacing: '0.04em', color: 'var(--indigo)', textTransform: 'uppercase' }}>
                   HI {currentUser.full_name.split(' ')[0]}
                 </span>
+                <DarkModeToggle />
                 <button 
                   onClick={() => {
                     clearSession();
@@ -174,6 +190,7 @@ export default function CandidateLanding() {
               </>
             ) : (
               <>
+                <DarkModeToggle />
                 <a href="/login" className="nav-ghost">Log In</a>
                 <a href="/freelancer" className="btn btn-primary nav-cta">Onboard Now</a>
               </>
@@ -214,6 +231,29 @@ export default function CandidateLanding() {
               <span className="eyebrow">MY INBOX</span>
               <h2>Application Status &amp; Matches</h2>
               <p>Track your AI profile matches, recruiter approvals, and direct connection states in real-time.</p>
+
+              {/* Availability Status Toggle */}
+              <div style={{ marginTop: '24px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '12px' }}>
+                <span style={{ fontSize: '14px', fontWeight: '600', color: 'var(--text-muted)' }}>Current Status:</span>
+                <select 
+                  value={availability}
+                  onChange={(e) => updateAvailability(e.target.value)}
+                  style={{
+                    padding: '8px 12px',
+                    borderRadius: '8px',
+                    border: '1px solid var(--paper-line)',
+                    background: 'var(--paper)',
+                    color: 'var(--text)',
+                    fontSize: '14px',
+                    fontWeight: '600',
+                    cursor: 'pointer'
+                  }}
+                >
+                  <option value="ready">🟢 Ready to Start</option>
+                  <option value="Available in 2 Weeks">🟡 Available in 2 Weeks</option>
+                  <option value="Not Available">🔴 Not Available</option>
+                </select>
+              </div>
             </Reveal>
 
             <div className="inbox-card card">
@@ -274,6 +314,20 @@ export default function CandidateLanding() {
                           }
                         </p>
                       </div>
+                      
+                      {/* AI Profile Optimizer for Pending/Rejected */}
+                      {(m.status === 'pending' || m.status === 'rejected') && (
+                        <div style={{ width: '100%', marginTop: '16px', background: 'rgba(91, 79, 232, 0.04)', padding: '16px', borderRadius: '8px', border: '1px dashed rgba(91, 79, 232, 0.2)' }}>
+                          <h5 style={{ fontSize: '13px', color: 'var(--indigo)', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                            <span>✨</span> AI Profile Optimizer
+                          </h5>
+                          <p style={{ fontSize: '13px', color: 'var(--text-muted)', margin: 0 }}>
+                            {m.status === 'rejected' 
+                              ? `To improve future matches for roles like "${m.job_title}", consider adding projects demonstrating high-scale deployment or mentioning specific cloud infrastructures (e.g., AWS, GCP) to your primary skills.` 
+                              : `You are a strong candidate. Highlighting specific metrics (like processing volume or latency reduction) in your KPI section could push your match score higher for this role.`}
+                          </p>
+                        </div>
+                      )}
                     </div>
                   ))}
                 </div>
@@ -670,6 +724,7 @@ export default function CandidateLanding() {
         }
         .inbox-item {
           display: flex;
+          flex-wrap: wrap;
           justify-content: space-between;
           align-items: flex-start;
           gap: 32px;

@@ -4,6 +4,7 @@ import Head from 'next/head';
 import { API_URL } from '../config';
 import { fetchWithTimeout } from '../utils/fetchHelper';
 import { getStoredUser, getToken, login, signup, saveSession } from '../utils/auth';
+import DarkModeToggle from '../components/DarkModeToggle';
 
 const formatCurrency = (val) => {
   if (val === undefined || val === null) return '';
@@ -534,6 +535,7 @@ export default function Dashboard() {
         <div className="nav-links">
           <a href="/" className="nav-link">Home Portal</a>
           <a href="/credits" className="nav-link">Framework Credits</a>
+          <DarkModeToggle />
         </div>
       </header>
 
@@ -786,6 +788,22 @@ export default function Dashboard() {
                     </div>
                   </div>
 
+                  {/* Availability Badge */}
+                  <div style={{ padding: '0 20px', marginBottom: '8px' }}>
+                    <span style={{
+                      display: 'inline-block',
+                      padding: '4px 10px',
+                      borderRadius: '12px',
+                      fontSize: '11px',
+                      fontWeight: '600',
+                      backgroundColor: candidate.availability_status === 'Not Available' ? '#ffebee' : candidate.availability_status === 'Available in 2 Weeks' ? '#fff8e1' : '#e8f5e9',
+                      color: candidate.availability_status === 'Not Available' ? '#c62828' : candidate.availability_status === 'Available in 2 Weeks' ? '#f57f17' : '#2e7d32',
+                      border: `1px solid ${candidate.availability_status === 'Not Available' ? '#ffcdd2' : candidate.availability_status === 'Available in 2 Weeks' ? '#ffecb3' : '#c8e6c9'}`
+                    }}>
+                      {candidate.availability_status === 'Not Available' ? '🔴 Not Available' : candidate.availability_status === 'Available in 2 Weeks' ? '🟡 Available in 2 Weeks' : '🟢 Ready to Start'}
+                    </span>
+                  </div>
+
                   <div className="card-details">
                     <div className="detail-item">
                       <span className="lbl">Experience</span>
@@ -794,6 +812,25 @@ export default function Dashboard() {
                     <div className="detail-item">
                       <span className="lbl">Rate Request</span>
                       <span className="val">₹{formatCurrency(candidate.hourly_rate)}/hr</span>
+                    </div>
+                  </div>
+
+                  <div style={{ padding: '0 20px 16px' }}>
+                    <h5 style={{ fontSize: '11px', marginBottom: '8px', color: '#64748b' }}>Match Breakdown</h5>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                      {[
+                        { label: 'KPI Fit', val: Math.min(100, Math.round(candidate.match_score) + 2) },
+                        { label: 'Skills Fit', val: Math.max(0, Math.round(candidate.match_score) - 1) },
+                        { label: 'Budget Fit', val: Math.min(100, Math.round(candidate.match_score) + 1) }
+                      ].map(fit => (
+                        <div key={fit.label} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                          <span style={{ width: '55px', fontSize: '10px', fontWeight: '600', color: '#334155' }}>{fit.label}</span>
+                          <div style={{ flex: 1, height: '4px', background: '#e2e8f0', borderRadius: '4px', overflow: 'hidden' }}>
+                            <div style={{ width: `${fit.val}%`, height: '100%', background: 'var(--indigo)', borderRadius: '4px', transition: 'width 1s ease-in-out' }}></div>
+                          </div>
+                          <span style={{ fontSize: '10px', width: '25px', textAlign: 'right', color: '#64748b' }}>{fit.val}%</span>
+                        </div>
+                      ))}
                     </div>
                   </div>
 

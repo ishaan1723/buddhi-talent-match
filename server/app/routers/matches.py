@@ -16,7 +16,7 @@ def get_job_matches(job_id: int):
             query = """
             SELECT m.id, m.job_id, m.freelancer_id, m.match_score, m.status,
                    f.name, f.email, f.linkedin_url, f.primary_skill, f.experience, f.hourly_rate, m.created_at, 
-                   f.proud_situation, f.headline, f.portfolio_url, f.rating, f.tags, f.resume_file_url, m.ai_reasoning
+                   f.proud_situation, f.headline, f.portfolio_url, f.rating, f.tags, f.resume_file_url, f.availability_status, m.ai_reasoning
             FROM matches m
             JOIN freelancers f ON m.freelancer_id = f.id
             WHERE m.job_id = %s
@@ -46,7 +46,8 @@ def get_job_matches(job_id: int):
                     rating=float(row[15]) if row[15] else 5.0,
                     tags=row[16] or "",
                     resume_file_url=row[17] or "",
-                    ai_reasoning=row[18]
+                    availability_status=row[18] or "ready",
+                    ai_reasoning=row[19]
                 ))
             return matches
             
@@ -141,7 +142,7 @@ def get_company_approved_matches(email: str):
             query = """
             SELECT m.id, m.job_id, m.freelancer_id, m.match_score, m.status,
                    j.title, f.name, f.email, f.linkedin_url, f.primary_skill, f.experience, f.hourly_rate,
-                   m.created_at, f.kpi_achieved, f.proud_situation, f.headline, f.portfolio_url, f.rating, f.tags, f.resume_file_url, m.ai_reasoning
+                   m.created_at, f.kpi_achieved, f.proud_situation, f.headline, f.portfolio_url, f.rating, f.tags, f.resume_file_url, f.availability_status, m.ai_reasoning
             FROM matches m
             JOIN freelancers f ON m.freelancer_id = f.id
             JOIN jobs j ON m.job_id = j.id
@@ -174,7 +175,8 @@ def get_company_approved_matches(email: str):
                     rating=float(row[17]) if row[17] else 5.0,
                     tags=row[18] or "",
                     resume_file_url=row[19] or "",
-                    ai_reasoning=row[20]
+                    availability_status=row[20] or "ready",
+                    ai_reasoning=row[21]
                 ))
             return matches
     except Exception as e:
@@ -191,7 +193,7 @@ def get_job_approved_matches(job_id: int):
             query = """
             SELECT m.id, m.job_id, m.freelancer_id, m.match_score, m.status,
                    j.title, f.name, f.email, f.linkedin_url, f.primary_skill, f.experience, f.hourly_rate,
-                   m.created_at, f.kpi_achieved, f.proud_situation, f.headline, f.portfolio_url, f.rating, f.tags, f.resume_file_url, m.ai_reasoning
+                   m.created_at, f.kpi_achieved, f.proud_situation, f.headline, f.portfolio_url, f.rating, f.tags, f.resume_file_url, f.availability_status, m.ai_reasoning
             FROM matches m
             JOIN freelancers f ON m.freelancer_id = f.id
             JOIN jobs j ON m.job_id = j.id
@@ -224,7 +226,8 @@ def get_job_approved_matches(job_id: int):
                     rating=float(row[17]) if row[17] else 5.0,
                     tags=row[18] or "",
                     resume_file_url=row[19] or "",
-                    ai_reasoning=row[20]
+                    availability_status=row[20] or "ready",
+                    ai_reasoning=row[21]
                 ))
             return matches
     except Exception as e:
