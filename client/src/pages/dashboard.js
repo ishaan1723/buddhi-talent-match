@@ -4,7 +4,6 @@ import Head from 'next/head';
 import { API_URL } from '../config';
 import { fetchWithTimeout } from '../utils/fetchHelper';
 import { getStoredUser, getToken, login, signup, saveSession } from '../utils/auth';
-import DarkModeToggle from '../components/DarkModeToggle';
 
 const formatCurrency = (val) => {
   if (val === undefined || val === null) return '';
@@ -535,7 +534,6 @@ export default function Dashboard() {
         <div className="nav-links">
           <a href="/" className="nav-link">Home Portal</a>
           <a href="/credits" className="nav-link">Framework Credits</a>
-          <DarkModeToggle />
         </div>
       </header>
 

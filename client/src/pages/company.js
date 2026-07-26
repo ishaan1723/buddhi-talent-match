@@ -4,7 +4,6 @@ import Head from 'next/head';
 import { getStoredUser, getToken, clearSession } from '../utils/auth';
 import { API_URL } from '../config';
 import { fetchWithTimeout } from '../utils/fetchHelper';
-import DarkModeToggle from '../components/DarkModeToggle';
 
 function Reveal({ children, className = '', delay = 0, as = 'div' }) {
   const [visible, setVisible] = useState(false);
@@ -36,8 +35,6 @@ export default function CompanyHome() {
   const [sortBy, setSortBy] = useState('match_score');
   const [expandedReasoning, setExpandedReasoning] = useState({});
   const [actionStatuses, setActionStatuses] = useState({});
-  const [interviewQuestions, setInterviewQuestions] = useState({});
-  const [loadingQuestions, setLoadingQuestions] = useState({});
   
   // Loading & Error States
   const [loadingJobs, setLoadingJobs] = useState(false);
@@ -281,22 +278,6 @@ export default function CompanyHome() {
     }, 1200);
   };
 
-  // Generate AI Interview Questions
-  const generateQuestions = (cand) => {
-    setLoadingQuestions(prev => ({ ...prev, [cand.id]: true }));
-    setTimeout(() => {
-      setInterviewQuestions(prev => ({
-        ...prev,
-        [cand.id]: [
-          `Can you walk us through how you achieved "${cand.kpi_achieved || 'your primary KPI'}" and what specific tools you used?`,
-          `Given our requirement for ${selectedJob?.title || 'this role'}, how would you apply your experience in ${cand.primary_skill} to meet our goals?`,
-          `Tell us about a time you faced a critical roadblock with ${cand.primary_skill.split(',')[0]} and how you resolved it to ensure project success.`
-        ]
-      }));
-      setLoadingQuestions(prev => ({ ...prev, [cand.id]: false }));
-    }, 1500);
-  };
-
   // Filter and sort candidates
   const filteredCandidates = approvedCandidates
     .filter(cand => {
@@ -342,7 +323,6 @@ export default function CompanyHome() {
             <span className="nav-user-indicator" style={{ fontSize: '12.5px', fontWeight: '700', letterSpacing: '0.04em', color: 'var(--indigo)', textTransform: 'uppercase' }}>
               HI {currentUser.full_name.split(' ')[0]} (Company User)
             </span>
-            <DarkModeToggle />
             <button 
               onClick={() => {
                 clearSession();
@@ -685,26 +665,6 @@ export default function CompanyHome() {
 
                           {/* Action Buttons */}
                           <div className="cand-actions-row">
-                            <button 
-                              onClick={() => generateQuestions(cand)}
-                              className="btn btn-secondary cand-action-btn"
-                              style={{ flex: '1 1 100%', marginBottom: '10px' }}
-                              disabled={loadingQuestions[cand.id]}
-                            >
-                              {loadingQuestions[cand.id] ? 'Generating...' : '✨ Generate AI Interview Questions'}
-                            </button>
-
-                            {interviewQuestions[cand.id] && (
-                              <div style={{ width: '100%', background: 'var(--paper-dim)', padding: '16px', borderRadius: '8px', marginBottom: '12px', fontSize: '13px' }}>
-                                <h5 style={{ marginBottom: '8px', color: 'var(--indigo)' }}>Suggested Questions:</h5>
-                                <ol style={{ paddingLeft: '16px', margin: 0, display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                                  {interviewQuestions[cand.id].map((q, idx) => (
-                                    <li key={idx} style={{ color: 'var(--text)' }}>{q}</li>
-                                  ))}
-                                </ol>
-                              </div>
-                            )}
-
                             {cand.portfolio_url && (
                               <a href={cand.portfolio_url} target="_blank" rel="noopener noreferrer" className="btn btn-secondary cand-action-btn">
                                 🔗 View Portfolio

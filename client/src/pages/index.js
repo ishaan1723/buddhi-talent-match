@@ -2,7 +2,6 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { useRouter } from 'next/router';
 import Head from 'next/head';
 import { getStoredUser, getToken, clearSession } from '../utils/auth';
-import DarkModeToggle from '../components/DarkModeToggle';
 
 /* ------------------------------------------------------------------
    Reveal: lightweight scroll-reveal wrapper (IntersectionObserver).
@@ -235,7 +234,6 @@ export default function Home() {
 
           <div className="nav-actions">
             <a href="/dashboard" className="nav-ghost">Recruiter Dashboard</a>
-            <DarkModeToggle />
             {currentUser ? (
               <>
                 <span className="nav-user-indicator" style={{ fontSize: '12.5px', fontWeight: '700', letterSpacing: '0.04em', color: 'var(--indigo)', textTransform: 'uppercase' }}>

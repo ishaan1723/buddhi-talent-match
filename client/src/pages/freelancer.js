@@ -4,7 +4,6 @@ import Head from 'next/head';
 import { API_URL } from '../config';
 import { fetchWithTimeout } from '../utils/fetchHelper';
 import { getStoredUser, getToken } from '../utils/auth';
-import DarkModeToggle from '../components/DarkModeToggle';
 
 export default function FreelancerOnboarding() {
   const router = useRouter();
@@ -217,7 +216,6 @@ export default function FreelancerOnboarding() {
           <img src="/logo.png" alt="AI Shop Logo" className="logo-img" />
           <span className="brand-name">AI Shop International</span>
         </a>
-        <DarkModeToggle />
       </header>
 
       <main className="form-container">

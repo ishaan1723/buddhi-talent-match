@@ -4,7 +4,6 @@ import Head from 'next/head';
 import { getStoredUser, getToken, clearSession } from '../utils/auth';
 import { API_URL } from '../config';
 import { fetchWithTimeout } from '../utils/fetchHelper';
-import DarkModeToggle from '../components/DarkModeToggle';
 
 function Reveal({ children, className = '', delay = 0, as = 'div' }) {
   const [visible, setVisible] = useState(false);
@@ -175,7 +174,6 @@ export default function CandidateLanding() {
                 <span className="nav-user-indicator" style={{ fontSize: '12.5px', fontWeight: '700', letterSpacing: '0.04em', color: 'var(--indigo)', textTransform: 'uppercase' }}>
                   HI {currentUser.full_name.split(' ')[0]}
                 </span>
-                <DarkModeToggle />
                 <button 
                   onClick={() => {
                     clearSession();
@@ -190,7 +188,6 @@ export default function CandidateLanding() {
               </>
             ) : (
               <>
-                <DarkModeToggle />
                 <a href="/login" className="nav-ghost">Log In</a>
                 <a href="/freelancer" className="btn btn-primary nav-cta">Onboard Now</a>
               </>
