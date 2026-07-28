@@ -28,6 +28,7 @@ export default function Login() {
   const [formError, setFormError] = useState('');
   const [loading, setLoading] = useState(false);
   const [activeFaq, setActiveFaq] = useState(null);
+  const [showWakeupNotice, setShowWakeupNotice] = useState(false);
 
   const validate = () => {
     const next = {};
@@ -40,9 +41,15 @@ export default function Login() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setFormError('');
+    setShowWakeupNotice(false);
     if (!validate()) return;
 
     setLoading(true);
+    // Show wakeup notice if it takes more than 2.5 seconds (Render cold start)
+    const wakeupTimer = setTimeout(() => {
+      setShowWakeupNotice(true);
+    }, 2500);
+
     try {
       const data = await login({ email, password, rememberMe });
       saveSession(data, rememberMe);
@@ -50,7 +57,9 @@ export default function Login() {
     } catch (err) {
       setFormError(err.message || 'Invalid email or password.');
     } finally {
+      clearTimeout(wakeupTimer);
       setLoading(false);
+      setShowWakeupNotice(false);
     }
   };
 
@@ -170,6 +179,24 @@ export default function Login() {
                 <button type="submit" className="btn btn-primary btn-block" disabled={loading}>
                   {loading ? "Signing in..." : "Log In"}
                 </button>
+
+                {showWakeupNotice && (
+                  <p className="wakeup-notice" style={{
+                    fontSize: '12px',
+                    color: '#b58e12',
+                    backgroundColor: 'rgba(201, 162, 39, 0.08)',
+                    border: '1px solid rgba(201, 162, 39, 0.25)',
+                    padding: '10px 14px',
+                    borderRadius: '8px',
+                    marginTop: '12px',
+                    textAlign: 'center',
+                    lineHeight: '1.4',
+                    animation: 'fadeIn 0.2s ease-out'
+                  }}>
+                    ⏳ <strong>Waking up the cloud server...</strong><br/>
+                    Render's free tier spins down after inactivity. Please wait up to 50 seconds for the backend to boot.
+                  </p>
+                )}
               </form>
 
               <div className="card-footer">

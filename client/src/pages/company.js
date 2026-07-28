@@ -40,6 +40,10 @@ export default function CompanyHome() {
   const [compareList, setCompareList] = useState([]);
   const [showCompareModal, setShowCompareModal] = useState(false);
   const [animateBars, setAnimateBars] = useState(false);
+
+  // AI Co-pilot chat states
+  const [copilotChat, setCopilotChat] = useState({});
+  const [typingId, setTypingId] = useState(null);
   
   // Loading & Error States
   const [loadingJobs, setLoadingJobs] = useState(false);
@@ -256,6 +260,69 @@ export default function CompanyHome() {
       ...prev,
       [candId]: !prev[candId]
     }));
+  };
+
+  const askCopilot = (cand, question) => {
+    const candId = cand.id;
+    // Add user message immediately
+    setCopilotChat(prev => {
+      const chat = prev[candId] || [];
+      return {
+        ...prev,
+        [candId]: [...chat, { sender: 'user', text: question }]
+      };
+    });
+    setTypingId(candId);
+
+    // Simulate AI response delay
+    setTimeout(() => {
+      let answer = "";
+      const name = cand.freelancer_name.toLowerCase();
+      const isIshaan = name.includes("ishaan");
+      const isAishwarya = name.includes("aishwarya");
+      const isAarav = name.includes("aarav");
+
+      if (question.includes("Why is")) {
+        if (isIshaan) {
+          answer = "Ishaan Jain is a Senior AI Engineer specializing in RAG architectures. He has a 96% Match Score, successfully scaling pipelines for 50k concurrent docs and reducing search latency by 45% using LangChain & hybrid search, which directly fits your requirement.";
+        } else if (isAishwarya) {
+          answer = "Aishwarya Roy has strong BERT/Hugging Face NLP credentials with an 84%-88% Match Score. She built document summarization microservices processing 120k files daily with sub-80ms API response latency.";
+        } else if (isAarav) {
+          answer = "Aarav Sharma is a versatile developer with strong foundations in NLP and computer vision pipelines, offering vetted matching coefficients across standard AI domains.";
+        } else {
+          answer = `This candidate has a verified Match Score of ${Math.round(cand.match_score)}% and shows solid alignment on the primary focus: ${cand.primary_skill}.`;
+        }
+      } else if (question.includes("potential risks")) {
+        if (isIshaan) {
+          answer = "Ishaan's hourly rate of ₹2,800 is at the higher end of the range, but still within your budget constraints. He is also flagged as 'Ready to Start', meaning he will likely secure another role quickly if not engaged.";
+        } else if (isAishwarya) {
+          answer = "Her primary focus is NLP and Hugging Face pipelines; if your project requires heavy computer vision or native mobile integration, she will require some onboarding ramp-up time.";
+        } else if (isAarav) {
+          answer = "He is an adaptable generalist but might require specific orientation on custom frameworks like LlamaIndex or specialized vector databases.";
+        } else {
+          answer = "No critical risks identified. The candidate's rate fits within budget constraints and their technical experience matches the job expectations.";
+        }
+      } else if (question.includes("hourly rate compare")) {
+        if (isIshaan) {
+          answer = "His rate (₹2,800/hr) is extremely competitive for a Senior RAG specialist with proven production deployment experience. Average market rates for this tier of talent range from ₹3,200 to ₹4,500/hr.";
+        } else if (isAishwarya) {
+          answer = "Her rate of ₹2,500/hr represents a highly cost-efficient middle-tier option for a specialized NLP developer, offering great value relative to her performance records.";
+        } else if (isAarav) {
+          answer = "His target rate is ₹3,200/hr, representing solid market-value pricing for a multi-disciplinary AI developer.";
+        } else {
+          answer = `His rate of ₹${cand.hourly_rate}/hr fits perfectly within your budget constraints.`;
+        }
+      }
+
+      setCopilotChat(prev => {
+        const chat = prev[candId] || [];
+        return {
+          ...prev,
+          [candId]: [...chat, { sender: 'ai', text: answer }]
+        };
+      });
+      setTypingId(null);
+    }, 1000);
   };
 
   // Trigger candidate action (Hire / Message)
@@ -724,6 +791,113 @@ export default function CompanyHome() {
                                         </div>
                                         <span style={{ fontSize: '11px', width: '30px', textAlign: 'right' }}>{fit.val}%</span>
                                       </div>
+                                    ))}
+                                  </div>
+                                </div>
+
+                                {/* AI Co-pilot Chat Assistant */}
+                                <div className="ai-chat-assistant" style={{ 
+                                  marginTop: '20px', 
+                                  borderTop: '1px dashed var(--paper-line)', 
+                                  paddingTop: '16px' 
+                                }}>
+                                  <h6 style={{ 
+                                    fontSize: '11px', 
+                                    fontWeight: '700', 
+                                    color: 'var(--indigo)', 
+                                    textTransform: 'uppercase', 
+                                    marginBottom: '10px', 
+                                    display: 'flex', 
+                                    alignItems: 'center', 
+                                    gap: '6px' 
+                                  }}>
+                                    🤖 AI MATCH CO-PILOT
+                                  </h6>
+                                  
+                                  {/* Chat Window */}
+                                  <div style={{ 
+                                    background: '#f8fafc', 
+                                    borderRadius: '10px', 
+                                    border: '1px solid #e2e8f0', 
+                                    padding: '12px', 
+                                    minHeight: '80px', 
+                                    maxHeight: '180px', 
+                                    overflowY: 'auto', 
+                                    display: 'flex', 
+                                    flexDirection: 'column', 
+                                    gap: '8px',
+                                    marginBottom: '10px'
+                                  }}>
+                                    {(!copilotChat[cand.id] || copilotChat[cand.id].length === 0) ? (
+                                      <p style={{ fontSize: '12px', color: '#64748b', margin: 0, fontStyle: 'italic' }}>
+                                        Ask me standard vetting questions using the co-pilot shortcuts below.
+                                      </p>
+                                    ) : (
+                                      copilotChat[cand.id].map((msg, mIdx) => (
+                                        <div key={mIdx} style={{
+                                          alignSelf: msg.sender === 'user' ? 'flex-end' : 'flex-start',
+                                          maxWidth: '85%',
+                                          background: msg.sender === 'user' ? 'var(--indigo)' : '#ffffff',
+                                          color: msg.sender === 'user' ? '#ffffff' : '#334155',
+                                          padding: '8px 12px',
+                                          borderRadius: msg.sender === 'user' ? '12px 12px 2px 12px' : '12px 12px 12px 2px',
+                                          fontSize: '12.5px',
+                                          border: msg.sender === 'user' ? 'none' : '1px solid #e2e8f0',
+                                          boxShadow: '0 1px 2px rgba(0,0,0,0.05)',
+                                          lineHeight: '1.4'
+                                        }}>
+                                          {msg.text}
+                                        </div>
+                                      ))
+                                    )}
+
+                                    {typingId === cand.id && (
+                                      <div style={{
+                                        alignSelf: 'flex-start',
+                                        background: '#ffffff',
+                                        color: '#64748b',
+                                        padding: '8px 12px',
+                                        borderRadius: '12px 12px 12px 2px',
+                                        fontSize: '12px',
+                                        border: '1px solid #e2e8f0',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        gap: '4px'
+                                      }}>
+                                        <span className="dot-anim" style={{ animation: 'bounce 1s infinite' }}>●</span>
+                                        <span className="dot-anim" style={{ animation: 'bounce 1s infinite 0.25s' }}>●</span>
+                                        <span className="dot-anim" style={{ animation: 'bounce 1s infinite 0.5s' }}>●</span>
+                                      </div>
+                                    )}
+                                  </div>
+
+                                  {/* Quick suggestion tags */}
+                                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
+                                    {[
+                                      `Why is this candidate a good fit?`,
+                                      "What are potential risks or missing skills?",
+                                      "How does hourly rate compare to market?"
+                                    ].map((q, qIdx) => (
+                                      <button 
+                                        key={qIdx}
+                                        onClick={() => askCopilot(cand, q)}
+                                        disabled={typingId === cand.id}
+                                        style={{
+                                          background: '#ffffff',
+                                          border: '1px solid var(--paper-line)',
+                                          borderRadius: '99px',
+                                          padding: '4px 10px',
+                                          fontSize: '11px',
+                                          color: 'var(--indigo)',
+                                          fontWeight: '600',
+                                          cursor: typingId === cand.id ? 'not-allowed' : 'pointer',
+                                          transition: 'all 0.2s ease',
+                                          boxShadow: '0 1px 2px rgba(0,0,0,0.02)'
+                                        }}
+                                        className="quick-question-btn"
+                                      >
+                                        💬 {q}
+                                      </button>
                                     ))}
                                   </div>
                                 </div>
@@ -1532,6 +1706,14 @@ export default function CompanyHome() {
           font-size: 12.5px;
           line-height: 1.5;
           color: var(--text-muted);
+        }
+        .quick-question-btn:hover {
+          background-color: var(--indigo-soft) !important;
+          border-color: rgba(91, 79, 232, 0.4) !important;
+        }
+        @keyframes bounce {
+          0%, 100% { transform: translateY(0); opacity: 0.4; }
+          50% { transform: translateY(-3px); opacity: 1; }
         }
         .recruiter-tag {
           display: inline-block;
