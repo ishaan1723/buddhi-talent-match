@@ -227,48 +227,6 @@ export default function FreelancerOnboarding() {
         <form onSubmit={handleSubmit} className="card form-card">
           {errorMsg && <div className="error-alert">{errorMsg}</div>}
 
-          {/* AI Resume Auto-Fill Header Dropzone */}
-          <div className="ai-autofill-dropzone" style={{
-            border: '2px dashed #bfdbfe',
-            backgroundColor: '#f8fafc',
-            borderRadius: '12px',
-            padding: '24px',
-            textAlign: 'center',
-            marginBottom: '28px',
-            position: 'relative'
-          }}>
-            {isParsing ? (
-              <div className="parsing-status">
-                <div className="spinner" style={{
-                  width: '28px',
-                  height: '28px',
-                  border: '3px solid #bfdbfe',
-                  borderTop: '3px solid #1656d8',
-                  borderRadius: '50%',
-                  margin: '0 auto 10px',
-                  animation: 'spin 1s linear infinite'
-                }}></div>
-                <p style={{ fontSize: '13px', color: '#101828', fontWeight: '600' }}>{parsingStage}</p>
-              </div>
-            ) : (
-              <div>
-                <span style={{ fontSize: '24px', marginBottom: '8px', display: 'block' }}>📄</span>
-                <h4 style={{ fontSize: '14px', color: '#101828', marginBottom: '4px', fontWeight: '700' }}>Autofill form with Resume PDF</h4>
-                <p style={{ fontSize: '12px', color: '#64748b', marginBottom: '14px' }}>Let AI parse your skills, hourly rate, and achievements instantly.</p>
-                <input 
-                  type="file" 
-                  accept=".pdf"
-                  onChange={(e) => handleAutoFillResume(e.target.files[0])}
-                  style={{
-                    fontSize: '12px',
-                    color: '#475569',
-                    cursor: 'pointer'
-                  }}
-                />
-              </div>
-            )}
-          </div>
-
           {/* Simple LinkedIn Profile Field */}
           <div className="form-group">
             <label htmlFor="linkedin_url">LinkedIn Profile URL</label>
