@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, status, Request
+from fastapi import APIRouter, HTTPException, status, Request, BackgroundTasks
 from typing import List
 from app.models.schemas import MatchResponse, FreelancerMatchResponse, CompanyApprovedMatchResponse
 from app.database.connection import get_db_cursor
@@ -81,7 +81,7 @@ def get_job_matches(job_id: int, request: Request):
         )
 
 @router.put("/{match_id}/status", status_code=status.HTTP_200_OK)
-def update_match_status(match_id: int, status: str):
+def update_match_status(match_id: int, status: str, background_tasks: BackgroundTasks):
     """Updates the match state (e.g., 'approved' or 'rejected') by the agency recruiter."""
     if status not in ["pending", "approved", "rejected"]:
         raise HTTPException(
@@ -91,6 +91,11 @@ def update_match_status(match_id: int, status: str):
         
     try:
         with get_db_cursor() as cursor:
+            # Check if match already approved to avoid duplicate emails
+            cursor.execute("SELECT status FROM matches WHERE id = %s", (match_id,))
+            old_status_row = cursor.fetchone()
+            old_status = old_status_row[0] if old_status_row else None
+
             query = """
             UPDATE matches
             SET status = %s
@@ -113,6 +118,33 @@ def update_match_status(match_id: int, status: str):
             freelancer_row = cursor.fetchone()
             freelancer_email = freelancer_row[0] if freelancer_row else ""
             linkedin_url = freelancer_row[1] if freelancer_row else ""
+
+            # Trigger automated email if newly approved
+            if status_res == "approved" and old_status != "approved":
+                email_query = """
+                SELECT j.posted_by, j.title, f.name, m.match_score, u.full_name
+                FROM matches m
+                JOIN jobs j ON m.job_id = j.id
+                JOIN freelancers f ON m.freelancer_id = f.id
+                LEFT JOIN users u ON j.posted_by = u.email
+                WHERE m.id = %s;
+                """
+                cursor.execute(email_query, (match_id_res,))
+                email_row = cursor.fetchone()
+                if email_row:
+                    client_email, job_title, candidate_name, match_score, client_name = email_row
+                    client_name = client_name or "Company Partner"
+                    
+                    # Add background email sending task
+                    from app.services.email import send_client_match_approved_email
+                    background_tasks.add_task(
+                        send_client_match_approved_email,
+                        client_email=client_email,
+                        client_name=client_name,
+                        job_title=job_title,
+                        candidate_name=candidate_name,
+                        match_score=float(match_score)
+                    )
                 
             return {
                 "id": match_id_res,

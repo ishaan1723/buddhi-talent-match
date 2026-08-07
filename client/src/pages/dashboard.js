@@ -911,6 +911,55 @@ export default function Dashboard() {
                         </span>
                       )}
                     </div>
+
+                    {candidate.status === 'approved' && (
+                      <div className="communication-links" style={{ display: 'flex', gap: '8px', marginTop: '12px', width: '100%', justifyContent: 'flex-end', flexWrap: 'wrap' }}>
+                        <a 
+                          href={`https://api.whatsapp.com/send?text=${encodeURIComponent(
+                            `Hi ${candidate.freelancer_name}, we have matching campaign updates for you regarding the *${getSelectedJob()?.title}* role on Buddhi Talent Match. Are you available for a brief discussion?`
+                          )}`}
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="btn btn-small"
+                          style={{ 
+                            backgroundColor: '#25D366', 
+                            color: '#fff', 
+                            border: 'none', 
+                            fontSize: '11px', 
+                            padding: '6px 12px', 
+                            borderRadius: '6px', 
+                            display: 'inline-flex', 
+                            alignItems: 'center', 
+                            gap: '4px',
+                            textDecoration: 'none',
+                            fontWeight: '600'
+                          }}
+                        >
+                          💬 WhatsApp
+                        </a>
+                        <a 
+                          href={`mailto:${candidate.freelancer_email}?subject=${encodeURIComponent(`Campaign recommendation: ${getSelectedJob()?.title}`)}&body=${encodeURIComponent(
+                            `Hi ${candidate.freelancer_name},\n\nWe have matching campaign updates for you regarding the "${getSelectedJob()?.title}" role on Buddhi Talent Match. Are you available for a brief screening?\n\nBest regards,\nThe Placement Team`
+                          )}`}
+                          className="btn btn-small"
+                          style={{ 
+                            backgroundColor: '#4f46e5', 
+                            color: '#fff', 
+                            border: 'none', 
+                            fontSize: '11px', 
+                            padding: '6px 12px', 
+                            borderRadius: '6px', 
+                            display: 'inline-flex', 
+                            alignItems: 'center', 
+                            gap: '4px',
+                            textDecoration: 'none',
+                            fontWeight: '600'
+                          }}
+                        >
+                          ✉️ Email
+                        </a>
+                      </div>
+                    )}
                   </div>
                 </div>
               ))}
@@ -1020,10 +1069,30 @@ export default function Dashboard() {
                 The Placement Team
               </div>
 
-              <div className="modal-actions">
+              <div className="modal-actions" style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', marginTop: '20px' }}>
                 <button onClick={handleCopyEmail} className="btn btn-primary">
                   {copied ? "Copied!" : "Copy to Clipboard"}
                 </button>
+                <a 
+                  href={`mailto:?subject=${encodeURIComponent(`Recommended AI Talent: ${shareModalCandidate.freelancer_name} (${shareModalCandidate.match_score}% Match)`)}&body=${encodeURIComponent(
+                    `Hello,\n\nWe have reviewed your request for "${getSelectedJob()?.title}". Using our semantic matching dashboard, we have vetted and approved the following candidate for your consideration:\n\n• Name: ${shareModalCandidate.freelancer_name}\n• Role Focus: ${shareModalCandidate.primary_skill}\n• Experience: ${shareModalCandidate.experience} Years\n• Target Rate: ₹${shareModalCandidate.hourly_rate}/hr\n• LinkedIn: ${shareModalCandidate.linkedin_url}\n\nPlease let us know when you would like to schedule a brief introductory interview.\n\nBest regards,\nThe Placement Team`
+                  )}`} 
+                  className="btn btn-primary"
+                  style={{ backgroundColor: '#10b981', display: 'inline-flex', alignItems: 'center', gap: '6px', textDecoration: 'none', color: '#fff', padding: '10px 16px', borderRadius: '8px', fontWeight: 'bold' }}
+                >
+                  ✉️ Open Mail App
+                </a>
+                <a 
+                  href={`https://api.whatsapp.com/send?text=${encodeURIComponent(
+                    `*Recommended AI Talent match approved on Buddhi Talent Match*:\n\n• *Name:* ${shareModalCandidate.freelancer_name}\n• *Role Focus:* ${shareModalCandidate.primary_skill}\n• *Experience:* ${shareModalCandidate.experience} Years\n• *Match Score:* ${shareModalCandidate.match_score}%\n• *Target Rate:* ₹${shareModalCandidate.hourly_rate}/hr\n\nView details in client dashboard: https://buddhi-talent-match-two.vercel.app/company`
+                  )}`} 
+                  target="_blank" 
+                  rel="noopener noreferrer" 
+                  className="btn btn-primary"
+                  style={{ backgroundColor: '#25D366', display: 'inline-flex', alignItems: 'center', gap: '6px', textDecoration: 'none', color: '#fff', padding: '10px 16px', borderRadius: '8px', fontWeight: 'bold' }}
+                >
+                  💬 Share on WhatsApp
+                </a>
                 <button onClick={() => setShareModalCandidate(null)} className="btn btn-secondary">Close</button>
               </div>
             </div>

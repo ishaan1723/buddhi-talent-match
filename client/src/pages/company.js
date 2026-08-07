@@ -744,9 +744,31 @@ export default function CompanyHome() {
                           </div>
 
                           {/* Direct Contacts Info */}
-                          <div className="cand-contact-row" style={{ display: 'flex', gap: '20px', fontSize: '13px', margin: '-4px 0 14px', color: 'var(--text-muted)' }}>
+                          <div className="cand-contact-row" style={{ display: 'flex', gap: '20px', alignItems: 'center', fontSize: '13px', margin: '-4px 0 14px', color: 'var(--text-muted)', flexWrap: 'wrap' }}>
                             <span>📧 <a href={`mailto:${cand.freelancer_email}`} style={{ color: 'var(--indigo)', fontWeight: '600' }}>{cand.freelancer_email}</a></span>
                             <span>🔗 <a href={cand.linkedin_url} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--indigo)', fontWeight: '600' }}>LinkedIn Profile</a></span>
+                            <a 
+                              href={`https://api.whatsapp.com/send?text=${encodeURIComponent(
+                                `Hi ${cand.freelancer_name}, we reviewed your pre-vetted AI profile on Buddhi Talent Match regarding the "${selectedJob.title}" role. Are you available for a brief introductory call?`
+                              )}`}
+                              target="_blank" 
+                              rel="noopener noreferrer"
+                              style={{ 
+                                backgroundColor: '#25D366', 
+                                color: '#fff', 
+                                border: 'none', 
+                                fontSize: '11px', 
+                                padding: '4px 10px', 
+                                borderRadius: '6px', 
+                                display: 'inline-flex', 
+                                alignItems: 'center', 
+                                gap: '4px',
+                                textDecoration: 'none',
+                                fontWeight: '600'
+                              }}
+                            >
+                              💬 WhatsApp Candidate
+                            </a>
                           </div>
 
                           {/* Expertise / Skills list */}

@@ -10,6 +10,10 @@ class Settings(BaseSettings):
     GEMINI_API_KEY: str = ""
     AI_PROVIDER: str = "openai"  # 'openai' or 'gemini'
 
+    # Brevo SMTP Configuration
+    BREVO_SMTP_KEY: str = ""
+    BREVO_SENDER_EMAIL: str = ""
+
     # Auth Configuration
     # NOTE: JWT_SECRET_KEY has a dev fallback so the app boots out of the box.
     # Set a real random value in .env before deploying to production.
