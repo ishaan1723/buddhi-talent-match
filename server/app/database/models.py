@@ -24,6 +24,7 @@ CREATE TABLE IF NOT EXISTS freelancers (
     tags TEXT DEFAULT '',
     resume_file_url VARCHAR(255) DEFAULT '',
     availability_status VARCHAR(50) DEFAULT 'ready',
+    phone VARCHAR(20) DEFAULT '',
     embedding double precision[],
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
@@ -93,6 +94,7 @@ def initialize_tables():
             cursor.execute("ALTER TABLE freelancers ADD COLUMN IF NOT EXISTS tags TEXT DEFAULT '';")
             cursor.execute("ALTER TABLE freelancers ADD COLUMN IF NOT EXISTS resume_file_url VARCHAR(255) DEFAULT '';")
             cursor.execute("ALTER TABLE freelancers ADD COLUMN IF NOT EXISTS availability_status VARCHAR(50) DEFAULT 'ready';")
+            cursor.execute("ALTER TABLE freelancers ADD COLUMN IF NOT EXISTS phone VARCHAR(20) DEFAULT '';")
             cursor.execute("ALTER TABLE matches ADD COLUMN IF NOT EXISTS ai_reasoning TEXT;")
         logger.info("Database schemas and tables checked/initialized successfully.")
     except Exception as e:

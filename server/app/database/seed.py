@@ -6,9 +6,11 @@ sys.path.append(os.path.abspath(os.path.dirname(__file__) + '/../..'))
 
 from app.database.connection import get_db_cursor
 from app.services.matching import run_match_for_job
+from app.database.models import initialize_tables
 
 def seed_database():
     print("--- STARTING DATABASE SEEDING ---")
+    initialize_tables()
     
     # 1. Apply schema migrations in an isolated transaction block
     print("Step 1: Applying database schema migrations...")
@@ -96,7 +98,8 @@ def seed_database():
                     "Built a document ingestion pipeline handling 50k concurrent document uploads without backend crashes.",
                     "Senior AI Engineer & RAG Specialist",
                     "https://github.com/ishaan-ai-developer",
-                    5.0
+                    5.0,
+                    "+919999999999"
                 ),
                 (
                     "Siddharth Mehta",
@@ -110,7 +113,8 @@ def seed_database():
                     "Redesigned CV model inference pipeline using TensorRT, saving $12,000/month in AWS cloud GPU costs.",
                     "Computer Vision & Deep Learning Engineer",
                     "https://github.com/sid-cv-projects",
-                    4.9
+                    4.9,
+                    "+918888888888"
                 ),
                 (
                     "Aishwarya Roy",
@@ -124,14 +128,15 @@ def seed_database():
                     "Optimized Hugging Face pipeline transformer runtime, reducing CPU memory overhead by 50%.",
                     "NLP Developer & LLM Engineer",
                     "https://github.com/aishwarya-nlp",
-                    4.8
+                    4.8,
+                    "+917777777777"
                 )
             ]
             
             for f in freelancers_to_insert:
                 cursor.execute("""
-                    INSERT INTO freelancers (name, email, linkedin_url, primary_skill, experience, hourly_rate, resume_text, kpi_achieved, proud_situation, headline, portfolio_url, rating)
-                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);
+                    INSERT INTO freelancers (name, email, linkedin_url, primary_skill, experience, hourly_rate, resume_text, kpi_achieved, proud_situation, headline, portfolio_url, rating, phone)
+                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);
                 """, f)
                 
             print("Successfully inserted jobs and freelancers into Supabase.")

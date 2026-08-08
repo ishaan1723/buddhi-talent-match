@@ -915,7 +915,7 @@ export default function Dashboard() {
                     {candidate.status === 'approved' && (
                       <div className="communication-links" style={{ display: 'flex', gap: '8px', marginTop: '12px', width: '100%', justifyContent: 'flex-end', flexWrap: 'wrap' }}>
                         <a 
-                          href={`https://api.whatsapp.com/send?text=${encodeURIComponent(
+                          href={`https://api.whatsapp.com/send?${candidate.freelancer_phone ? `phone=${candidate.freelancer_phone.replace(/[^0-9+]/g, '')}&` : ''}text=${encodeURIComponent(
                             `Hi ${candidate.freelancer_name}, we have matching campaign updates for you regarding the *${getSelectedJob()?.title}* role on Buddhi Talent Match. Are you available for a brief discussion?`
                           )}`}
                           target="_blank" 
@@ -997,6 +997,12 @@ export default function Dashboard() {
                         </a>
                       </td>
                     </tr>
+                    {activeDrawerCandidate.freelancer_phone && (
+                      <tr>
+                        <td className="table-lbl">Phone Number</td>
+                        <td>{activeDrawerCandidate.freelancer_phone}</td>
+                      </tr>
+                    )}
                     <tr>
                       <td className="table-lbl">Primary Focus</td>
                       <td>{activeDrawerCandidate.primary_skill}</td>

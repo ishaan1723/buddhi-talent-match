@@ -14,6 +14,7 @@ class FreelancerBase(BaseModel):
     tags: Optional[str] = ""
     resume_file_url: Optional[str] = ""
     availability_status: Optional[str] = "ready"
+    phone: Optional[str] = ""
 
 class FreelancerCreate(FreelancerBase):
     pass
@@ -66,6 +67,7 @@ class MatchResponse(BaseModel):
     resume_file_url: Optional[str] = ""
     availability_status: Optional[str] = "ready"
     ai_reasoning: Optional[str] = None
+    freelancer_phone: Optional[str] = ""
 
 class FreelancerMatchResponse(BaseModel):
     id: int
@@ -103,6 +105,7 @@ class CompanyApprovedMatchResponse(BaseModel):
     resume_file_url: Optional[str] = ""
     availability_status: Optional[str] = "ready"
     ai_reasoning: Optional[str] = None
+    freelancer_phone: Optional[str] = ""
 
 
 # ---------------------------------------------------------------------------

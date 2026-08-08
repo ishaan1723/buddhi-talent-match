@@ -26,7 +26,8 @@ export default function FreelancerOnboarding() {
     experience: 2,
     hourly_rate: 1500,
     kpi_achieved: '',
-    proud_situation: ''
+    proud_situation: '',
+    phone: ''
   });
 
   const [submitted, setSubmitted] = useState(false);
@@ -67,7 +68,8 @@ export default function FreelancerOnboarding() {
           experience: parsed.experience || 3,
           hourly_rate: parsed.hourly_rate || 2500,
           kpi_achieved: parsed.kpi_achieved || '',
-          proud_situation: parsed.proud_situation || ''
+          proud_situation: parsed.proud_situation || '',
+          phone: parsed.phone || ''
         });
         setResumeFile(file);
         setParsingStage("Auto-Fill complete!");
@@ -86,7 +88,8 @@ export default function FreelancerOnboarding() {
         experience: 5,
         hourly_rate: 3200,
         kpi_achieved: "Integrated OpenCV filters and PyTorch models to reduce processing latency by 35% on edge platforms.",
-        proud_situation: "Designed and trained convolutional neural networks (CNNs) for real-time defect detection and high-fidelity image segmentation."
+        proud_situation: "Designed and trained convolutional neural networks (CNNs) for real-time defect detection and high-fidelity image segmentation.",
+        phone: "+919999999999"
       });
       setResumeFile(file);
       setParsingStage("Auto-Fill complete!");
@@ -127,6 +130,7 @@ export default function FreelancerOnboarding() {
       formDataPayload.append('hourly_rate', formData.hourly_rate);
       formDataPayload.append('kpi_achieved', formData.kpi_achieved);
       formDataPayload.append('proud_situation', formData.proud_situation);
+      formDataPayload.append('phone', formData.phone);
       if (resumeFile) {
         formDataPayload.append('resume', resumeFile);
       }
@@ -263,6 +267,19 @@ export default function FreelancerOnboarding() {
               required 
               placeholder="e.g. rohan@example.com" 
               value={formData.email}
+              onChange={handleChange}
+            />
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="phone">Phone Number (WhatsApp Direct)</label>
+            <input 
+              type="text" 
+              id="phone" 
+              name="phone" 
+              required 
+              placeholder="e.g. +919999999999" 
+              value={formData.phone}
               onChange={handleChange}
             />
           </div>

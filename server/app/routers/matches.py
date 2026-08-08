@@ -23,7 +23,7 @@ def get_job_matches(job_id: int, request: Request):
             query = """
             SELECT m.id, m.job_id, m.freelancer_id, m.match_score, m.status,
                    f.name, f.email, f.linkedin_url, f.primary_skill, f.experience, f.hourly_rate, m.created_at, 
-                   f.proud_situation, f.headline, f.portfolio_url, f.rating, f.tags, f.resume_file_url, f.availability_status, m.ai_reasoning
+                   f.proud_situation, f.headline, f.portfolio_url, f.rating, f.tags, f.resume_file_url, f.availability_status, m.ai_reasoning, f.phone
             FROM matches m
             JOIN freelancers f ON m.freelancer_id = f.id
             WHERE m.job_id = %s
@@ -37,6 +37,7 @@ def get_job_matches(job_id: int, request: Request):
                 status_val = row[4]
                 raw_email = row[6]
                 raw_linkedin = row[7]
+                raw_phone = row[20] or ""
 
                 # Security Gating logic
                 if not is_recruiter and status_val != 'approved':
@@ -46,9 +47,15 @@ def get_job_matches(job_id: int, request: Request):
                     else:
                         masked_email = "hidden***@example.com"
                     masked_linkedin = "https://linkedin.com/in/hidden-profile-unlocked-on-approval"
+                    
+                    if len(raw_phone) > 4:
+                        masked_phone = raw_phone[:3] + "******" + raw_phone[-2:]
+                    else:
+                        masked_phone = "+91 ******89"
                 else:
                     masked_email = raw_email
                     masked_linkedin = raw_linkedin
+                    masked_phone = raw_phone
 
                 matches.append(MatchResponse(
                     id=row[0],
@@ -70,7 +77,8 @@ def get_job_matches(job_id: int, request: Request):
                     tags=row[16] or "",
                     resume_file_url=row[17] or "",
                     availability_status=row[18] or "ready",
-                    ai_reasoning=row[19]
+                    ai_reasoning=row[19],
+                    freelancer_phone=masked_phone
                 ))
             return matches
             
@@ -114,10 +122,11 @@ def update_match_status(match_id: int, status: str, background_tasks: Background
             match_id_res, status_res, freelancer_id = result[0], result[1], result[2]
             
             # Fetch unmasked details
-            cursor.execute("SELECT email, linkedin_url FROM freelancers WHERE id = %s", (freelancer_id,))
+            cursor.execute("SELECT email, linkedin_url, phone FROM freelancers WHERE id = %s", (freelancer_id,))
             freelancer_row = cursor.fetchone()
             freelancer_email = freelancer_row[0] if freelancer_row else ""
             linkedin_url = freelancer_row[1] if freelancer_row else ""
+            freelancer_phone = freelancer_row[2] if freelancer_row else ""
 
             # Trigger automated email if newly approved
             if status_res == "approved" and old_status != "approved":
@@ -207,7 +216,7 @@ def get_company_approved_matches(email: str):
             query = """
             SELECT m.id, m.job_id, m.freelancer_id, m.match_score, m.status,
                    j.title, f.name, f.email, f.linkedin_url, f.primary_skill, f.experience, f.hourly_rate,
-                   m.created_at, f.kpi_achieved, f.proud_situation, f.headline, f.portfolio_url, f.rating, f.tags, f.resume_file_url, f.availability_status, m.ai_reasoning
+                   m.created_at, f.kpi_achieved, f.proud_situation, f.headline, f.portfolio_url, f.rating, f.tags, f.resume_file_url, f.availability_status, m.ai_reasoning, f.phone
             FROM matches m
             JOIN freelancers f ON m.freelancer_id = f.id
             JOIN jobs j ON m.job_id = j.id
@@ -241,7 +250,8 @@ def get_company_approved_matches(email: str):
                     tags=row[18] or "",
                     resume_file_url=row[19] or "",
                     availability_status=row[20] or "ready",
-                    ai_reasoning=row[21]
+                    ai_reasoning=row[21],
+                    freelancer_phone=row[22] or ""
                 ))
             return matches
     except Exception as e:
@@ -258,7 +268,7 @@ def get_job_approved_matches(job_id: int):
             query = """
             SELECT m.id, m.job_id, m.freelancer_id, m.match_score, m.status,
                    j.title, f.name, f.email, f.linkedin_url, f.primary_skill, f.experience, f.hourly_rate,
-                   m.created_at, f.kpi_achieved, f.proud_situation, f.headline, f.portfolio_url, f.rating, f.tags, f.resume_file_url, f.availability_status, m.ai_reasoning
+                   m.created_at, f.kpi_achieved, f.proud_situation, f.headline, f.portfolio_url, f.rating, f.tags, f.resume_file_url, f.availability_status, m.ai_reasoning, f.phone
             FROM matches m
             JOIN freelancers f ON m.freelancer_id = f.id
             JOIN jobs j ON m.job_id = j.id
@@ -292,7 +302,8 @@ def get_job_approved_matches(job_id: int):
                     tags=row[18] or "",
                     resume_file_url=row[19] or "",
                     availability_status=row[20] or "ready",
-                    ai_reasoning=row[21]
+                    ai_reasoning=row[21],
+                    freelancer_phone=row[22] or ""
                 ))
             return matches
     except Exception as e:

@@ -747,8 +747,11 @@ export default function CompanyHome() {
                           <div className="cand-contact-row" style={{ display: 'flex', gap: '20px', alignItems: 'center', fontSize: '13px', margin: '-4px 0 14px', color: 'var(--text-muted)', flexWrap: 'wrap' }}>
                             <span>📧 <a href={`mailto:${cand.freelancer_email}`} style={{ color: 'var(--indigo)', fontWeight: '600' }}>{cand.freelancer_email}</a></span>
                             <span>🔗 <a href={cand.linkedin_url} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--indigo)', fontWeight: '600' }}>LinkedIn Profile</a></span>
+                            {cand.freelancer_phone && (
+                              <span>📞 <a href={`tel:${cand.freelancer_phone}`} style={{ color: 'var(--indigo)', fontWeight: '600' }}>{cand.freelancer_phone}</a></span>
+                            )}
                             <a 
-                              href={`https://api.whatsapp.com/send?text=${encodeURIComponent(
+                              href={`https://api.whatsapp.com/send?${cand.freelancer_phone ? `phone=${cand.freelancer_phone.replace(/[^0-9+]/g, '')}&` : ''}text=${encodeURIComponent(
                                 `Hi ${cand.freelancer_name}, we reviewed your pre-vetted AI profile on Buddhi Talent Match regarding the "${selectedJob.title}" role. Are you available for a brief introductory call?`
                               )}`}
                               target="_blank" 

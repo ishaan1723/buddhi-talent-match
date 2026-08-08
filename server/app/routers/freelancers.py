@@ -27,6 +27,7 @@ async def create_freelancer(
     kpi_achieved: Optional[str] = Form(None),
     proud_situation: Optional[str] = Form(None),
     tags: Optional[str] = Form(""),
+    phone: Optional[str] = Form(""),
     resume: Optional[UploadFile] = File(None)
 ):
     resume_text = ""
@@ -52,8 +53,8 @@ async def create_freelancer(
         with get_db_cursor() as cursor:
             # Insert freelancer details into database including resume text, tags, and file url
             query = """
-            INSERT INTO freelancers (name, email, linkedin_url, primary_skill, experience, hourly_rate, resume_text, kpi_achieved, proud_situation, tags, resume_file_url, availability_status)
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, 'ready')
+            INSERT INTO freelancers (name, email, linkedin_url, primary_skill, experience, hourly_rate, resume_text, kpi_achieved, proud_situation, tags, resume_file_url, availability_status, phone)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, 'ready', %s)
             RETURNING id, created_at;
             """
             cursor.execute(query, (
@@ -67,7 +68,8 @@ async def create_freelancer(
                 kpi_achieved,
                 proud_situation,
                 tags or "",
-                resume_file_url
+                resume_file_url,
+                phone or ""
             ))
             result = cursor.fetchone()
             f_id, created_at = result[0], result[1]
@@ -88,6 +90,7 @@ async def create_freelancer(
             tags=tags or "",
             resume_file_url=resume_file_url,
             availability_status='ready',
+            phone=phone or "",
             created_at=created_at
         )
             

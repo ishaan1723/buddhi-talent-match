@@ -7,9 +7,11 @@ sys.path.append(os.path.abspath(os.path.dirname(__file__) + '/../..'))
 from app.database.connection import get_db_cursor
 from app.auth.security import hash_password
 from app.services.matching import calculate_match_score
+from app.database.models import initialize_tables
 
 def create_test_accounts():
     print("--- CREATING TEST USER ACCOUNTS ---")
+    initialize_tables()
     
     company_email = "jainishaan1723@gmail.com"
     company_pass = "123456789"
@@ -73,10 +75,10 @@ def create_test_accounts():
             f_portfolio = "https://github.com/ishaan-ai-projects"
             
             cursor.execute("""
-                INSERT INTO freelancers (name, email, linkedin_url, primary_skill, experience, hourly_rate, resume_text, kpi_achieved, proud_situation, headline, portfolio_url, rating)
-                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, 5.0)
+                INSERT INTO freelancers (name, email, linkedin_url, primary_skill, experience, hourly_rate, resume_text, kpi_achieved, proud_situation, headline, portfolio_url, rating, phone)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, 5.0, %s)
                 RETURNING id;
-            """, (f_name, freelancer_email, "https://linkedin.com/in/ishaan-jain-ai", f_skill, 5, f_rate, f_resume, f_kpi_achieved, f_proud, f_headline, f_portfolio))
+            """, (f_name, freelancer_email, "https://linkedin.com/in/ishaan-jain-ai", f_skill, 5, f_rate, f_resume, f_kpi_achieved, f_proud, f_headline, f_portfolio, "+919999999999"))
             freelancer_id = cursor.fetchone()[0]
             
             # 6. Calculate Match & Insert pre-approved matches row (with customized demo matching score)
